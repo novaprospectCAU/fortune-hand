@@ -1,0 +1,139 @@
+{
+  "jokers": [
+    {
+      "id": "lucky_seven",
+      "name": "Lucky Seven",
+      "description": "+77 Mult if hand contains a 7",
+      "rarity": "common",
+      "cost": 40,
+      "trigger": { "type": "on_play", "cardCondition": { "rank": "7" } },
+      "effect": { "type": "add_mult", "value": 77 }
+    },
+    {
+      "id": "slot_master",
+      "name": "Slot Master",
+      "description": "Skull symbols become Wild",
+      "rarity": "uncommon",
+      "cost": 60,
+      "trigger": { "type": "on_slot" },
+      "effect": { "type": "modify_slot", "modification": { "symbolWeights": { "skull": 0, "wild": 15 } } }
+    },
+    {
+      "id": "high_roller",
+      "name": "High Roller",
+      "description": "Roulette max multiplier +2x",
+      "rarity": "rare",
+      "cost": 80,
+      "trigger": { "type": "on_roulette" },
+      "effect": { "type": "modify_roulette", "modification": { "maxMultiplier": 2 } }
+    },
+    {
+      "id": "greedy_joker",
+      "name": "Greedy Joker",
+      "description": "+3 Mult for each Gold earned this turn",
+      "rarity": "common",
+      "cost": 35,
+      "trigger": { "type": "on_score" },
+      "effect": { "type": "add_mult", "value": 3, "perGoldEarned": true }
+    },
+    {
+      "id": "flush_master",
+      "name": "Flush Master",
+      "description": "+50 Chips if played hand is a Flush",
+      "rarity": "common",
+      "cost": 45,
+      "trigger": { "type": "on_score" },
+      "effect": { "type": "add_chips", "value": 50, "handCondition": "flush" }
+    },
+    {
+      "id": "pair_lover",
+      "name": "Pair Lover",
+      "description": "×2 Mult if played hand contains a Pair",
+      "rarity": "uncommon",
+      "cost": 55,
+      "trigger": { "type": "on_score" },
+      "effect": { "type": "multiply", "value": 2, "handCondition": "pair" }
+    },
+    {
+      "id": "diamond_digger",
+      "name": "Diamond Digger",
+      "description": "+10 Chips for each Diamond card played",
+      "rarity": "common",
+      "cost": 30,
+      "trigger": { "type": "on_play", "cardCondition": { "suit": "diamonds" } },
+      "effect": { "type": "add_chips", "value": 10 }
+    },
+    {
+      "id": "ace_hunter",
+      "name": "Ace Hunter",
+      "description": "+100 Chips if hand contains an Ace",
+      "rarity": "uncommon",
+      "cost": 50,
+      "trigger": { "type": "on_play", "cardCondition": { "rank": "A" } },
+      "effect": { "type": "add_chips", "value": 100 }
+    },
+    {
+      "id": "safe_player",
+      "name": "Safe Player",
+      "description": "+30% safe zone on Roulette",
+      "rarity": "rare",
+      "cost": 70,
+      "trigger": { "type": "on_roulette" },
+      "effect": { "type": "modify_roulette", "modification": { "safeZoneBonus": 30 } }
+    },
+    {
+      "id": "echo",
+      "name": "Echo",
+      "description": "All played cards trigger twice",
+      "rarity": "legendary",
+      "cost": 150,
+      "trigger": { "type": "on_play" },
+      "effect": { "type": "retrigger", "count": 1 }
+    },
+    {
+      "id": "gold_rush",
+      "name": "Gold Rush",
+      "description": "+5 Gold at end of each round",
+      "rarity": "common",
+      "cost": 25,
+      "trigger": { "type": "passive" },
+      "effect": { "type": "add_gold", "value": 5 }
+    },
+    {
+      "id": "jackpot_hunter",
+      "name": "Jackpot Hunter",
+      "description": "Star symbols appear 2x more often",
+      "rarity": "rare",
+      "cost": 90,
+      "trigger": { "type": "on_slot" },
+      "effect": { "type": "modify_slot", "modification": { "symbolWeights": { "star": 10 } } }
+    },
+    {
+      "id": "card_counter",
+      "name": "Card Counter",
+      "description": "+1 Mult for each card in hand",
+      "rarity": "uncommon",
+      "cost": 45,
+      "trigger": { "type": "on_score" },
+      "effect": { "type": "add_mult", "value": 1, "perCardInHand": true }
+    },
+    {
+      "id": "risk_taker",
+      "name": "Risk Taker",
+      "description": "×3 Mult but 0x zone +10%",
+      "rarity": "rare",
+      "cost": 75,
+      "trigger": { "type": "on_score" },
+      "effect": { "type": "multiply", "value": 3, "penalty": { "zeroZone": 10 } }
+    },
+    {
+      "id": "fortune_teller",
+      "name": "Fortune Teller",
+      "description": "See Roulette result before spinning",
+      "rarity": "legendary",
+      "cost": 200,
+      "trigger": { "type": "on_roulette" },
+      "effect": { "type": "custom", "handler": "fortuneTeller" }
+    }
+  ]
+}
