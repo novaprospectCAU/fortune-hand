@@ -18,7 +18,6 @@ import {
   getSlotModifier,
   getRouletteModifier,
   getRetriggerCount,
-  type EffectResult,
 } from './effects';
 
 /**

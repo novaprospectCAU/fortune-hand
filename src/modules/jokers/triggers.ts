@@ -7,7 +7,6 @@
 import type {
   Joker,
   JokerContext,
-  JokerTrigger,
   CardCondition,
   Card,
   SlotResult,

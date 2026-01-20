@@ -227,7 +227,7 @@ describe('roulette', () => {
   describe('calculateTargetAngle', () => {
     it('should return angle that lands on target segment', () => {
       const config = createTestConfig();
-      const targetSegment = config.segments[0]; // 'zero' segment
+      const targetSegment = config.segments[0]!; // 'zero' segment
 
       const angle = calculateTargetAngle(targetSegment, config, 5);
 
@@ -237,7 +237,7 @@ describe('roulette', () => {
 
     it('should return multiple rotations worth of angle', () => {
       const config = createTestConfig();
-      const targetSegment = config.segments[1];
+      const targetSegment = config.segments[1]!;
 
       const angle3 = calculateTargetAngle(targetSegment, config, 3);
       const angle5 = calculateTargetAngle(targetSegment, config, 5);

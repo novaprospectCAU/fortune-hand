@@ -71,7 +71,7 @@ describe('deck', () => {
       const shuffled = shuffle(single);
 
       expect(shuffled).toHaveLength(1);
-      expect(shuffled[0].id).toBe('A_hearts');
+      expect(shuffled[0]!.id).toBe('A_hearts');
     });
   });
 
@@ -249,8 +249,8 @@ describe('deck', () => {
       const newDeck = addToDeck(deck, [createCard('K', 'spades')]);
 
       expect(newDeck.cards).toHaveLength(2);
-      expect(newDeck.cards[0].id).toBe('A_hearts'); // 기존 카드가 맨 위
-      expect(newDeck.cards[1].id).toBe('K_spades'); // 새 카드가 맨 아래
+      expect(newDeck.cards[0]!.id).toBe('A_hearts'); // 기존 카드가 맨 위
+      expect(newDeck.cards[1]!.id).toBe('K_spades'); // 새 카드가 맨 아래
     });
 
     it('should maintain immutability', () => {

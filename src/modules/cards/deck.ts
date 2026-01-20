@@ -17,7 +17,9 @@ export function shuffle(cards: Card[]): Card[] {
 
   for (let i = result.length - 1; i > 0; i--) {
     const j = Math.floor(Math.random() * (i + 1));
-    [result[i], result[j]] = [result[j], result[i]];
+    const temp = result[i]!;
+    result[i] = result[j]!;
+    result[j] = temp;
   }
 
   return result;
@@ -44,7 +46,9 @@ export function shuffleWithSeed(cards: Card[], seed: number): Card[] {
 
   for (let i = result.length - 1; i > 0; i--) {
     const j = Math.floor(random() * (i + 1));
-    [result[i], result[j]] = [result[j], result[i]];
+    const temp = result[i]!;
+    result[i] = result[j]!;
+    result[j] = temp;
   }
 
   return result;

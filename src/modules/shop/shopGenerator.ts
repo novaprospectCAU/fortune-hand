@@ -55,7 +55,8 @@ export function weightedRandom<T extends string>(
   }
 
   // Fallback to first option
-  return entries[0][0];
+  const firstEntry = entries[0];
+  return firstEntry ? firstEntry[0] : (Object.keys(weights)[0] as T);
 }
 
 /**
@@ -115,7 +116,7 @@ function generateJokerItem(rarity: Rarity, round: number): ShopItem | null {
   if (availableJokers.length === 0) {
     // Fallback to any joker if none of this rarity
     if (jokersData.jokers.length === 0) return null;
-    const joker = jokersData.jokers[Math.floor(Math.random() * jokersData.jokers.length)];
+    const joker = jokersData.jokers[Math.floor(Math.random() * jokersData.jokers.length)]!;
     return {
       id: generateItemId(),
       type: 'joker',
@@ -125,7 +126,7 @@ function generateJokerItem(rarity: Rarity, round: number): ShopItem | null {
     };
   }
 
-  const joker = availableJokers[Math.floor(Math.random() * availableJokers.length)];
+  const joker = availableJokers[Math.floor(Math.random() * availableJokers.length)]!;
   return {
     id: generateItemId(),
     type: 'joker',
@@ -149,7 +150,7 @@ function generateCardItem(rarity: Rarity, round: number): ShopItem | null {
     // Fallback to any special card if none of this rarity
     if (cardsData.specialCards.length === 0) return null;
     const card =
-      cardsData.specialCards[Math.floor(Math.random() * cardsData.specialCards.length)];
+      cardsData.specialCards[Math.floor(Math.random() * cardsData.specialCards.length)]!;
     return {
       id: generateItemId(),
       type: 'card',
@@ -163,7 +164,7 @@ function generateCardItem(rarity: Rarity, round: number): ShopItem | null {
     };
   }
 
-  const card = availableCards[Math.floor(Math.random() * availableCards.length)];
+  const card = availableCards[Math.floor(Math.random() * availableCards.length)]!;
   return {
     id: generateItemId(),
     type: 'card',
@@ -204,7 +205,7 @@ function generatePackItem(rarity: Rarity, round: number): ShopItem {
  */
 function generateVoucherItem(rarity: Rarity, round: number): ShopItem {
   const voucherTypes = ['extra_hand', 'extra_discard', 'shop_discount', 'luck_boost'];
-  const voucherId = voucherTypes[Math.floor(Math.random() * voucherTypes.length)];
+  const voucherId = voucherTypes[Math.floor(Math.random() * voucherTypes.length)]!;
 
   return {
     id: generateItemId(),

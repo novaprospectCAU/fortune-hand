@@ -2,7 +2,7 @@
  * Shop Generator Module Tests
  */
 
-import { describe, it, expect, vi, beforeEach, afterEach } from 'vitest';
+import { describe, it, expect } from 'vitest';
 import {
   generateShop,
   selectItemType,
@@ -166,7 +166,10 @@ describe('shopGenerator', () => {
       for (let i = 0; i < iterations; i++) {
         const shop = generateShop(1, 0);
         for (const item of shop.items) {
-          typeCounts[item.type]++;
+          const count = typeCounts[item.type];
+          if (count !== undefined) {
+            typeCounts[item.type] = count + 1;
+          }
         }
       }
 
@@ -176,10 +179,10 @@ describe('shopGenerator', () => {
       // joker: 40%, card: 30%, pack: 20%, voucher: 10%
       // Allow 10% margin for randomness
 
-      const jokerRatio = typeCounts.joker / totalItems;
-      const cardRatio = typeCounts.card / totalItems;
-      const packRatio = typeCounts.pack / totalItems;
-      const voucherRatio = typeCounts.voucher / totalItems;
+      const jokerRatio = typeCounts['joker']! / totalItems;
+      const cardRatio = typeCounts['card']! / totalItems;
+      const packRatio = typeCounts['pack']! / totalItems;
+      const voucherRatio = typeCounts['voucher']! / totalItems;
 
       // These are soft checks - may occasionally fail due to randomness
       expect(jokerRatio).toBeGreaterThan(0.25); // Should be ~40%

@@ -111,9 +111,9 @@ describe('probability', () => {
       const total = normalized.reduce((sum, s) => sum + s.probability, 0);
 
       expect(total).toBeCloseTo(100, 5);
-      expect(normalized[0].probability).toBeCloseTo(20, 5);
-      expect(normalized[1].probability).toBeCloseTo(40, 5);
-      expect(normalized[2].probability).toBeCloseTo(40, 5);
+      expect(normalized[0]!.probability).toBeCloseTo(20, 5);
+      expect(normalized[1]!.probability).toBeCloseTo(40, 5);
+      expect(normalized[2]!.probability).toBeCloseTo(40, 5);
     });
 
     it('should return empty array for empty input', () => {
@@ -130,8 +130,8 @@ describe('probability', () => {
       const normalized = normalizeSegments(segments);
 
       // Should distribute equally
-      expect(normalized[0].probability).toBeCloseTo(50, 5);
-      expect(normalized[1].probability).toBeCloseTo(50, 5);
+      expect(normalized[0]!.probability).toBeCloseTo(50, 5);
+      expect(normalized[1]!.probability).toBeCloseTo(50, 5);
     });
 
     it('should clamp negative probabilities to 0', () => {
@@ -142,8 +142,8 @@ describe('probability', () => {
 
       const normalized = normalizeSegments(segments);
 
-      expect(normalized[0].probability).toBe(0);
-      expect(normalized[1].probability).toBe(100);
+      expect(normalized[0]!.probability).toBe(0);
+      expect(normalized[1]!.probability).toBe(100);
     });
 
     it('should not mutate original segments', () => {
@@ -153,8 +153,8 @@ describe('probability', () => {
 
       const normalized = normalizeSegments(original);
 
-      expect(original[0].probability).toBe(50);
-      expect(normalized[0].probability).toBe(100);
+      expect(original[0]!.probability).toBe(50);
+      expect(normalized[0]!.probability).toBe(100);
     });
   });
 
@@ -169,13 +169,13 @@ describe('probability', () => {
       distributeExtraProbability(segments, 10);
 
       // Zero multiplier segment should not receive extra
-      expect(segments[0].probability).toBe(10);
+      expect(segments[0]!.probability).toBe(10);
 
       // 50/(50+40) * 10 = 5.55... added to segment 'one'
-      expect(segments[1].probability).toBeCloseTo(55.56, 1);
+      expect(segments[1]!.probability).toBeCloseTo(55.56, 1);
 
       // 40/(50+40) * 10 = 4.44... added to segment 'two'
-      expect(segments[2].probability).toBeCloseTo(44.44, 1);
+      expect(segments[2]!.probability).toBeCloseTo(44.44, 1);
     });
 
     it('should handle no eligible recipients', () => {
@@ -185,7 +185,7 @@ describe('probability', () => {
 
       // Should not throw
       distributeExtraProbability(segments, 10);
-      expect(segments[0].probability).toBe(100);
+      expect(segments[0]!.probability).toBe(100);
     });
   });
 
@@ -196,8 +196,8 @@ describe('probability', () => {
         { id: 'b', multiplier: 2, probability: 75, color: '#fff' },
       ];
 
-      const angleA = calculateSegmentAngle(segments[0], segments);
-      const angleB = calculateSegmentAngle(segments[1], segments);
+      const angleA = calculateSegmentAngle(segments[0]!, segments);
+      const angleB = calculateSegmentAngle(segments[1]!, segments);
 
       expect(angleA).toBeCloseTo(90, 5); // 25% of 360
       expect(angleB).toBeCloseTo(270, 5); // 75% of 360

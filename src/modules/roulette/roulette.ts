@@ -165,11 +165,15 @@ export function calculateTargetAngle(
   // Calculate the starting angle of the target segment
   let startAngle = 0;
   for (let i = 0; i < segmentIndex; i++) {
-    startAngle += (normalized[i].probability / 100) * 360;
+    const seg = normalized[i];
+    if (seg) {
+      startAngle += (seg.probability / 100) * 360;
+    }
   }
 
   // Calculate the center of the segment
-  const segmentAngle = (normalized[segmentIndex].probability / 100) * 360;
+  const targetSeg = normalized[segmentIndex]!;
+  const segmentAngle = (targetSeg.probability / 100) * 360;
   const centerAngle = startAngle + segmentAngle / 2;
 
   // Add extra rotations and adjust so the pointer (at top/0 degrees) lands on the segment

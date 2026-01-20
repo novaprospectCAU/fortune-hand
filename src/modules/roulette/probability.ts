@@ -28,7 +28,7 @@ export function selectSegment(
 
   if (validSegments.length === 0) {
     // If all probabilities are 0, return first segment as fallback
-    return segments[0];
+    return segments[0]!;
   }
 
   // Calculate total probability
@@ -50,7 +50,7 @@ export function selectSegment(
   }
 
   // Fallback to last valid segment (shouldn't reach here normally)
-  return validSegments[validSegments.length - 1];
+  return validSegments[validSegments.length - 1]!;
 }
 
 /**
@@ -157,7 +157,10 @@ export function calculateSegmentStartAngle(
   let startAngle = 0;
 
   for (let i = 0; i < segmentIndex; i++) {
-    startAngle += (normalized[i].probability / 100) * 360;
+    const seg = normalized[i];
+    if (seg) {
+      startAngle += (seg.probability / 100) * 360;
+    }
   }
 
   return startAngle;
@@ -187,5 +190,5 @@ export function getSegmentAtAngle(
     }
   }
 
-  return normalized[normalized.length - 1];
+  return normalized[normalized.length - 1]!;
 }

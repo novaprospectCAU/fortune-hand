@@ -52,7 +52,7 @@ function createEmptyResult(): EffectResult {
  * @param context - The current game context (for context-dependent effects)
  * @returns The effect result with bonuses and other modifiers
  */
-export function applyEffect(joker: Joker, context: JokerContext): EffectResult {
+export function applyEffect(joker: Joker, _context: JokerContext): EffectResult {
   const result = createEmptyResult();
   const effect = joker.effect;
 
