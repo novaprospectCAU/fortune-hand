@@ -1,0 +1,74 @@
+{
+  "specialCards": [
+    {
+      "id": "wild_joker",
+      "name": "Wild Joker",
+      "description": "Can be any rank or suit",
+      "isWild": true,
+      "rarity": "rare",
+      "shopCost": 50
+    },
+    {
+      "id": "gold_ace",
+      "name": "Golden Ace",
+      "description": "Scores as Ace but gives +10 gold instead of chips",
+      "baseRank": "A",
+      "baseSuit": "spades",
+      "isGold": true,
+      "goldValue": 10,
+      "rarity": "uncommon",
+      "shopCost": 30
+    },
+    {
+      "id": "slot_seven",
+      "name": "Lucky Seven",
+      "description": "Triggers a mini slot spin when played",
+      "baseRank": "7",
+      "baseSuit": "hearts",
+      "triggerSlot": true,
+      "rarity": "rare",
+      "shopCost": 40
+    },
+    {
+      "id": "roulette_king",
+      "name": "Gambler's King",
+      "description": "Grants an extra roulette spin",
+      "baseRank": "K",
+      "baseSuit": "diamonds",
+      "triggerRoulette": true,
+      "rarity": "rare",
+      "shopCost": 45
+    }
+  ],
+
+  "enhancements": [
+    {
+      "id": "bonus",
+      "name": "Bonus",
+      "description": "+30 Chips",
+      "type": "chips",
+      "value": 30
+    },
+    {
+      "id": "mult",
+      "name": "Mult",
+      "description": "+4 Mult",
+      "type": "mult",
+      "value": 4
+    },
+    {
+      "id": "gold_seal",
+      "name": "Gold Seal",
+      "description": "+3 Gold when scored",
+      "type": "gold",
+      "value": 3
+    },
+    {
+      "id": "red_seal",
+      "name": "Red Seal",
+      "description": "Retrigger this card",
+      "type": "retrigger",
+      "value": 1
+    }
+  ]
+}

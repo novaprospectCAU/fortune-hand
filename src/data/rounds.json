@@ -1,0 +1,13 @@
+{
+  "rounds": [
+    { "round": 1, "targetScore": 300, "handsBonus": 0, "discardsBonus": 0 },
+    { "round": 2, "targetScore": 800, "handsBonus": 0, "discardsBonus": 0 },
+    { "round": 3, "targetScore": 2000, "handsBonus": 0, "discardsBonus": 1 },
+    { "round": 4, "targetScore": 5000, "handsBonus": 1, "discardsBonus": 0 },
+    { "round": 5, "targetScore": 11000, "handsBonus": 0, "discardsBonus": 0 },
+    { "round": 6, "targetScore": 20000, "handsBonus": 0, "discardsBonus": 1 },
+    { "round": 7, "targetScore": 35000, "handsBonus": 1, "discardsBonus": 0 },
+    { "round": 8, "targetScore": 50000, "handsBonus": 0, "discardsBonus": 0 }
+  ],
+  "endlessScoreIncrement": 25000
+}

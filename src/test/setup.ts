@@ -1,4 +1,5 @@
 import '@testing-library/jest-dom';
+import { afterEach } from 'vitest';
 
 // Mock random for deterministic tests
 export function mockRandom(seed: number) {
