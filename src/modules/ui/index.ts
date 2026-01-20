@@ -1,0 +1,85 @@
+/**
+ * UI Module - Public API
+ *
+ * Common UI components and utilities for Fortune's Hand game.
+ */
+
+// Styles & Theme
+export { theme, colors, spacing, borderRadius, fontSize, fontWeight, zIndex, shadows } from './styles/theme';
+export { getRarityColor, getSuitColor, isRedSuit } from './styles/theme';
+
+// Animations
+export * from './animations';
+
+// Common Components
+export {
+  Button,
+  type ButtonProps,
+  Modal,
+  type ModalProps,
+  Tooltip,
+  type TooltipProps,
+  Badge,
+  type BadgeProps,
+  ProgressBar,
+  type ProgressBarProps,
+} from './components/common';
+
+// Layout Components
+export {
+  GameLayout,
+  type GameLayoutProps,
+  Header,
+  type HeaderProps,
+  Sidebar,
+  type SidebarProps,
+  Footer,
+  type FooterProps,
+} from './components/layout';
+
+// Display Components
+export {
+  ScoreDisplay,
+  type ScoreDisplayProps,
+  GoldDisplay,
+  type GoldDisplayProps,
+  RoundInfo,
+  type RoundInfoProps,
+  PhaseIndicator,
+  type PhaseIndicatorProps,
+} from './components/display';
+
+// Feedback Components
+export {
+  ScorePopup,
+  type ScorePopupProps,
+  Toast,
+  ToastContainer,
+  type ToastProps,
+  type ToastContainerProps,
+  EffectText,
+  MultiEffectText,
+  type EffectTextProps,
+  type MultiEffectTextProps,
+} from './components/feedback';
+
+// Hooks
+export {
+  useAnimation,
+  useSequentialAnimation,
+  useAnimatedValue,
+  type UseAnimationOptions,
+  type UseAnimationReturn,
+  type UseSequentialAnimationOptions,
+  type UseSequentialAnimationReturn,
+  type UseAnimatedValueOptions,
+  type UseAnimatedValueReturn,
+  useTooltip,
+  useTooltipGroup,
+  type TooltipPosition,
+  type TooltipCoordinates,
+  type UseTooltipOptions,
+  type UseTooltipReturn,
+  type UseTooltipGroupOptions,
+  type UseTooltipGroupReturn,
+} from './hooks';
