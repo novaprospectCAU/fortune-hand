@@ -423,6 +423,7 @@ function App() {
             )}
 
             <RouletteWheel
+              key={rouletteRetryUsed ? 'retry' : 'initial'}
               config={getRouletteConfig()}
               baseScore={rouletteRetryUsed
                 ? Math.floor((scoreCalculation?.finalScore ?? 0) * 0.75)
