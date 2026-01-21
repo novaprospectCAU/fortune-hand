@@ -7,6 +7,8 @@
 import { motion } from 'framer-motion';
 import { clsx } from 'clsx';
 import type { GamePhase } from '@/types/interfaces';
+import { useI18n, LanguageSelector } from '../../i18n';
+import type { TranslationKey } from '../../i18n';
 
 export interface HeaderProps {
   round: number;
@@ -16,16 +18,16 @@ export interface HeaderProps {
   className?: string;
 }
 
-const phaseLabels: Record<GamePhase, string> = {
-  IDLE: 'Ready',
-  SLOT_PHASE: 'Slot Spin',
-  DRAW_PHASE: 'Draw Cards',
-  PLAY_PHASE: 'Play Hand',
-  SCORE_PHASE: 'Scoring',
-  ROULETTE_PHASE: 'Roulette',
-  REWARD_PHASE: 'Rewards',
-  SHOP_PHASE: 'Shop',
-  GAME_OVER: 'Game Over',
+const phaseTranslationKeys: Record<GamePhase, TranslationKey> = {
+  IDLE: 'continue',
+  SLOT_PHASE: 'slotPhase',
+  DRAW_PHASE: 'drawPhase',
+  PLAY_PHASE: 'playPhase',
+  SCORE_PHASE: 'scorePhase',
+  ROULETTE_PHASE: 'roulettePhase',
+  REWARD_PHASE: 'rewardPhase',
+  SHOP_PHASE: 'shopPhase',
+  GAME_OVER: 'gameOver',
 };
 
 export function Header({
@@ -35,6 +37,7 @@ export function Header({
   phase,
   className,
 }: HeaderProps) {
+  const { t } = useI18n();
   const progress = Math.min(100, (currentScore / targetScore) * 100);
   const isWinning = currentScore >= targetScore;
 
@@ -77,9 +80,12 @@ export function Header({
               )}
             />
             <span className="text-slate-300 text-xs sm:text-sm font-medium">
-              {phaseLabels[phase]}
+              {t(phaseTranslationKeys[phase])}
             </span>
           </div>
+
+          {/* Language Selector */}
+          <LanguageSelector className="ml-auto sm:ml-0" />
         </div>
 
         {/* Score Progress */}

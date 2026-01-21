@@ -7,6 +7,7 @@ import { memo, useState, useCallback } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import type { Card as CardType } from '@/types/interfaces';
 import { isSpecialCard } from '../specialCards';
+import { useI18n } from '@/modules/ui';
 
 /**
  * 무늬별 기호 매핑
@@ -116,21 +117,24 @@ function getSpecialGlow(card: CardType): string | undefined {
 /**
  * 카드 효과 설명 생성
  */
-function getCardEffectDescriptions(card: CardType): string[] {
+function getCardEffectDescriptions(
+  card: CardType,
+  t: (key: import('@/modules/ui').TranslationKey, params?: Record<string, string | number>) => string
+): string[] {
   const effects: string[] = [];
 
   // 특수 카드 효과
   if (card.isWild) {
-    effects.push('🌟 Wild: 어떤 랭크/무늬로도 사용 가능');
+    effects.push(`🌟 ${t('wildEffect')}`);
   }
   if (card.isGold) {
-    effects.push('💰 Gold: 점수 대신 골드 획득');
+    effects.push(`💰 ${t('goldEffect')}`);
   }
   if (card.triggerSlot) {
-    effects.push('🎰 Slot: 플레이 시 미니 슬롯 발동');
+    effects.push(`🎰 ${t('slotEffect')}`);
   }
   if (card.triggerRoulette) {
-    effects.push('🎯 Roulette: 추가 룰렛 기회');
+    effects.push(`🎯 ${t('rouletteEffect')}`);
   }
 
   // 강화 효과
@@ -138,16 +142,16 @@ function getCardEffectDescriptions(card: CardType): string[] {
     const { type, value } = card.enhancement;
     switch (type) {
       case 'mult':
-        effects.push(`🔴 Mult +${value}: 배수 +${value} 추가`);
+        effects.push(`🔴 ${t('multEffect', { value })}`);
         break;
       case 'chips':
-        effects.push(`🔵 Chips +${value}: 칩 +${value} 추가`);
+        effects.push(`🔵 ${t('chipsEffect', { value })}`);
         break;
       case 'gold':
-        effects.push(`🟡 Gold +${value}: 점수 시 골드 +${value}`);
+        effects.push(`🟡 ${t('goldBonusEffect', { value })}`);
         break;
       case 'retrigger':
-        effects.push(`🟣 Retrigger: 이 카드 ${value + 1}번 발동`);
+        effects.push(`🟣 ${t('retriggerEffect', { count: value + 1 })}`);
         break;
     }
   }
@@ -167,6 +171,7 @@ function CardComponent({
   faceDown = false,
   size = 'md',
 }: CardProps) {
+  const { t } = useI18n();
   const [showTooltip, setShowTooltip] = useState(false);
 
   const sizeStyle = SIZE_STYLES[size];
@@ -180,7 +185,7 @@ function CardComponent({
   const hasSpecialEffect = specialBorder || enhancementGradient;
 
   // 카드 효과 설명 목록
-  const effectDescriptions = getCardEffectDescriptions(card);
+  const effectDescriptions = getCardEffectDescriptions(card, t);
   const hasEffects = effectDescriptions.length > 0;
 
   // 툴팁 표시/숨김 핸들러

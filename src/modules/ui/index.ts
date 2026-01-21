@@ -108,3 +108,14 @@ export {
   type TutorialActions,
   type UseTutorialReturn,
 } from './hooks';
+
+// I18n
+export {
+  I18nProvider,
+  useI18n,
+  useTranslation,
+  LanguageSelector,
+  translations,
+  type Language,
+  type TranslationKey,
+} from './i18n';

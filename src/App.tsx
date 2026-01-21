@@ -11,7 +11,7 @@ import { AnimatePresence, motion } from 'framer-motion';
 import { useGameStore } from '@/modules/core';
 
 // UI module - layout and common components
-import { GameLayout, ScoreDisplay, DeckViewer, CardEffectTooltip, Modal, Button, RoundClearCelebration } from '@/modules/ui';
+import { GameLayout, ScoreDisplay, DeckViewer, CardEffectTooltip, Modal, Button, RoundClearCelebration, useI18n } from '@/modules/ui';
 
 // Game modules - components
 import { SlotMachine } from '@/modules/slots';
@@ -29,6 +29,9 @@ import type { ShopItemProps } from '@/modules/shop/components/ShopItem';
  * Main game component
  */
 function App() {
+  // I18n
+  const { t } = useI18n();
+
   // Get state and actions from the store
   const {
     phase,
@@ -225,7 +228,7 @@ function App() {
               initial={{ opacity: 0, y: -20 }}
               animate={{ opacity: 1, y: 0 }}
             >
-              Fortune's Hand
+              {t('gameTitle')}
             </motion.h1>
             <motion.p
               className="text-xl text-gray-400 mb-8"
@@ -233,7 +236,7 @@ function App() {
               animate={{ opacity: 1 }}
               transition={{ delay: 0.2 }}
             >
-              Card x Slot x Roulette Deckbuilder
+              {t('gameSubtitle')}
             </motion.p>
             <motion.div
               initial={{ opacity: 0, y: 20 }}
@@ -241,9 +244,9 @@ function App() {
               transition={{ delay: 0.4 }}
             >
               <p className="text-gray-500 text-sm mb-4 text-center max-w-md">
-                Spin the slot, play your cards, and risk it all on the roulette.
+                {t('gameDescription')}
                 <br />
-                Can you beat all 8 rounds?
+                {t('gameChallenge')}
               </p>
             </motion.div>
           </div>
@@ -258,10 +261,10 @@ function App() {
               className="text-center mb-6"
             >
               <h2 className="text-2xl font-bold text-white mb-2">
-                Round {round} - Turn {turn}
+                {t('roundTurn', { round, turn })}
               </h2>
               {!slotResult && (
-                <p className="text-gray-400">Spin the slot to begin your turn!</p>
+                <p className="text-gray-400">{t('spinToBegin')}</p>
               )}
             </motion.div>
             <SlotMachine
@@ -276,13 +279,13 @@ function App() {
                 className="mt-6 bg-game-surface rounded-lg p-4 max-w-md"
               >
                 <h3 className="text-lg font-bold text-white text-center mb-2">
-                  {slotResult.isJackpot ? '🎉 JACKPOT! 🎉' : 'Slot Result'}
+                  {slotResult.isJackpot ? `🎉 ${t('jackpot')} 🎉` : t('slotResult')}
                 </h3>
                 <div className="text-center text-sm">
-                  {formatSlotEffects(slotResult.effects)}
+                  {formatSlotEffects(slotResult.effects, t)}
                 </div>
                 <p className="text-gray-400 text-center text-sm mt-3">
-                  Click Continue to draw cards
+                  {t('clickContinueToDraw')}
                 </p>
               </motion.div>
             )}
@@ -297,8 +300,8 @@ function App() {
               animate={{ opacity: 1 }}
               className="text-center"
             >
-              <h2 className="text-2xl font-bold text-white mb-2">Drawing Cards...</h2>
-              <p className="text-gray-400">Preparing your hand</p>
+              <h2 className="text-2xl font-bold text-white mb-2">{t('drawingCards')}</h2>
+              <p className="text-gray-400">{t('preparingHand')}</p>
             </motion.div>
           </div>
         );
@@ -321,12 +324,12 @@ function App() {
                     })}
                   </span>
                   {slotResult.isJackpot && (
-                    <span className="text-yellow-400 font-bold">JACKPOT!</span>
+                    <span className="text-yellow-400 font-bold">{t('jackpot')}</span>
                   )}
                 </div>
                 {/* Slot Effects Description */}
                 <div className="text-center mt-2 text-sm">
-                  {formatSlotEffects(slotResult.effects)}
+                  {formatSlotEffects(slotResult.effects, t)}
                 </div>
               </motion.div>
             )}
@@ -334,7 +337,7 @@ function App() {
             {/* Hand */}
             <div className="flex-1 flex flex-col justify-end">
               <div className="text-center mb-2 text-gray-400">
-                Select up to 5 cards to play
+                {t('selectUpTo5')}
               </div>
               <Hand
                 cards={hand}
@@ -358,15 +361,15 @@ function App() {
                 className="text-center"
               >
                 <h2 className="text-3xl font-bold text-white mb-2">
-                  {formatHandType(handResult.handType)}
+                  {formatHandType(handResult.handType, t)}
                 </h2>
                 <div className="flex items-center justify-center gap-2 mb-4">
                   <span className="text-blue-400 text-xl">
-                    {scoreCalculation.chipTotal} Chips
+                    {scoreCalculation.chipTotal} {t('chips')}
                   </span>
                   <span className="text-gray-500">x</span>
                   <span className="text-red-400 text-xl">
-                    {scoreCalculation.multTotal} Mult
+                    {scoreCalculation.multTotal} {t('mult')}
                   </span>
                 </div>
                 <div className="text-4xl font-bold text-accent">
@@ -400,7 +403,7 @@ function App() {
                   {rouletteResult.finalScore.toLocaleString()} pts
                 </div>
                 {rouletteRetryUsed && (
-                  <p className="text-orange-400 text-sm mt-1">(-25% penalty applied)</p>
+                  <p className="text-orange-400 text-sm mt-1">{t('penaltyApplied')}</p>
                 )}
               </motion.div>
             ) : (
@@ -410,10 +413,10 @@ function App() {
                 className="text-center mb-4"
               >
                 <h2 className="text-xl font-bold text-white mb-1">
-                  {rouletteRetryUsed ? 'Retry Spin!' : 'Risk the Roulette?'}
+                  {rouletteRetryUsed ? t('retrySpin') : t('riskTheRoulette')}
                 </h2>
                 <p className="text-gray-400 text-sm">
-                  Base Score: {rouletteRetryUsed
+                  {t('baseScore')}: {rouletteRetryUsed
                     ? Math.floor((scoreCalculation?.finalScore ?? 0) * 0.75).toLocaleString()
                     : (scoreCalculation?.finalScore.toLocaleString() ?? 0)
                   }
@@ -448,14 +451,14 @@ function App() {
                     }}
                     className="px-4 py-2 bg-orange-600 hover:bg-orange-500 text-white rounded-lg font-medium transition-colors"
                   >
-                    Retry (-25%)
+                    {t('retryWithPenalty')}
                   </button>
                 )}
                 <button
                   onClick={confirmRoulette}
                   className="px-6 py-2 bg-green-600 hover:bg-green-500 text-white rounded-lg font-medium transition-colors"
                 >
-                  Accept
+                  {t('accept')}
                 </button>
               </motion.div>
             )}
@@ -470,14 +473,14 @@ function App() {
               animate={{ opacity: 1, scale: 1 }}
               className="text-center"
             >
-              <h2 className="text-2xl font-bold text-white mb-4">Turn Complete!</h2>
+              <h2 className="text-2xl font-bold text-white mb-4">{t('turnComplete')}</h2>
               {rouletteResult && (
                 <div className="mb-4">
                   {rouletteResult.wasSkipped ? (
-                    <p className="text-gray-400">You kept your score</p>
+                    <p className="text-gray-400">{t('keptScore')}</p>
                   ) : (
                     <p className="text-gray-400">
-                      Roulette: x{rouletteResult.segment.multiplier}
+                      {t('roulette')}: x{rouletteResult.segment.multiplier}
                     </p>
                   )}
                 </div>
@@ -523,13 +526,13 @@ function App() {
               animate={{ opacity: 1, scale: 1 }}
               className="text-center"
             >
-              <h2 className="text-4xl font-bold text-red-500 mb-4">Game Over</h2>
-              <p className="text-gray-400 mb-2">You reached Round {round}</p>
+              <h2 className="text-4xl font-bold text-red-500 mb-4">{t('gameOver')}</h2>
+              <p className="text-gray-400 mb-2">{t('youReachedRound', { round })}</p>
               <p className="text-gray-400 mb-6">
-                Final Score: {currentScore.toLocaleString()} / {targetScore.toLocaleString()}
+                {t('finalScore')}: {currentScore.toLocaleString()} / {targetScore.toLocaleString()}
               </p>
               <div className="text-2xl text-accent font-bold">
-                Better luck next time!
+                {t('betterLuckNextTime')}
               </div>
             </motion.div>
           </div>
@@ -629,7 +632,7 @@ function App() {
     <Modal
       isOpen={!!jokerToRemove}
       onClose={() => setJokerToRemove(null)}
-      title="Remove Joker?"
+      title={t('removeJoker')}
     >
       {jokerToRemove && (
         <div className="text-center">
@@ -638,14 +641,14 @@ function App() {
             <p className="text-gray-400 text-sm">{jokerToRemove.description}</p>
           </div>
           <p className="text-yellow-400 text-sm mb-4">
-            This joker will be permanently removed.
+            {t('jokerWillBeRemoved')}
           </p>
           <div className="flex justify-center gap-3">
             <Button
               variant="ghost"
               onClick={() => setJokerToRemove(null)}
             >
-              Cancel
+              {t('cancel')}
             </Button>
             <Button
               variant="danger"
@@ -654,7 +657,7 @@ function App() {
                 setJokerToRemove(null);
               }}
             >
-              Remove
+              {t('remove')}
             </Button>
           </div>
         </div>
@@ -695,53 +698,56 @@ function getSymbolEmoji(symbol: string): string {
 /**
  * Format slot effects for display
  */
-function formatSlotEffects(effects: import('@/types/interfaces').SlotEffects): React.ReactNode {
+function formatSlotEffects(
+  effects: import('@/types/interfaces').SlotEffects,
+  t: (key: import('@/modules/ui').TranslationKey, params?: Record<string, string | number>) => string
+): React.ReactNode {
   const parts: string[] = [];
 
   // Card bonuses
   if (effects.cardBonus.extraDraw > 0) {
-    parts.push(`+${effects.cardBonus.extraDraw} extra draw`);
+    parts.push(t('extraDraw', { n: effects.cardBonus.extraDraw }));
   }
   if (effects.cardBonus.handSize > 0) {
-    parts.push(`+${effects.cardBonus.handSize} hand size`);
+    parts.push(t('handSize', { n: effects.cardBonus.handSize }));
   }
   if (effects.cardBonus.scoreMultiplier > 1) {
-    parts.push(`x${effects.cardBonus.scoreMultiplier} score`);
+    parts.push(t('scoreMultiplier', { n: effects.cardBonus.scoreMultiplier }));
   }
 
   // Roulette bonuses
   if (effects.rouletteBonus.safeZoneBonus > 0) {
-    parts.push(`+${effects.rouletteBonus.safeZoneBonus}% safe zone`);
+    parts.push(t('safeZone', { n: effects.rouletteBonus.safeZoneBonus }));
   }
   if (effects.rouletteBonus.maxMultiplier > 0) {
-    parts.push(`+${effects.rouletteBonus.maxMultiplier}x max mult`);
+    parts.push(t('maxMult', { n: effects.rouletteBonus.maxMultiplier }));
   }
   if (effects.rouletteBonus.freeSpins > 0) {
-    parts.push(`${effects.rouletteBonus.freeSpins} free spin`);
+    parts.push(t('freeSpin', { n: effects.rouletteBonus.freeSpins }));
   }
 
   // Instant rewards
   if (effects.instant.gold > 0) {
-    parts.push(`+${effects.instant.gold} gold`);
+    parts.push(t('instantGold', { n: effects.instant.gold }));
   }
   if (effects.instant.chips > 0) {
-    parts.push(`+${effects.instant.chips} chips`);
+    parts.push(t('instantChips', { n: effects.instant.chips }));
   }
 
   // Penalties
   const penalties: string[] = [];
   if (effects.penalty.discardCards > 0) {
-    penalties.push(`-${effects.penalty.discardCards} cards discarded`);
+    penalties.push(t('cardsDiscarded', { n: effects.penalty.discardCards }));
   }
   if (effects.penalty.skipRoulette) {
-    penalties.push('roulette skipped');
+    penalties.push(t('rouletteSkipped'));
   }
   if (effects.penalty.loseGold > 0) {
-    penalties.push(`-${effects.penalty.loseGold} gold`);
+    penalties.push(t('loseGold', { n: effects.penalty.loseGold }));
   }
 
   if (parts.length === 0 && penalties.length === 0) {
-    return <span className="text-gray-500">No effects</span>;
+    return <span className="text-gray-500">{t('noEffects')}</span>;
   }
 
   return (
@@ -759,20 +765,24 @@ function formatSlotEffects(effects: import('@/types/interfaces').SlotEffects): R
 /**
  * Format hand type for display
  */
-function formatHandType(handType: string): string {
-  const typeMap: Record<string, string> = {
-    high_card: 'High Card',
-    pair: 'Pair',
-    two_pair: 'Two Pair',
-    three_of_a_kind: 'Three of a Kind',
-    straight: 'Straight',
-    flush: 'Flush',
-    full_house: 'Full House',
-    four_of_a_kind: 'Four of a Kind',
-    straight_flush: 'Straight Flush',
-    royal_flush: 'Royal Flush',
+function formatHandType(
+  handType: string,
+  t: (key: import('@/modules/ui').TranslationKey) => string
+): string {
+  const typeToKey: Record<string, import('@/modules/ui').TranslationKey> = {
+    high_card: 'highCard',
+    pair: 'pair',
+    two_pair: 'twoPair',
+    three_of_a_kind: 'threeOfAKind',
+    straight: 'straight',
+    flush: 'flush',
+    full_house: 'fullHouse',
+    four_of_a_kind: 'fourOfAKind',
+    straight_flush: 'straightFlush',
+    royal_flush: 'royalFlush',
   };
-  return typeMap[handType] || handType;
+  const key = typeToKey[handType];
+  return key ? t(key) : handType;
 }
 
 export default App;

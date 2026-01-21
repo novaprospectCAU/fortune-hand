@@ -6,6 +6,7 @@
 import { motion, AnimatePresence } from 'framer-motion';
 import type { Card as CardType } from '@/types/interfaces';
 import { Card } from '@/modules/cards/components/Card';
+import { useI18n } from '@/modules/ui';
 
 export interface PackOpenOverlayProps {
   cards: CardType[] | null;
@@ -13,13 +14,15 @@ export interface PackOpenOverlayProps {
 }
 
 export function PackOpenOverlay({ cards, onClose }: PackOpenOverlayProps) {
+  const { t } = useI18n();
+
   if (!cards || cards.length === 0) return null;
 
   const isSingleCard = cards.length === 1;
-  const title = isSingleCard ? '🃏 Card Acquired!' : '🎁 Pack Opened!';
+  const title = isSingleCard ? `🃏 ${t('cardAcquired')}` : `🎁 ${t('packOpened')}`;
   const subtitle = isSingleCard
-    ? '1 card added to your deck'
-    : `${cards.length} cards added to your deck`;
+    ? t('cardAddedToDeck')
+    : t('cardsAddedToDeck', { n: cards.length });
 
   return (
     <AnimatePresence>
@@ -98,7 +101,7 @@ export function PackOpenOverlay({ cards, onClose }: PackOpenOverlayProps) {
               transition-colors
             "
           >
-            Continue Shopping
+            {t('continueShipping')}
           </motion.button>
         </motion.div>
       </motion.div>
