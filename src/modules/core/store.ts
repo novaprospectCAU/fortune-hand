@@ -725,6 +725,9 @@ export const useGameStore = create<GameStore>((set, get) => ({
           const joker = getJokerById(purchasedItem.itemId);
           if (joker && state.jokers.length < state.maxJokers) {
             newJokers = [...state.jokers, joker];
+            console.log('Joker added:', joker.name);
+          } else if (!joker) {
+            console.warn('Joker not found:', purchasedItem.itemId);
           } else if (state.jokers.length >= state.maxJokers) {
             console.warn('Max jokers reached');
           }
@@ -735,6 +738,9 @@ export const useGameStore = create<GameStore>((set, get) => ({
           const specialCard = getSpecialCardById(purchasedItem.itemId);
           if (specialCard) {
             newDeck = addToDeck(state.deck, [specialCard]);
+            console.log('Special card added:', specialCard.id);
+          } else {
+            console.warn('Special card not found:', purchasedItem.itemId);
           }
           break;
         }
