@@ -79,14 +79,14 @@ export function GameLayout({
       />
 
       {/* Main Content Area */}
-      <div className="flex-1 flex flex-col lg:flex-row overflow-hidden">
+      <div className="flex-1 flex flex-col md:flex-row overflow-hidden">
         {/* Main Game Area */}
         <main className="flex-1 overflow-y-auto p-3 sm:p-4 md:p-6">
           {children}
         </main>
 
-        {/* Desktop Sidebar - Hidden on mobile/tablet */}
-        <div className="hidden lg:block">
+        {/* Desktop Sidebar - Hidden on mobile */}
+        <div className="hidden md:block">
           <Sidebar
             gold={gold}
             handsRemaining={handsRemaining}
@@ -104,7 +104,7 @@ export function GameLayout({
         type="button"
         onClick={() => setSidebarOpen(!sidebarOpen)}
         className={clsx(
-          'lg:hidden fixed bottom-20 right-3 z-20',
+          'md:hidden fixed bottom-20 right-3 z-20',
           'w-14 h-14 rounded-full',
           'bg-game-surface border-2 border-game-border',
           'flex items-center justify-center',
@@ -145,7 +145,7 @@ export function GameLayout({
 
       {/* Mobile Sidebar Overlay */}
       {sidebarOpen && (
-        <div className="lg:hidden fixed inset-0 z-30">
+        <div className="md:hidden fixed inset-0 z-30">
           {/* Backdrop */}
           <div
             className="absolute inset-0 bg-black/60 backdrop-blur-sm"
