@@ -388,6 +388,9 @@ export interface GameState {
   handsRemaining: number;
   discardsRemaining: number;
   slotSpinsRemaining: number;
+
+  // 팩 오픈 결과 (오버레이 표시용)
+  openedPackCards: Card[] | null;
 }
 
 export interface GameConfig {
@@ -431,6 +434,9 @@ export interface GameActions {
 
   // 조커 관리
   removeJoker(jokerId: string): void;
+
+  // 팩 오픈 결과
+  clearOpenedPackCards(): void;
 }
 
 // ============================================================

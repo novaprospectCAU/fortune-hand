@@ -53,8 +53,8 @@ export {
 } from './vouchers';
 
 // Component exports
-export { Shop, ShopItem, RerollButton, PackDisplay } from './components';
-export type { ShopProps, ShopItemProps, RerollButtonProps, PackDisplayProps } from './components';
+export { Shop, ShopItem, RerollButton, PackDisplay, PackOpenOverlay } from './components';
+export type { ShopProps, ShopItemProps, RerollButtonProps, PackDisplayProps, PackOpenOverlayProps } from './components';
 
 // Re-export types from interfaces for convenience
 export type { ShopState, ShopItem as ShopItemType, Transaction } from '@/types/interfaces';

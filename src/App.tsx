@@ -17,7 +17,7 @@ import { GameLayout, ScoreDisplay, DeckViewer, CardEffectTooltip, Modal, Button 
 import { SlotMachine } from '@/modules/slots';
 import { Hand } from '@/modules/cards';
 import { RouletteWheel, getDefaultConfig, applyBonuses } from '@/modules/roulette';
-import { Shop } from '@/modules/shop';
+import { Shop, PackOpenOverlay } from '@/modules/shop';
 import { getJokerById } from '@/modules/jokers';
 import { getSpecialCardById } from '@/modules/cards';
 
@@ -64,6 +64,8 @@ function App() {
     removeJoker,
     rerollShop,
     leaveShop,
+    openedPackCards,
+    clearOpenedPackCards,
   } = useGameStore();
 
   // Deck viewer state
@@ -489,6 +491,11 @@ function App() {
                 getItemDetails={getItemDetails}
               />
             )}
+            {/* Pack open overlay */}
+            <PackOpenOverlay
+              cards={openedPackCards}
+              onClose={clearOpenedPackCards}
+            />
           </div>
         );
 

@@ -95,6 +95,7 @@ function createInitialState(): Omit<GameState, keyof GameActions> & {
     handsRemaining: DEFAULT_GAME_CONFIG.startingHands,
     discardsRemaining: DEFAULT_GAME_CONFIG.startingDiscards,
     slotSpinsRemaining: DEFAULT_GAME_CONFIG.startingSlotSpins,
+    openedPackCards: null,
     config: mergeGameConfig(),
     shopState: null,
   };
@@ -789,12 +790,15 @@ export const useGameStore = create<GameStore>((set, get) => ({
         }
         case 'pack': {
           // Use pack cards from transaction if available, then shuffle
+          // Also store opened cards for overlay display
           if (transaction.packCards && transaction.packCards.length > 0) {
             const deckWithCards = addToDeck(state.deck, transaction.packCards);
             newDeck = {
               ...deckWithCards,
               cards: shuffle(deckWithCards.cards),
             };
+            // Store pack cards for display in overlay
+            set({ openedPackCards: transaction.packCards });
             console.log('Pack cards added and deck shuffled:', transaction.packCards.length, 'cards');
           }
           break;
@@ -922,6 +926,10 @@ export const useGameStore = create<GameStore>((set, get) => ({
     });
 
     console.log('Joker removed:', jokerToRemove.name);
+  },
+
+  clearOpenedPackCards: () => {
+    set({ openedPackCards: null });
   },
 }));
 
