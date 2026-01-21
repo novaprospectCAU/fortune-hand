@@ -2,6 +2,8 @@
 
 카드 + 슬롯머신 + 룰렛을 결합한 덱빌더 로그라이트 게임
 
+🎮 **[Play Now](https://novaprospectcau.github.io/fortune-hand/)**
+
 ## 게임 소개
 
 **Fortune's Hand**는 포커, 슬롯머신, 룰렛의 요소를 결합한 독특한 덱빌딩 로그라이트 게임입니다.
@@ -121,21 +123,24 @@ src/
 - [x] Shop 모듈 (상점, 거래)
 - [x] UI 모듈 (공통 컴포넌트)
 
-**테스트: 726 passed**
+### M2: Full Mechanics ✅
 
-### M2: Full Mechanics (예정)
-
-- [ ] 전체 게임 플로우 연결
-- [ ] 라운드 진행 시스템
-- [ ] 게임 오버/승리 처리
-- [ ] 밸런스 조정
+- [x] 메인 게임 화면 통합 (App.tsx)
+- [x] 전체 게임 플로우 연결
+  - IDLE → SLOT → DRAW → PLAY → SCORE → ROULETTE → REWARD → SHOP
+- [x] 라운드 진행 시스템 (8라운드 + 엔드리스 모드)
+- [x] 슬롯 스핀 횟수 제한 (라운드당 4회)
+- [x] 게임 오버/승리 처리
+- [x] 상점 시스템 연동
+- [x] 조커 효과 실시간 적용
+- [x] GitHub Pages 자동 배포
 
 ### M3: Polish (예정)
 
 - [ ] 애니메이션 강화
 - [ ] 사운드 효과
 - [ ] 튜토리얼
-- [ ] 반응형 UI
+- [ ] 모바일 최적화
 
 ## 테스트
 
