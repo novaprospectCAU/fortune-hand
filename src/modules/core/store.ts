@@ -782,6 +782,8 @@ export const useGameStore = create<GameStore>((set, get) => ({
               ...deckWithCard,
               cards: shuffle(deckWithCard.cards),
             };
+            // Store card for display in overlay
+            set({ openedPackCards: [specialCard] });
             console.log('Special card added and deck shuffled:', specialCard.id);
           } else {
             console.warn('Special card not found:', purchasedItem.itemId);

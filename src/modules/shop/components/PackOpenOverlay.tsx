@@ -1,6 +1,6 @@
 /**
- * Pack Open Overlay - 팩 오픈 결과 오버레이
- * 상점에서 팩을 구매했을 때 획득한 카드를 표시
+ * Pack Open Overlay - 카드 구매 결과 오버레이
+ * 상점에서 팩 또는 카드를 구매했을 때 획득한 카드를 표시
  */
 
 import { motion, AnimatePresence } from 'framer-motion';
@@ -14,6 +14,12 @@ export interface PackOpenOverlayProps {
 
 export function PackOpenOverlay({ cards, onClose }: PackOpenOverlayProps) {
   if (!cards || cards.length === 0) return null;
+
+  const isSingleCard = cards.length === 1;
+  const title = isSingleCard ? '🃏 Card Acquired!' : '🎁 Pack Opened!';
+  const subtitle = isSingleCard
+    ? '1 card added to your deck'
+    : `${cards.length} cards added to your deck`;
 
   return (
     <AnimatePresence>
@@ -39,7 +45,7 @@ export function PackOpenOverlay({ cards, onClose }: PackOpenOverlayProps) {
             transition={{ delay: 0.1 }}
             className="text-3xl font-bold text-white"
           >
-            🎁 Pack Opened!
+            {title}
           </motion.h2>
 
           {/* Cards */}
@@ -77,7 +83,7 @@ export function PackOpenOverlay({ cards, onClose }: PackOpenOverlayProps) {
             transition={{ delay: 0.3 + cards.length * 0.15 }}
             className="text-gray-400 text-sm"
           >
-            {cards.length} cards added to your deck
+            {subtitle}
           </motion.p>
 
           {/* Close button */}

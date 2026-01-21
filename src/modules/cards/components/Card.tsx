@@ -39,13 +39,23 @@ const SPECIAL_BORDER_COLORS = {
 };
 
 /**
- * 강화 배경 색상
+ * 강화 배경 그라데이션 (더 눈에 띄게)
  */
-const ENHANCEMENT_BG_COLORS: Record<string, string> = {
-  mult: 'rgba(239, 68, 68, 0.1)', // 빨강 투명
-  chips: 'rgba(59, 130, 246, 0.1)', // 파랑 투명
-  gold: 'rgba(245, 158, 11, 0.1)', // 골드 투명
-  retrigger: 'rgba(168, 85, 247, 0.1)', // 보라 투명
+const ENHANCEMENT_GRADIENTS: Record<string, string> = {
+  mult: 'linear-gradient(135deg, #fff 0%, #fecaca 50%, #fca5a5 100%)', // 빨강 그라데이션
+  chips: 'linear-gradient(135deg, #fff 0%, #bfdbfe 50%, #93c5fd 100%)', // 파랑 그라데이션
+  gold: 'linear-gradient(135deg, #fff 0%, #fef08a 50%, #fde047 100%)', // 골드 그라데이션
+  retrigger: 'linear-gradient(135deg, #fff 0%, #e9d5ff 50%, #d8b4fe 100%)', // 보라 그라데이션
+};
+
+/**
+ * 특수 카드 글로우 효과
+ */
+const SPECIAL_GLOW_SHADOWS: Record<string, string> = {
+  wild: '0 0 12px rgba(168, 85, 247, 0.6), inset 0 0 8px rgba(168, 85, 247, 0.1)', // 보라 글로우
+  gold: '0 0 12px rgba(245, 158, 11, 0.6), inset 0 0 8px rgba(245, 158, 11, 0.1)', // 골드 글로우
+  slot: '0 0 12px rgba(34, 197, 94, 0.6), inset 0 0 8px rgba(34, 197, 94, 0.1)', // 초록 글로우
+  roulette: '0 0 12px rgba(59, 130, 246, 0.6), inset 0 0 8px rgba(59, 130, 246, 0.1)', // 파랑 글로우
 };
 
 export interface CardProps {
@@ -93,6 +103,17 @@ function getSpecialBorderColor(card: CardType): string | undefined {
 }
 
 /**
+ * 특수 카드 글로우 효과 결정
+ */
+function getSpecialGlow(card: CardType): string | undefined {
+  if (card.isWild) return SPECIAL_GLOW_SHADOWS.wild;
+  if (card.isGold) return SPECIAL_GLOW_SHADOWS.gold;
+  if (card.triggerSlot) return SPECIAL_GLOW_SHADOWS.slot;
+  if (card.triggerRoulette) return SPECIAL_GLOW_SHADOWS.roulette;
+  return undefined;
+}
+
+/**
  * Card 컴포넌트
  * 개별 카드의 시각적 표현과 상호작용 처리
  */
@@ -108,9 +129,11 @@ function CardComponent({
   const suitColor = SUIT_COLORS[card.suit];
   const suitSymbol = SUIT_SYMBOLS[card.suit];
   const specialBorder = getSpecialBorderColor(card);
-  const enhancementBg = card.enhancement
-    ? ENHANCEMENT_BG_COLORS[card.enhancement.type]
+  const specialGlow = getSpecialGlow(card);
+  const enhancementGradient = card.enhancement
+    ? ENHANCEMENT_GRADIENTS[card.enhancement.type]
     : undefined;
+  const hasSpecialEffect = specialBorder || enhancementGradient;
 
   // 카드 뒷면
   if (faceDown) {
@@ -128,25 +151,30 @@ function CardComponent({
     );
   }
 
+  // 특수 효과가 있는 카드는 테두리를 두껍게
+  const borderWidth = hasSpecialEffect ? 3 : 2;
+
   return (
     <motion.div
       className={`
         ${sizeStyle.width} ${sizeStyle.height} rounded-lg
-        bg-white border-2 shadow-md
+        bg-white shadow-md
         flex flex-col relative
         ${disabled ? 'opacity-50 cursor-not-allowed' : 'cursor-pointer'}
         ${selected ? 'ring-2 ring-yellow-400 ring-offset-1 sm:ring-offset-2' : ''}
         touch-manipulation select-none
       `}
       style={{
+        borderWidth: `${borderWidth}px`,
+        borderStyle: 'solid',
         borderColor: specialBorder || '#d1d5db',
-        backgroundColor: enhancementBg || 'white',
+        background: enhancementGradient || 'white',
       }}
       initial={false}
       animate={{
         boxShadow: selected
-          ? '0 8px 25px rgba(0, 0, 0, 0.2)'
-          : '0 2px 8px rgba(0, 0, 0, 0.1)',
+          ? `0 8px 25px rgba(0, 0, 0, 0.2)${specialGlow ? `, ${specialGlow}` : ''}`
+          : specialGlow || '0 2px 8px rgba(0, 0, 0, 0.1)',
       }}
       whileTap={!disabled ? { scale: 0.95 } : undefined}
       onClick={!disabled ? onClick : undefined}
