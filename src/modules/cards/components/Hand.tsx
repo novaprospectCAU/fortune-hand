@@ -19,21 +19,21 @@ export interface HandProps {
 }
 
 /**
- * 카드 겹침 정도 (음수 마진) - 모바일에서는 더 많이 겹침
+ * 카드 겹침 정도 (음수 마진) - 모바일에서 카드가 크므로 더 많이 겹침
  */
 const OVERLAP_STYLES = {
-  sm: '-ml-6 sm:-ml-4',
-  md: '-ml-8 sm:-ml-6',
-  lg: '-ml-10 sm:-ml-8',
+  sm: '-ml-8 sm:-ml-4',
+  md: '-ml-10 sm:-ml-6',
+  lg: '-ml-12 sm:-ml-8',
 };
 
 /**
  * 손패 컨테이너 패딩
  */
 const CONTAINER_PADDING = {
-  sm: 'pl-6 sm:pl-4',
-  md: 'pl-8 sm:pl-6',
-  lg: 'pl-10 sm:pl-8',
+  sm: 'pl-8 sm:pl-4',
+  md: 'pl-10 sm:pl-6',
+  lg: 'pl-12 sm:pl-8',
 };
 
 /**
@@ -102,6 +102,9 @@ function HandComponent({
           const rotation = getCardRotation(index, cards.length);
           const yOffset = getCardYOffset(index, cards.length);
 
+          // 선택된 카드는 위로 이동
+          const selectedYOffset = isSelected ? yOffset - 12 : yOffset;
+
           return (
             <motion.div
               key={card.id}
@@ -109,7 +112,7 @@ function HandComponent({
               initial={{ opacity: 0, y: 50, scale: 0.8 }}
               animate={{
                 opacity: 1,
-                y: yOffset,
+                y: selectedYOffset,
                 scale: 1,
                 rotate: rotation,
                 zIndex: isSelected ? 100 : index,
@@ -117,17 +120,12 @@ function HandComponent({
               exit={{ opacity: 0, y: 50, scale: 0.8 }}
               transition={{
                 type: 'spring',
-                stiffness: 300,
-                damping: 25,
-                delay: index * 0.05,
+                stiffness: 400,
+                damping: 30,
               }}
               style={{
                 transformOrigin: 'bottom center',
               }}
-              whileHover={!disabled && !isDisabled ? {
-                y: isSelected ? yOffset - 8 : yOffset - 6,
-                zIndex: 100,
-              } : undefined}
               onMouseEnter={() => onCardHover?.(card)}
               onMouseLeave={() => onCardHover?.(null)}
             >

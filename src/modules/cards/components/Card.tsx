@@ -58,26 +58,26 @@ export interface CardProps {
 }
 
 /**
- * 카드 크기별 스타일 (모바일 반응형)
+ * 카드 크기별 스타일 (모바일 반응형 - 모바일에서 더 큰 카드)
  */
 const SIZE_STYLES = {
   sm: {
-    width: 'w-12 sm:w-14',
-    height: 'h-16 sm:h-20',
+    width: 'w-14 sm:w-14',
+    height: 'h-20 sm:h-20',
     fontSize: 'text-xs sm:text-sm',
     rankSize: 'text-base sm:text-lg',
   },
   md: {
-    width: 'w-16 sm:w-20',
-    height: 'h-24 sm:h-28',
+    width: 'w-[4.5rem] sm:w-20',
+    height: 'h-[6.5rem] sm:h-28',
     fontSize: 'text-sm sm:text-base',
-    rankSize: 'text-lg sm:text-xl',
+    rankSize: 'text-xl sm:text-xl',
   },
   lg: {
-    width: 'w-20 sm:w-24 md:w-28',
-    height: 'h-28 sm:h-36 md:h-40',
+    width: 'w-24 sm:w-24 md:w-28',
+    height: 'h-32 sm:h-36 md:h-40',
     fontSize: 'text-base sm:text-lg',
-    rankSize: 'text-xl sm:text-2xl md:text-3xl',
+    rankSize: 'text-2xl sm:text-2xl md:text-3xl',
   },
 };
 
@@ -144,15 +144,13 @@ function CardComponent({
       }}
       initial={false}
       animate={{
-        y: selected ? -8 : 0,
         boxShadow: selected
           ? '0 8px 25px rgba(0, 0, 0, 0.2)'
           : '0 2px 8px rgba(0, 0, 0, 0.1)',
       }}
-      whileHover={!disabled ? { scale: 1.02 } : undefined}
-      whileTap={!disabled ? { scale: 0.98 } : undefined}
+      whileTap={!disabled ? { scale: 0.95 } : undefined}
       onClick={!disabled ? onClick : undefined}
-      transition={{ type: 'spring', stiffness: 300, damping: 20 }}
+      transition={{ type: 'spring', stiffness: 400, damping: 25 }}
     >
       {/* 왼쪽 상단 랭크/무늬 */}
       <div
