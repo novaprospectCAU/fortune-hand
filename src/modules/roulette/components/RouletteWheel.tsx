@@ -110,12 +110,13 @@ export function RouletteWheel({
 
       {/* Wheel container */}
       <motion.div
+        initial={false}
         animate={{ rotate: rotation }}
         transition={{
-          duration: config.spinDuration / 1000,
+          duration: isSpinning ? config.spinDuration / 1000 : 0,
           ease: [0.2, 0.8, 0.2, 1], // Custom easeOut curve
         }}
-        onAnimationComplete={handleAnimationComplete}
+        onAnimationComplete={isSpinning ? handleAnimationComplete : undefined}
         className="cursor-pointer touch-manipulation"
         onClick={handleSpin}
       >
