@@ -5,13 +5,14 @@
  * Packs contain random combinations of standard and special cards.
  */
 
-import type { Card } from '@/types/interfaces';
+import type { Card, CardEnhancement } from '@/types/interfaces';
 import type { Rarity } from '@/data/constants';
 import { createCard } from '@/modules/cards/cardFactory';
 import { getSpecialCardsByRarity, getAllSpecialCards } from '@/modules/cards/specialCards';
 import { RANKS, SUITS } from '@/data/constants';
 import packsData from '@/data/packs.json';
 import balanceData from '@/data/balance.json';
+import cardsData from '@/data/cards.json';
 
 /**
  * Pack definition from JSON data
@@ -24,6 +25,8 @@ export interface PackData {
   cardCount: number;
   guaranteedRarity: Rarity | null;
   specialCardWeight: number; // 0-1, probability of getting a special card
+  enhancedCardWeight?: number; // 0-1, probability of getting an enhanced standard card
+  preferredEnhancement?: string; // preferred enhancement type for this pack
   rarity: Rarity;
 }
 
@@ -82,12 +85,39 @@ function selectRarity(seed?: number): Rarity {
 }
 
 /**
- * Generate a random standard card
+ * Get a random enhancement
  */
-function generateStandardCard(): Card {
+function getRandomEnhancement(preferredType?: string): CardEnhancement {
+  const enhancements = cardsData.enhancements;
+
+  // If preferred type is specified, try to use it 70% of the time
+  if (preferredType && Math.random() < 0.7) {
+    const preferred = enhancements.find(e => e.type === preferredType);
+    if (preferred) {
+      return { type: preferred.type as CardEnhancement['type'], value: preferred.value };
+    }
+  }
+
+  const randomEnhancement = enhancements[Math.floor(Math.random() * enhancements.length)]!;
+  return { type: randomEnhancement.type as CardEnhancement['type'], value: randomEnhancement.value };
+}
+
+/**
+ * Generate a random standard card (optionally with enhancement)
+ */
+function generateStandardCard(enhanced: boolean = false, preferredEnhancement?: string): Card {
   const rank = RANKS[Math.floor(Math.random() * RANKS.length)]!;
   const suit = SUITS[Math.floor(Math.random() * SUITS.length)]!;
-  return createCard(rank, suit);
+  const card = createCard(rank, suit);
+
+  if (enhanced) {
+    return {
+      ...card,
+      enhancement: getRandomEnhancement(preferredEnhancement),
+    };
+  }
+
+  return card;
 }
 
 /**
@@ -137,6 +167,7 @@ export function openPack(packId: string, seed?: number): PackResult | null {
   const cards: Card[] = [];
   let hasSpecialCards = false;
   let guaranteedSpecialGiven = false;
+  const enhancedWeight = pack.enhancedCardWeight ?? 0;
 
   for (let i = 0; i < pack.cardCount; i++) {
     // Determine if this card should be a special card
@@ -156,8 +187,9 @@ export function openPack(packId: string, seed?: number): PackResult | null {
       cards.push(generateSpecialCard(rarity));
       hasSpecialCards = true;
     } else {
-      // Generate standard card
-      cards.push(generateStandardCard());
+      // Generate standard card (possibly enhanced)
+      const shouldBeEnhanced = Math.random() < enhancedWeight;
+      cards.push(generateStandardCard(shouldBeEnhanced, pack.preferredEnhancement));
     }
   }
 

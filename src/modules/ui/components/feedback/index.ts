@@ -6,3 +6,4 @@ export { ScorePopup, type ScorePopupProps } from './ScorePopup';
 export { Toast, ToastContainer, type ToastProps, type ToastContainerProps } from './Toast';
 export { EffectText, MultiEffectText, type EffectTextProps, type MultiEffectTextProps } from './EffectText';
 export { CardEffectTooltip, type CardEffectTooltipProps } from './CardEffectTooltip';
+export { RoundClearCelebration, type RoundClearCelebrationProps } from './RoundClearCelebration';

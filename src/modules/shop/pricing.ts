@@ -8,23 +8,23 @@
 import type { Rarity } from '@/data/constants';
 
 /**
- * Base prices for different item types
+ * Base prices for different item types (lowered for better accessibility)
  */
 export const BASE_PRICES: Record<string, number> = {
-  joker: 40,
-  card: 20,
-  pack: 30,
-  voucher: 50,
+  joker: 25,
+  card: 12,
+  pack: 18,
+  voucher: 35,
 };
 
 /**
- * Rarity multipliers for price calculation
+ * Rarity multipliers for price calculation (flattened curve)
  */
 export const RARITY_MULTIPLIERS: Record<Rarity, number> = {
   common: 1,
-  uncommon: 1.5,
-  rare: 2.5,
-  legendary: 5,
+  uncommon: 1.3,
+  rare: 1.8,
+  legendary: 3,
 };
 
 /**

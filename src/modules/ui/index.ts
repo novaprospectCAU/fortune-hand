@@ -69,6 +69,8 @@ export {
   type MultiEffectTextProps,
   CardEffectTooltip,
   type CardEffectTooltipProps,
+  RoundClearCelebration,
+  type RoundClearCelebrationProps,
 } from './components/feedback';
 
 // Tutorial Components

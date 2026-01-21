@@ -11,7 +11,7 @@ import { AnimatePresence, motion } from 'framer-motion';
 import { useGameStore } from '@/modules/core';
 
 // UI module - layout and common components
-import { GameLayout, ScoreDisplay, DeckViewer, CardEffectTooltip, Modal, Button } from '@/modules/ui';
+import { GameLayout, ScoreDisplay, DeckViewer, CardEffectTooltip, Modal, Button, RoundClearCelebration } from '@/modules/ui';
 
 // Game modules - components
 import { SlotMachine } from '@/modules/slots';
@@ -79,6 +79,21 @@ function App() {
 
   // Joker removal confirmation
   const [jokerToRemove, setJokerToRemove] = useState<Joker | null>(null);
+
+  // Round clear celebration state
+  const [showRoundClear, setShowRoundClear] = useState(false);
+  const [clearedRoundInfo, setClearedRoundInfo] = useState<{ round: number; score: number; target: number } | null>(null);
+  const [previousPhase, setPreviousPhase] = useState<string | null>(null);
+
+  // Detect round clear (REWARD_PHASE -> SHOP_PHASE with success)
+  useEffect(() => {
+    if (previousPhase === 'REWARD_PHASE' && phase === 'SHOP_PHASE') {
+      // Round was cleared successfully (went to shop instead of game over)
+      setClearedRoundInfo({ round, score: currentScore, target: targetScore });
+      setShowRoundClear(true);
+    }
+    setPreviousPhase(phase);
+  }, [phase, previousPhase, round, currentScore, targetScore]);
 
   // Reset retry state when leaving roulette phase
   useEffect(() => {
@@ -644,6 +659,18 @@ function App() {
         </div>
       )}
     </Modal>
+
+    {/* Round clear celebration */}
+    <RoundClearCelebration
+      isVisible={showRoundClear}
+      round={clearedRoundInfo?.round ?? round}
+      score={clearedRoundInfo?.score ?? currentScore}
+      targetScore={clearedRoundInfo?.target ?? targetScore}
+      onComplete={() => {
+        setShowRoundClear(false);
+        setClearedRoundInfo(null);
+      }}
+    />
   </>
   );
 }

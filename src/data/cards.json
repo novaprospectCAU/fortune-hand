@@ -6,7 +6,7 @@
       "description": "Can be any rank or suit",
       "isWild": true,
       "rarity": "rare",
-      "shopCost": 50
+      "shopCost": 35
     },
     {
       "id": "gold_ace",
@@ -17,7 +17,29 @@
       "isGold": true,
       "goldValue": 10,
       "rarity": "uncommon",
-      "shopCost": 30
+      "shopCost": 20
+    },
+    {
+      "id": "gold_king",
+      "name": "Golden King",
+      "description": "Scores as King but gives +8 gold instead of chips",
+      "baseRank": "K",
+      "baseSuit": "hearts",
+      "isGold": true,
+      "goldValue": 8,
+      "rarity": "uncommon",
+      "shopCost": 18
+    },
+    {
+      "id": "gold_queen",
+      "name": "Golden Queen",
+      "description": "Scores as Queen but gives +8 gold instead of chips",
+      "baseRank": "Q",
+      "baseSuit": "diamonds",
+      "isGold": true,
+      "goldValue": 8,
+      "rarity": "common",
+      "shopCost": 15
     },
     {
       "id": "slot_seven",
@@ -27,7 +49,17 @@
       "baseSuit": "hearts",
       "triggerSlot": true,
       "rarity": "rare",
-      "shopCost": 40
+      "shopCost": 28
+    },
+    {
+      "id": "slot_three",
+      "name": "Triple Threat",
+      "description": "Triggers a mini slot spin when played",
+      "baseRank": "3",
+      "baseSuit": "clubs",
+      "triggerSlot": true,
+      "rarity": "uncommon",
+      "shopCost": 22
     },
     {
       "id": "roulette_king",
@@ -37,7 +69,49 @@
       "baseSuit": "diamonds",
       "triggerRoulette": true,
       "rarity": "rare",
-      "shopCost": 45
+      "shopCost": 30
+    },
+    {
+      "id": "roulette_ace",
+      "name": "High Roller Ace",
+      "description": "Grants an extra roulette spin",
+      "baseRank": "A",
+      "baseSuit": "hearts",
+      "triggerRoulette": true,
+      "rarity": "uncommon",
+      "shopCost": 25
+    },
+    {
+      "id": "wild_two",
+      "name": "Deuce Wild",
+      "description": "A wild 2 that can be any rank or suit",
+      "baseRank": "2",
+      "baseSuit": "spades",
+      "isWild": true,
+      "rarity": "uncommon",
+      "shopCost": 22
+    },
+    {
+      "id": "lucky_jack",
+      "name": "Lucky Jack",
+      "description": "This Jack triggers both slot and roulette bonuses",
+      "baseRank": "J",
+      "baseSuit": "clubs",
+      "triggerSlot": true,
+      "triggerRoulette": true,
+      "rarity": "legendary",
+      "shopCost": 50
+    },
+    {
+      "id": "golden_seven",
+      "name": "Midas Seven",
+      "description": "Gives +15 gold when played",
+      "baseRank": "7",
+      "baseSuit": "diamonds",
+      "isGold": true,
+      "goldValue": 15,
+      "rarity": "rare",
+      "shopCost": 32
     }
   ],
 
