@@ -420,6 +420,9 @@ export interface GameActions {
   // 룰렛 단계
   spinRoulette(): void;
   skipRoulette(): void;
+  retryRoulette(): void;
+  confirmRoulette(): void;
+  setRouletteResult(result: RouletteResult): void;
   
   // 상점 단계
   buyItem(itemId: string): void;

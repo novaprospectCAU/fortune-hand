@@ -17,6 +17,7 @@ export interface FooterProps {
   handsRemaining: number;
   discardsRemaining: number;
   hasSlotResult?: boolean;
+  hasRouletteResult?: boolean;
   className?: string;
   onPlay?: () => void;
   onDiscard?: () => void;
@@ -32,10 +33,10 @@ export function Footer({
   handsRemaining,
   discardsRemaining,
   hasSlotResult = false,
+  hasRouletteResult = false,
   className,
   onPlay,
   onDiscard,
-  onSpinRoulette,
   onSkipRoulette,
   onContinue,
 }: FooterProps) {
@@ -120,6 +121,11 @@ export function Footer({
         );
 
       case 'ROULETTE_PHASE':
+        // After roulette is spun, buttons are shown in the main area
+        if (hasRouletteResult) {
+          return null;
+        }
+        // Before spinning, show Skip option and hint to click wheel
         return (
           <div className="flex items-center gap-3">
             <Button
@@ -129,13 +135,7 @@ export function Footer({
             >
               Skip (x1 Safe)
             </Button>
-            <Button
-              variant="secondary"
-              size="lg"
-              onClick={onSpinRoulette}
-            >
-              Gamble!
-            </Button>
+            <span className="text-gray-400 text-sm">or click the wheel to spin</span>
           </div>
         );
 
@@ -181,9 +181,9 @@ export function Footer({
     <footer
       className={clsx(
         'w-full bg-game-surface border-t border-game-border',
-        'px-3 py-3 sm:px-4 sm:py-4 md:px-6',
+        'px-2 py-2 sm:px-3 sm:py-3 md:px-4',
         // Safe area for mobile home indicators
-        'pb-[calc(0.75rem+env(safe-area-inset-bottom))] sm:pb-[calc(1rem+env(safe-area-inset-bottom))]',
+        'pb-[calc(0.5rem+env(safe-area-inset-bottom))] sm:pb-[calc(0.75rem+env(safe-area-inset-bottom))]',
         className
       )}
     >

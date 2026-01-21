@@ -16,7 +16,7 @@ import type {
   ShopState,
   SlotResult,
 } from '@/types/interfaces';
-import { DEFAULT_GAME_CONFIG } from '@/data/constants';
+import { DEFAULT_GAME_CONFIG, calculateGoldReward } from '@/data/constants';
 import {
   getNextPhase,
   getTargetScoreForRound,
@@ -301,7 +301,8 @@ export const useGameStore = create<GameStore>((set, get) => ({
         const newScore = currentScore + turnScore;
         const goldFromSlot = slotResult?.effects.instant.gold ?? 0;
         const goldPenalty = slotResult?.effects.penalty.loseGold ?? 0;
-        const newGold = Math.max(0, get().gold + goldFromSlot - goldPenalty);
+        const goldFromScore = calculateGoldReward(turnScore);  // Gold reward based on score
+        const newGold = Math.max(0, get().gold + goldFromSlot + goldFromScore - goldPenalty);
 
         // Discard played cards
         const playedCards = get().selectedCards;
@@ -627,14 +628,10 @@ export const useGameStore = create<GameStore>((set, get) => ({
       return;
     }
 
-    // TODO: Implement multiple roulette spins based on rouletteSpinsGranted
-    // For now, rouletteSpinsGranted is tracked but only one spin is performed
-    // Future enhancement: Allow player to spin multiple times if rouletteSpinsGranted > 0
-
+    // Roulette wheel handles its own spin - this is just for programmatic triggering
     const baseScore = state.scoreCalculation?.finalScore ?? 0;
     let config = getDefaultRouletteConfig();
 
-    // Apply slot bonuses to roulette
     if (state.slotResult) {
       config = applyRouletteBonuses(config, state.slotResult.effects.rouletteBonus);
     }
@@ -650,6 +647,66 @@ export const useGameStore = create<GameStore>((set, get) => ({
       type: 'ROULETTE_SPIN',
       result,
     });
+  },
+
+  // Set roulette result from RouletteWheel component
+  setRouletteResult: (result: RouletteResult) => {
+    const state = get();
+    if (state.phase !== 'ROULETTE_PHASE') {
+      console.warn('setRouletteResult is only valid in ROULETTE_PHASE');
+      return;
+    }
+
+    set({ rouletteResult: result });
+
+    getGameEventEmitter().emit({
+      type: 'ROULETTE_SPIN',
+      result,
+    });
+  },
+
+  // Retry roulette with 25% penalty (can only retry once)
+  retryRoulette: () => {
+    const state = get();
+    if (!isActionValidInPhase('spinRoulette', state.phase)) {
+      console.warn('retryRoulette is not valid in phase:', state.phase);
+      return;
+    }
+
+    if (!state.rouletteResult) {
+      console.warn('No roulette result to retry from');
+      return;
+    }
+
+    // Apply 25% penalty to base score
+    const originalBaseScore = state.scoreCalculation?.finalScore ?? 0;
+    const penalizedScore = Math.floor(originalBaseScore * 0.75);
+
+    let config = getDefaultRouletteConfig();
+    if (state.slotResult) {
+      config = applyRouletteBonuses(config, state.slotResult.effects.rouletteBonus);
+    }
+
+    const result = rouletteSpin({
+      baseScore: penalizedScore,
+      config,
+    });
+
+    set({ rouletteResult: result });
+
+    getGameEventEmitter().emit({
+      type: 'ROULETTE_SPIN',
+      result,
+    });
+  },
+
+  // Confirm roulette result and proceed to reward phase
+  confirmRoulette: () => {
+    const state = get();
+    if (!isActionValidInPhase('spinRoulette', state.phase)) {
+      console.warn('confirmRoulette is not valid in phase:', state.phase);
+      return;
+    }
 
     // Move to reward phase
     get().nextPhase();

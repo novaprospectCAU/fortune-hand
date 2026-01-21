@@ -58,6 +58,8 @@ function App() {
     discardSelected,
     spinRoulette,
     skipRoulette,
+    retryRoulette,
+    confirmRoulette,
     buyItem,
     rerollShop,
     leaveShop,
@@ -68,6 +70,16 @@ function App() {
 
   // Hovered card state (for effect tooltip)
   const [hoveredCard, setHoveredCard] = useState<import('@/types/interfaces').Card | null>(null);
+
+  // Roulette retry tracking (resets when phase changes)
+  const [rouletteRetryUsed, setRouletteRetryUsed] = useState(false);
+
+  // Reset retry state when leaving roulette phase
+  useEffect(() => {
+    if (phase !== 'ROULETTE_PHASE') {
+      setRouletteRetryUsed(false);
+    }
+  }, [phase]);
 
   // Keyboard shortcut for deck viewer (D key)
   useEffect(() => {
@@ -107,9 +119,9 @@ function App() {
     useGameStore.getState().setSlotResult(result);
   }, []);
 
-  // Roulette spin complete handler
-  const handleRouletteSpinComplete = useCallback(() => {
-    // RouletteWheel handles animation, store action manages state
+  // Roulette spin complete handler - save result to store
+  const handleRouletteSpinComplete = useCallback((result: import('@/types/interfaces').RouletteResult) => {
+    useGameStore.getState().setRouletteResult(result);
   }, []);
 
   // Get roulette config with bonuses applied
@@ -218,7 +230,7 @@ function App() {
 
       case 'SLOT_PHASE':
         return (
-          <div className="flex flex-col items-center justify-center h-full py-8">
+          <div className="flex flex-col items-center justify-center h-full py-2 sm:py-4">
             <motion.div
               initial={{ opacity: 0, scale: 0.9 }}
               animate={{ opacity: 1, scale: 1 }}
@@ -258,7 +270,7 @@ function App() {
 
       case 'DRAW_PHASE':
         return (
-          <div className="flex flex-col items-center justify-center h-full py-8">
+          <div className="flex flex-col items-center justify-center h-full py-2 sm:py-4">
             <motion.div
               initial={{ opacity: 0 }}
               animate={{ opacity: 1 }}
@@ -317,7 +329,7 @@ function App() {
 
       case 'SCORE_PHASE':
         return (
-          <div className="flex flex-col items-center justify-center h-full py-8">
+          <div className="flex flex-col items-center justify-center h-full py-2 sm:py-4">
             {handResult && scoreCalculation && (
               <motion.div
                 initial={{ opacity: 0, scale: 0.9 }}
@@ -346,34 +358,87 @@ function App() {
 
       case 'ROULETTE_PHASE':
         return (
-          <div className="flex flex-col items-center justify-center h-full py-8">
-            <motion.div
-              initial={{ opacity: 0 }}
-              animate={{ opacity: 1 }}
-              className="text-center mb-6"
-            >
-              <h2 className="text-2xl font-bold text-white mb-2">
-                Risk the Roulette?
-              </h2>
-              <p className="text-gray-400">
-                Current Score: {scoreCalculation?.finalScore.toLocaleString() ?? 0}
-              </p>
-              <p className="text-yellow-400 text-sm mt-2">
-                Spin to multiply your score or lose it all!
-              </p>
-            </motion.div>
+          <div className="flex flex-col items-center justify-center h-full py-4">
+            {/* Result display above the wheel */}
+            {rouletteResult && !rouletteResult.wasSkipped ? (
+              <motion.div
+                initial={{ opacity: 0, scale: 0.8 }}
+                animate={{ opacity: 1, scale: 1 }}
+                className="text-center mb-4"
+              >
+                <div className={`text-4xl font-bold mb-2 ${
+                  rouletteResult.segment.multiplier === 0
+                    ? 'text-red-500'
+                    : rouletteResult.segment.multiplier >= 5
+                      ? 'text-yellow-400'
+                      : 'text-green-400'
+                }`}>
+                  x{rouletteResult.segment.multiplier}
+                </div>
+                <div className="text-2xl font-bold text-white">
+                  {rouletteResult.finalScore.toLocaleString()} pts
+                </div>
+                {rouletteRetryUsed && (
+                  <p className="text-orange-400 text-sm mt-1">(-25% penalty applied)</p>
+                )}
+              </motion.div>
+            ) : (
+              <motion.div
+                initial={{ opacity: 0 }}
+                animate={{ opacity: 1 }}
+                className="text-center mb-4"
+              >
+                <h2 className="text-xl font-bold text-white mb-1">
+                  Risk the Roulette?
+                </h2>
+                <p className="text-gray-400 text-sm">
+                  Base Score: {scoreCalculation?.finalScore.toLocaleString() ?? 0}
+                </p>
+              </motion.div>
+            )}
+
             <RouletteWheel
               config={getRouletteConfig()}
-              baseScore={scoreCalculation?.finalScore ?? 0}
+              baseScore={rouletteRetryUsed
+                ? Math.floor((scoreCalculation?.finalScore ?? 0) * 0.75)
+                : (scoreCalculation?.finalScore ?? 0)
+              }
               onSpinComplete={handleRouletteSpinComplete}
-              disabled={false}
+              disabled={!!rouletteResult}
             />
+
+            {/* Action buttons after spinning */}
+            {rouletteResult && !rouletteResult.wasSkipped && (
+              <motion.div
+                initial={{ opacity: 0, y: 20 }}
+                animate={{ opacity: 1, y: 0 }}
+                className="flex gap-3 mt-4"
+              >
+                {!rouletteRetryUsed && (
+                  <button
+                    onClick={() => {
+                      setRouletteRetryUsed(true);
+                      retryRoulette();
+                    }}
+                    className="px-4 py-2 bg-orange-600 hover:bg-orange-500 text-white rounded-lg font-medium transition-colors"
+                  >
+                    Retry (-25%)
+                  </button>
+                )}
+                <button
+                  onClick={confirmRoulette}
+                  className="px-6 py-2 bg-green-600 hover:bg-green-500 text-white rounded-lg font-medium transition-colors"
+                >
+                  Accept
+                </button>
+              </motion.div>
+            )}
           </div>
         );
 
       case 'REWARD_PHASE':
         return (
-          <div className="flex flex-col items-center justify-center h-full py-8">
+          <div className="flex flex-col items-center justify-center h-full py-2 sm:py-4">
             <motion.div
               initial={{ opacity: 0, scale: 0.9 }}
               animate={{ opacity: 1, scale: 1 }}
@@ -421,7 +486,7 @@ function App() {
 
       case 'GAME_OVER':
         return (
-          <div className="flex flex-col items-center justify-center h-full py-8">
+          <div className="flex flex-col items-center justify-center h-full py-2 sm:py-4">
             <motion.div
               initial={{ opacity: 0, scale: 0.9 }}
               animate={{ opacity: 1, scale: 1 }}

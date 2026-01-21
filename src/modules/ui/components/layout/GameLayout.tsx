@@ -54,6 +54,7 @@ export function GameLayout({
     maxJokers = 5,
     selectedCards = [],
     slotResult = null,
+    rouletteResult = null,
   } = gameState;
 
   const maxSelectCards = 5; // From game config
@@ -63,10 +64,10 @@ export function GameLayout({
       <MobileHelper />
       <div
         className={clsx(
-          'min-h-screen bg-game-bg text-white',
-          'flex flex-col',
-          // Safe area for mobile notches
-          'supports-[padding:max(0px)]:pb-[env(safe-area-inset-bottom)]',
+          'h-screen max-h-screen bg-game-bg text-white',
+          'flex flex-col overflow-hidden',
+          // Use dynamic viewport height on supported browsers
+          'supports-[height:100dvh]:h-[100dvh] supports-[height:100dvh]:max-h-[100dvh]',
           className
         )}
       >
@@ -81,7 +82,7 @@ export function GameLayout({
       {/* Main Content Area */}
       <div className="flex-1 flex flex-col md:flex-row overflow-hidden">
         {/* Main Game Area */}
-        <main className="flex-1 overflow-y-auto p-3 sm:p-4 md:p-6">
+        <main className="flex-1 overflow-y-auto p-2 sm:p-3 md:p-4">
           {children}
         </main>
 
@@ -183,6 +184,7 @@ export function GameLayout({
         handsRemaining={handsRemaining}
         discardsRemaining={discardsRemaining}
         hasSlotResult={!!slotResult}
+        hasRouletteResult={!!rouletteResult}
         onPlay={onPlay}
         onDiscard={onDiscard}
         onSpinRoulette={onSpinRoulette}

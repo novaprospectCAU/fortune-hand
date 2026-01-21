@@ -111,3 +111,18 @@ export const DEFAULT_GAME_CONFIG = {
   maxSelectCards: 5,
   maxJokers: 5,
 } as const;
+
+// 점수 기반 골드 보상 설정
+export const SCORING_CONFIG = {
+  goldPerScore: 0.01,    // 점수당 골드 (1000점 = 10골드)
+  minGoldPerRound: 5,    // 라운드당 최소 골드
+  maxGoldPerRound: 50,   // 라운드당 최대 골드
+} as const;
+
+/**
+ * 점수 기반 골드 보상 계산
+ */
+export function calculateGoldReward(score: number): number {
+  const rawGold = Math.floor(score * SCORING_CONFIG.goldPerScore);
+  return Math.min(SCORING_CONFIG.maxGoldPerRound, Math.max(SCORING_CONFIG.minGoldPerRound, rawGold));
+}
