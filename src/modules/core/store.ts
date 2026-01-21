@@ -14,6 +14,7 @@ import type {
   Deck,
   RouletteResult,
   ShopState,
+  SlotResult,
 } from '@/types/interfaces';
 import { DEFAULT_GAME_CONFIG } from '@/data/constants';
 import {
@@ -80,6 +81,7 @@ function createInitialState(): Omit<GameState, keyof GameActions> & {
     maxJokers: DEFAULT_GAME_CONFIG.maxJokers,
     handsRemaining: DEFAULT_GAME_CONFIG.startingHands,
     discardsRemaining: DEFAULT_GAME_CONFIG.startingDiscards,
+    slotSpinsRemaining: DEFAULT_GAME_CONFIG.startingSlotSpins,
     config: mergeGameConfig(),
     shopState: null,
   };
@@ -167,6 +169,7 @@ export const useGameStore = create<GameStore>((set, get) => ({
       maxJokers: config.maxJokers,
       handsRemaining: config.startingHands + bonuses.handsBonus,
       discardsRemaining: config.startingDiscards + bonuses.discardsBonus,
+      slotSpinsRemaining: config.startingSlotSpins,
     });
 
     getGameEventEmitter().emit({
@@ -360,6 +363,12 @@ export const useGameStore = create<GameStore>((set, get) => ({
       return;
     }
 
+    // Check if spins remaining
+    if (state.slotSpinsRemaining <= 0) {
+      console.warn('No slot spins remaining');
+      return;
+    }
+
     // Evaluate jokers for slot modifiers (future use)
     evaluateJokers(state.jokers, {
       phase: 'SLOT_PHASE',
@@ -374,12 +383,38 @@ export const useGameStore = create<GameStore>((set, get) => ({
     set({
       slotResult: result,
       gold: Math.max(0, state.gold + instantGold - goldPenalty),
+      slotSpinsRemaining: state.slotSpinsRemaining - 1,
     });
 
     getGameEventEmitter().emit({
       type: 'SLOT_SPIN',
       result,
     });
+
+    // Automatically advance to draw phase
+    get().nextPhase();
+  },
+
+  skipSlot: () => {
+    const state = get();
+    if (!isActionValidInPhase('spinSlot', state.phase)) {
+      console.warn('skipSlot is not valid in phase:', state.phase);
+      return;
+    }
+
+    // Create a neutral slot result (no bonuses, no penalties)
+    const neutralResult: SlotResult = {
+      symbols: ['card', 'target', 'gold'],
+      isJackpot: false,
+      effects: {
+        cardBonus: { extraDraw: 0, handSize: 0, scoreMultiplier: 1 },
+        rouletteBonus: { safeZoneBonus: 0, maxMultiplier: 0, freeSpins: 0 },
+        instant: { gold: 0, chips: 0 },
+        penalty: { discardCards: 0, skipRoulette: false, loseGold: 0 },
+      },
+    };
+
+    set({ slotResult: neutralResult });
 
     // Automatically advance to draw phase
     get().nextPhase();
@@ -653,6 +688,7 @@ export const useGameStore = create<GameStore>((set, get) => ({
       selectedCards: [],
       handsRemaining: state.config.startingHands + bonuses.handsBonus,
       discardsRemaining: state.config.startingDiscards + bonuses.discardsBonus,
+      slotSpinsRemaining: state.config.startingSlotSpins,
       shopState: null,
       slotResult: null,
       handResult: null,

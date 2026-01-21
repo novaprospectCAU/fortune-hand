@@ -34,6 +34,7 @@ describe('Event System', () => {
         startingGold: 100,
         startingHands: 4,
         startingDiscards: 3,
+        startingSlotSpins: 4,
         handSize: 8,
         maxJokers: 5,
         roundScores: [300, 800, 2000],

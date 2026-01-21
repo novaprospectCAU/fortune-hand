@@ -18,21 +18,21 @@ export interface HandProps {
 }
 
 /**
- * 카드 겹침 정도 (음수 마진)
+ * 카드 겹침 정도 (음수 마진) - 값이 작을수록 간격이 넓어짐
  */
 const OVERLAP_STYLES = {
-  sm: '-ml-8',
-  md: '-ml-10',
-  lg: '-ml-14',
+  sm: '-ml-4',
+  md: '-ml-6',
+  lg: '-ml-8',
 };
 
 /**
  * 손패 컨테이너 패딩
  */
 const CONTAINER_PADDING = {
-  sm: 'pl-8',
-  md: 'pl-10',
-  lg: 'pl-14',
+  sm: 'pl-4',
+  md: 'pl-6',
+  lg: 'pl-8',
 };
 
 /**

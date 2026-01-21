@@ -341,12 +341,14 @@ export interface GameState {
   // 플레이 제한
   handsRemaining: number;
   discardsRemaining: number;
+  slotSpinsRemaining: number;
 }
 
 export interface GameConfig {
   startingGold: number;
   startingHands: number;
   startingDiscards: number;
+  startingSlotSpins: number;
   handSize: number;
   maxJokers: number;
   roundScores: number[];  // 라운드별 목표 점수
@@ -360,6 +362,7 @@ export interface GameActions {
   
   // 슬롯 단계
   spinSlot(): void;
+  skipSlot(): void;
   
   // 카드 단계
   selectCard(cardId: string): void;

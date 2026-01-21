@@ -45,10 +45,12 @@ function App() {
     maxJokers,
     handsRemaining,
     discardsRemaining,
+    slotSpinsRemaining,
     shopState,
     // Actions
     startGame,
     spinSlot,
+    skipSlot,
     selectCard,
     deselectCard,
     playHand,
@@ -351,6 +353,10 @@ function App() {
     spinSlot();
   }, [spinSlot]);
 
+  const handleSkipSlot = useCallback(() => {
+    skipSlot();
+  }, [skipSlot]);
+
   const handleSpinRoulette = useCallback(() => {
     spinRoulette();
   }, [spinRoulette]);
@@ -387,10 +393,12 @@ function App() {
         maxJokers,
         handsRemaining,
         discardsRemaining,
+        slotSpinsRemaining,
       }}
       onPlay={handlePlay}
       onDiscard={handleDiscard}
       onSpinSlot={handleSpinSlot}
+      onSkipSlot={handleSkipSlot}
       onSpinRoulette={handleSpinRoulette}
       onSkipRoulette={handleSkipRoulette}
       onContinue={handleContinue}

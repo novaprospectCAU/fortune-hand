@@ -118,6 +118,7 @@ export function createDefaultConfig(): GameConfig {
     startingGold: DEFAULT_GAME_CONFIG.startingGold,
     startingHands: DEFAULT_GAME_CONFIG.startingHands,
     startingDiscards: DEFAULT_GAME_CONFIG.startingDiscards,
+    startingSlotSpins: DEFAULT_GAME_CONFIG.startingSlotSpins,
     handSize: DEFAULT_GAME_CONFIG.handSize,
     maxJokers: DEFAULT_GAME_CONFIG.maxJokers,
     roundScores,
@@ -144,7 +145,7 @@ export function mergeGameConfig(partial?: Partial<GameConfig>): GameConfig {
 export function isActionValidInPhase(action: string, phase: GamePhase): boolean {
   const validActions: Record<GamePhase, string[]> = {
     IDLE: ['startGame'],
-    SLOT_PHASE: ['spinSlot'],
+    SLOT_PHASE: ['spinSlot', 'skipSlot'],
     DRAW_PHASE: [], // Drawing is automatic
     PLAY_PHASE: ['selectCard', 'deselectCard', 'playHand', 'discardSelected'],
     SCORE_PHASE: [], // Scoring is automatic

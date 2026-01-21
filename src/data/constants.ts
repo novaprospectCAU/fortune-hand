@@ -106,6 +106,7 @@ export const DEFAULT_GAME_CONFIG = {
   startingGold: 100,
   startingHands: 4,
   startingDiscards: 3,
+  startingSlotSpins: 4,  // 라운드당 슬롯 스핀 횟수
   handSize: 8,
   maxSelectCards: 5,
   maxJokers: 5,

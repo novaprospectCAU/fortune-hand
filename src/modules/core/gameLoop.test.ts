@@ -65,6 +65,7 @@ describe('Game Loop', () => {
         maxJokers: 5,
         handsRemaining: 4,
         discardsRemaining: 3,
+        slotSpinsRemaining: 4,
         ...overrides,
       };
     }

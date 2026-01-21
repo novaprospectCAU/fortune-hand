@@ -19,6 +19,7 @@ export interface GameLayoutProps {
   onPlay?: () => void;
   onDiscard?: () => void;
   onSpinSlot?: () => void;
+  onSkipSlot?: () => void;
   onSpinRoulette?: () => void;
   onSkipRoulette?: () => void;
   onContinue?: () => void;
@@ -32,6 +33,7 @@ export function GameLayout({
   onPlay,
   onDiscard,
   onSpinSlot,
+  onSkipSlot,
   onSpinRoulette,
   onSkipRoulette,
   onContinue,
@@ -47,6 +49,7 @@ export function GameLayout({
     gold = 0,
     handsRemaining = 0,
     discardsRemaining = 0,
+    slotSpinsRemaining = 0,
     jokers = [],
     maxJokers = 5,
     selectedCards = [],
@@ -152,9 +155,11 @@ export function GameLayout({
         maxSelectCards={maxSelectCards}
         handsRemaining={handsRemaining}
         discardsRemaining={discardsRemaining}
+        slotSpinsRemaining={slotSpinsRemaining}
         onPlay={onPlay}
         onDiscard={onDiscard}
         onSpinSlot={onSpinSlot}
+        onSkipSlot={onSkipSlot}
         onSpinRoulette={onSpinRoulette}
         onSkipRoulette={onSkipRoulette}
         onContinue={onContinue}
