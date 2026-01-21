@@ -11,7 +11,7 @@ import { AnimatePresence, motion } from 'framer-motion';
 import { useGameStore } from '@/modules/core';
 
 // UI module - layout and common components
-import { GameLayout, ScoreDisplay, DeckViewer, CardEffectTooltip } from '@/modules/ui';
+import { GameLayout, ScoreDisplay, DeckViewer, CardEffectTooltip, Modal, Button } from '@/modules/ui';
 
 // Game modules - components
 import { SlotMachine } from '@/modules/slots';
@@ -61,6 +61,7 @@ function App() {
     retryRoulette,
     confirmRoulette,
     buyItem,
+    removeJoker,
     rerollShop,
     leaveShop,
   } = useGameStore();
@@ -73,6 +74,9 @@ function App() {
 
   // Roulette retry tracking (resets when phase changes)
   const [rouletteRetryUsed, setRouletteRetryUsed] = useState(false);
+
+  // Joker removal confirmation
+  const [jokerToRemove, setJokerToRemove] = useState<Joker | null>(null);
 
   // Reset retry state when leaving roulette phase
   useEffect(() => {
@@ -109,9 +113,9 @@ function App() {
     [selectedCards, selectCard, deselectCard]
   );
 
-  // Joker click handler (for future tooltip/detail view)
-  const handleJokerClick = useCallback((_joker: Joker) => {
-    // TODO: Show joker detail modal
+  // Joker click handler - show removal confirmation
+  const handleJokerClick = useCallback((joker: Joker) => {
+    setJokerToRemove(joker);
   }, []);
 
   // Slot spin complete handler - save result to store and advance phase
@@ -389,10 +393,14 @@ function App() {
                 className="text-center mb-4"
               >
                 <h2 className="text-xl font-bold text-white mb-1">
-                  Risk the Roulette?
+                  {rouletteRetryUsed ? 'Retry Spin!' : 'Risk the Roulette?'}
                 </h2>
                 <p className="text-gray-400 text-sm">
-                  Base Score: {scoreCalculation?.finalScore.toLocaleString() ?? 0}
+                  Base Score: {rouletteRetryUsed
+                    ? Math.floor((scoreCalculation?.finalScore ?? 0) * 0.75).toLocaleString()
+                    : (scoreCalculation?.finalScore.toLocaleString() ?? 0)
+                  }
+                  {rouletteRetryUsed && <span className="text-orange-400"> (-25%)</span>}
                 </p>
               </motion.div>
             )}
@@ -593,6 +601,42 @@ function App() {
 
     {/* Card Effect Tooltip (centered) */}
     <CardEffectTooltip card={hoveredCard} />
+
+    {/* Joker Removal Confirmation Modal */}
+    <Modal
+      isOpen={!!jokerToRemove}
+      onClose={() => setJokerToRemove(null)}
+      title="Remove Joker?"
+    >
+      {jokerToRemove && (
+        <div className="text-center">
+          <div className="mb-4">
+            <h3 className="text-lg font-bold text-white mb-1">{jokerToRemove.name}</h3>
+            <p className="text-gray-400 text-sm">{jokerToRemove.description}</p>
+          </div>
+          <p className="text-yellow-400 text-sm mb-4">
+            This joker will be permanently removed.
+          </p>
+          <div className="flex justify-center gap-3">
+            <Button
+              variant="ghost"
+              onClick={() => setJokerToRemove(null)}
+            >
+              Cancel
+            </Button>
+            <Button
+              variant="danger"
+              onClick={() => {
+                removeJoker(jokerToRemove.id);
+                setJokerToRemove(null);
+              }}
+            >
+              Remove
+            </Button>
+          </div>
+        </div>
+      )}
+    </Modal>
   </>
   );
 }

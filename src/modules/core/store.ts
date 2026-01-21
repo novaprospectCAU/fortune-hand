@@ -665,7 +665,8 @@ export const useGameStore = create<GameStore>((set, get) => ({
     });
   },
 
-  // Retry roulette with 25% penalty (can only retry once)
+  // Retry roulette - clears result so wheel can spin again
+  // The penalty is applied in App.tsx by passing reduced baseScore to the wheel
   retryRoulette: () => {
     const state = get();
     if (!isActionValidInPhase('spinRoulette', state.phase)) {
@@ -678,26 +679,8 @@ export const useGameStore = create<GameStore>((set, get) => ({
       return;
     }
 
-    // Apply 25% penalty to base score
-    const originalBaseScore = state.scoreCalculation?.finalScore ?? 0;
-    const penalizedScore = Math.floor(originalBaseScore * 0.75);
-
-    let config = getDefaultRouletteConfig();
-    if (state.slotResult) {
-      config = applyRouletteBonuses(config, state.slotResult.effects.rouletteBonus);
-    }
-
-    const result = rouletteSpin({
-      baseScore: penalizedScore,
-      config,
-    });
-
-    set({ rouletteResult: result });
-
-    getGameEventEmitter().emit({
-      type: 'ROULETTE_SPIN',
-      result,
-    });
+    // Clear the result so the wheel can be spun again
+    set({ rouletteResult: null });
   },
 
   // Confirm roulette result and proceed to reward phase
@@ -910,6 +893,26 @@ export const useGameStore = create<GameStore>((set, get) => ({
     });
 
     get()._setPhase('SLOT_PHASE');
+  },
+
+  // ============================================================
+  // Joker Management Actions
+  // ============================================================
+
+  removeJoker: (jokerId: string) => {
+    const state = get();
+    const jokerToRemove = state.jokers.find(j => j.id === jokerId);
+
+    if (!jokerToRemove) {
+      console.warn('Joker not found:', jokerId);
+      return;
+    }
+
+    set({
+      jokers: state.jokers.filter(j => j.id !== jokerId),
+    });
+
+    console.log('Joker removed:', jokerToRemove.name);
   },
 }));
 

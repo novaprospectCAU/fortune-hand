@@ -428,6 +428,9 @@ export interface GameActions {
   buyItem(itemId: string): void;
   rerollShop(): void;
   leaveShop(): void;
+
+  // 조커 관리
+  removeJoker(jokerId: string): void;
 }
 
 // ============================================================
