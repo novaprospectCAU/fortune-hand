@@ -3,8 +3,8 @@
  * 카드의 시각적 표현과 상호작용 담당
  */
 
-import { memo } from 'react';
-import { motion } from 'framer-motion';
+import { memo, useState, useCallback } from 'react';
+import { motion, AnimatePresence } from 'framer-motion';
 import type { Card as CardType } from '@/types/interfaces';
 import { isSpecialCard } from '../specialCards';
 
@@ -114,6 +114,48 @@ function getSpecialGlow(card: CardType): string | undefined {
 }
 
 /**
+ * 카드 효과 설명 생성
+ */
+function getCardEffectDescriptions(card: CardType): string[] {
+  const effects: string[] = [];
+
+  // 특수 카드 효과
+  if (card.isWild) {
+    effects.push('🌟 Wild: 어떤 랭크/무늬로도 사용 가능');
+  }
+  if (card.isGold) {
+    effects.push('💰 Gold: 점수 대신 골드 획득');
+  }
+  if (card.triggerSlot) {
+    effects.push('🎰 Slot: 플레이 시 미니 슬롯 발동');
+  }
+  if (card.triggerRoulette) {
+    effects.push('🎯 Roulette: 추가 룰렛 기회');
+  }
+
+  // 강화 효과
+  if (card.enhancement) {
+    const { type, value } = card.enhancement;
+    switch (type) {
+      case 'mult':
+        effects.push(`🔴 Mult +${value}: 배수 +${value} 추가`);
+        break;
+      case 'chips':
+        effects.push(`🔵 Chips +${value}: 칩 +${value} 추가`);
+        break;
+      case 'gold':
+        effects.push(`🟡 Gold +${value}: 점수 시 골드 +${value}`);
+        break;
+      case 'retrigger':
+        effects.push(`🟣 Retrigger: 이 카드 ${value + 1}번 발동`);
+        break;
+    }
+  }
+
+  return effects;
+}
+
+/**
  * Card 컴포넌트
  * 개별 카드의 시각적 표현과 상호작용 처리
  */
@@ -125,6 +167,8 @@ function CardComponent({
   faceDown = false,
   size = 'md',
 }: CardProps) {
+  const [showTooltip, setShowTooltip] = useState(false);
+
   const sizeStyle = SIZE_STYLES[size];
   const suitColor = SUIT_COLORS[card.suit];
   const suitSymbol = SUIT_SYMBOLS[card.suit];
@@ -134,6 +178,21 @@ function CardComponent({
     ? ENHANCEMENT_GRADIENTS[card.enhancement.type]
     : undefined;
   const hasSpecialEffect = specialBorder || enhancementGradient;
+
+  // 카드 효과 설명 목록
+  const effectDescriptions = getCardEffectDescriptions(card);
+  const hasEffects = effectDescriptions.length > 0;
+
+  // 툴팁 표시/숨김 핸들러
+  const handleMouseEnter = useCallback(() => {
+    if (hasEffects && !faceDown) {
+      setShowTooltip(true);
+    }
+  }, [hasEffects, faceDown]);
+
+  const handleMouseLeave = useCallback(() => {
+    setShowTooltip(false);
+  }, []);
 
   // 카드 뒷면
   if (faceDown) {
@@ -178,8 +237,32 @@ function CardComponent({
       }}
       whileTap={!disabled ? { scale: 0.95 } : undefined}
       onClick={!disabled ? onClick : undefined}
+      onMouseEnter={handleMouseEnter}
+      onMouseLeave={handleMouseLeave}
       transition={{ type: 'spring', stiffness: 400, damping: 25 }}
     >
+      {/* 카드 효과 툴팁 */}
+      <AnimatePresence>
+        {showTooltip && hasEffects && (
+          <motion.div
+            initial={{ opacity: 0, y: 10 }}
+            animate={{ opacity: 1, y: 0 }}
+            exit={{ opacity: 0, y: 10 }}
+            transition={{ duration: 0.15 }}
+            className="absolute z-50 bottom-full left-1/2 -translate-x-1/2 mb-2 pointer-events-none"
+          >
+            <div className="bg-gray-900 text-white text-xs rounded-lg px-3 py-2 shadow-lg whitespace-nowrap">
+              {effectDescriptions.map((desc, idx) => (
+                <div key={idx} className={idx > 0 ? 'mt-1' : ''}>
+                  {desc}
+                </div>
+              ))}
+              {/* 툴팁 화살표 */}
+              <div className="absolute top-full left-1/2 -translate-x-1/2 border-4 border-transparent border-t-gray-900" />
+            </div>
+          </motion.div>
+        )}
+      </AnimatePresence>
       {/* 왼쪽 상단 랭크/무늬 */}
       <div
         className={`absolute top-1 left-1 ${sizeStyle.fontSize} font-bold leading-none`}
