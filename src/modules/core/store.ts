@@ -41,6 +41,7 @@ import {
   buyItem as shopBuyItem,
   rerollShop,
 } from './moduleIntegration';
+import { getJokerById } from '@/modules/jokers';
 
 /**
  * Extended store interface combining state and actions
@@ -625,9 +626,25 @@ export const useGameStore = create<GameStore>((set, get) => ({
       ),
     };
 
+    // Handle purchased item based on type
+    const purchasedItem = transaction.item;
+    let newJokers = state.jokers;
+
+    if (purchasedItem?.type === 'joker') {
+      // Add joker to player's collection
+      const joker = getJokerById(purchasedItem.itemId);
+      if (joker && state.jokers.length < state.maxJokers) {
+        newJokers = [...state.jokers, joker];
+      } else if (state.jokers.length >= state.maxJokers) {
+        console.warn('Max jokers reached');
+      }
+    }
+    // TODO: Handle other item types (card, pack, voucher)
+
     set({
       gold: transaction.newGold,
       shopState: newShopState,
+      jokers: newJokers,
     });
 
     if (transaction.item) {
