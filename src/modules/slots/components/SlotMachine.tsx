@@ -100,7 +100,7 @@ export function SlotMachine({
         <div className="absolute -inset-2 sm:-inset-3 bg-gradient-to-b from-amber-800 to-amber-900 rounded-lg sm:rounded-xl" />
 
         {/* 릴 컨테이너 */}
-        <div className="relative flex gap-2 sm:gap-3 p-3 sm:p-4 bg-slate-950 rounded-lg border-2 sm:border-4 border-amber-700">
+        <div className="relative flex justify-center gap-2 sm:gap-3 p-3 sm:p-4 bg-slate-950 rounded-lg border-2 sm:border-4 border-amber-700">
           {/* 장식 볼트 - 모바일에서는 작게 */}
           <div className="absolute -top-1 sm:-top-2 -left-1 sm:-left-2 w-3 h-3 sm:w-4 sm:h-4 bg-amber-600 rounded-full border border-amber-400 sm:border-2" />
           <div className="absolute -top-1 sm:-top-2 -right-1 sm:-right-2 w-3 h-3 sm:w-4 sm:h-4 bg-amber-600 rounded-full border border-amber-400 sm:border-2" />
