@@ -27,14 +27,6 @@ const OVERLAP_STYLES = {
   lg: '-ml-12 sm:-ml-8',
 };
 
-/**
- * 손패 컨테이너 패딩
- */
-const CONTAINER_PADDING = {
-  sm: 'pl-8 sm:pl-4',
-  md: 'pl-10 sm:pl-6',
-  lg: 'pl-12 sm:pl-8',
-};
 
 /**
  * Hand 컴포넌트
@@ -92,23 +84,27 @@ function HandComponent({
 
   return (
     <div
-      className={`flex items-end justify-center ${CONTAINER_PADDING[size]} py-2 sm:py-4 overflow-x-auto`}
+      className="flex items-end justify-center py-2 sm:py-4 overflow-x-auto w-full"
     >
-      <AnimatePresence mode="popLayout">
-        {cards.map((card, index) => {
-          const isSelected = selectedSet.has(card.id);
-          const isDisabled =
-            disabled || (!isSelected && isMaxSelected);
-          const rotation = getCardRotation(index, cards.length);
-          const yOffset = getCardYOffset(index, cards.length);
+      <div className="flex items-end">
+        <AnimatePresence mode="popLayout">
+          {cards.map((card, index) => {
+            const isSelected = selectedSet.has(card.id);
+            const isDisabled =
+              disabled || (!isSelected && isMaxSelected);
+            const rotation = getCardRotation(index, cards.length);
+            const yOffset = getCardYOffset(index, cards.length);
 
-          // 선택된 카드는 위로 이동
-          const selectedYOffset = isSelected ? yOffset - 12 : yOffset;
+            // 선택된 카드는 위로 이동
+            const selectedYOffset = isSelected ? yOffset - 12 : yOffset;
 
-          return (
-            <motion.div
-              key={card.id}
-              className={`${index > 0 ? OVERLAP_STYLES[size] : ''}`}
+            // 첫 번째 카드는 마진 없음, 나머지는 음수 마진으로 겹침
+            const marginClass = index > 0 ? OVERLAP_STYLES[size] : '';
+
+            return (
+              <motion.div
+                key={card.id}
+                className={marginClass}
               initial={{ opacity: 0, y: 50, scale: 0.8 }}
               animate={{
                 opacity: 1,
@@ -136,10 +132,11 @@ function HandComponent({
                 disabled={isDisabled}
                 size={size}
               />
-            </motion.div>
-          );
-        })}
-      </AnimatePresence>
+              </motion.div>
+            );
+          })}
+        </AnimatePresence>
+      </div>
 
       {/* 손패가 비어있을 때 */}
       {cards.length === 0 && (
