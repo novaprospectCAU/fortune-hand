@@ -18,9 +18,11 @@ import { SlotMachine } from '@/modules/slots';
 import { Hand } from '@/modules/cards';
 import { RouletteWheel, getDefaultConfig, applyBonuses } from '@/modules/roulette';
 import { Shop } from '@/modules/shop';
+import { getJokerById } from '@/modules/jokers';
 
 // Types
 import type { Joker } from '@/types/interfaces';
+import type { ShopItemProps } from '@/modules/shop/components/ShopItem';
 
 /**
  * Main game component
@@ -98,6 +100,25 @@ function App() {
     }
     return config;
   }, [slotResult]);
+
+  // Get item details for shop display
+  const getItemDetails = useCallback(
+    (itemId: string, itemType: string): ShopItemProps['itemDetails'] | undefined => {
+      if (itemType === 'joker') {
+        const joker = getJokerById(itemId);
+        if (joker) {
+          return {
+            name: joker.name,
+            description: joker.description,
+            rarity: joker.rarity,
+          };
+        }
+      }
+      // TODO: Add support for other item types (card, pack, voucher)
+      return undefined;
+    },
+    []
+  );
 
   // Render main content based on phase
   const renderMainContent = () => {
@@ -306,6 +327,7 @@ function App() {
                 onBuy={buyItem}
                 onReroll={rerollShop}
                 onLeave={leaveShop}
+                getItemDetails={getItemDetails}
               />
             )}
           </div>
