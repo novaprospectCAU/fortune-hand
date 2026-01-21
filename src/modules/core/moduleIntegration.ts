@@ -20,8 +20,6 @@ import type {
   Joker,
   JokerContext,
   ShopState,
-  ShopItem,
-  Transaction,
   Suit,
   Rank,
 } from '@/types/interfaces';
@@ -692,74 +690,12 @@ export function evaluateJokers(
 // Shop Module Integration
 // ============================================================
 
-/**
- * Generate shop items
- */
-export function generateShop(round: number, _luck: number): ShopState {
-  const itemCount = balanceData.shop.itemCount;
-  const items: ShopItem[] = [];
+// Import and re-export the actual shop functions from the shop module
+import { generateShop as shopGenerateShop } from '@/modules/shop/shopGenerator';
+import { buyItem as shopBuyItem } from '@/modules/shop/transactions';
 
-  for (let i = 0; i < itemCount; i++) {
-    // Simple item generation
-    const itemType = Math.random() < 0.5 ? 'joker' : 'card';
-    const cost = itemType === 'joker' ? 40 + Math.floor(Math.random() * 60) : 20 + Math.floor(Math.random() * 30);
-
-    items.push({
-      id: `shop_item_${round}_${i}`,
-      type: itemType,
-      itemId: `${itemType}_${i}`,
-      cost,
-      sold: false,
-    });
-  }
-
-  return {
-    items,
-    rerollCost: balanceData.shop.rerollBaseCost,
-    rerollsUsed: 0,
-  };
-}
-
-/**
- * Buy an item from the shop
- */
-export function buyItem(
-  shopState: ShopState,
-  itemId: string,
-  playerGold: number
-): Transaction {
-  const item = shopState.items.find(i => i.id === itemId);
-
-  if (!item) {
-    return {
-      success: false,
-      newGold: playerGold,
-      error: 'Item not found',
-    };
-  }
-
-  if (item.sold) {
-    return {
-      success: false,
-      newGold: playerGold,
-      error: 'Item already sold',
-    };
-  }
-
-  if (playerGold < item.cost) {
-    return {
-      success: false,
-      newGold: playerGold,
-      error: 'Not enough gold',
-    };
-  }
-
-  return {
-    success: true,
-    item,
-    newGold: playerGold - item.cost,
-  };
-}
+export const generateShop = shopGenerateShop;
+export const buyItem = shopBuyItem;
 
 /**
  * Reroll shop items
@@ -783,7 +719,7 @@ export function rerollShop(
     };
   }
 
-  const newShop = generateShop(round, luck);
+  const newShop = shopGenerateShop(round, luck);
   newShop.rerollsUsed = shopState.rerollsUsed + 1;
   newShop.rerollCost = Math.max(0,
     balanceData.shop.rerollBaseCost +

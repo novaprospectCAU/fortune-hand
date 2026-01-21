@@ -520,7 +520,7 @@ describe('Shop Module Integration', () => {
 
       const result = buyItem(shop, 'item1', 100);
       expect(result.success).toBe(false);
-      expect(result.error).toBe('Item already sold');
+      expect(result.error).toBe('Already sold');
     });
   });
 
