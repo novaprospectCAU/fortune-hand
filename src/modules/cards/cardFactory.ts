@@ -7,6 +7,19 @@ import type { Card, Suit, Rank } from '@/types/interfaces';
 import { RANKS, SUITS } from '@/data/constants';
 
 /**
+ * 카드 ID 생성용 카운터
+ * 각 카드가 고유 ID를 갖도록 함
+ */
+let cardIdCounter = 0;
+
+/**
+ * 고유 카드 ID 생성
+ */
+function generateCardId(rank: Rank, suit: Suit): string {
+  return `${rank}_${suit}_${++cardIdCounter}`;
+}
+
+/**
  * 단일 카드 생성
  * @param rank - 카드 랭크 (A, 2-10, J, Q, K)
  * @param suit - 카드 무늬 (hearts, diamonds, clubs, spades)
@@ -14,7 +27,7 @@ import { RANKS, SUITS } from '@/data/constants';
  */
 export function createCard(rank: Rank, suit: Suit): Card {
   return {
-    id: `${rank}_${suit}`,
+    id: generateCardId(rank, suit),
     rank,
     suit,
   };
