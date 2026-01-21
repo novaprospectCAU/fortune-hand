@@ -16,13 +16,9 @@ export interface FooterProps {
   maxSelectCards: number;
   handsRemaining: number;
   discardsRemaining: number;
-  slotSpinsRemaining?: number;
-  canSpin?: boolean;
   className?: string;
   onPlay?: () => void;
   onDiscard?: () => void;
-  onSpinSlot?: () => void;
-  onSkipSlot?: () => void;
   onSpinRoulette?: () => void;
   onSkipRoulette?: () => void;
   onContinue?: () => void;
@@ -34,13 +30,9 @@ export function Footer({
   maxSelectCards,
   handsRemaining,
   discardsRemaining,
-  slotSpinsRemaining = 0,
-  canSpin = true,
   className,
   onPlay,
   onDiscard,
-  onSpinSlot,
-  onSkipSlot,
   onSpinRoulette,
   onSkipRoulette,
   onContinue,
@@ -59,33 +51,7 @@ export function Footer({
         );
 
       case 'SLOT_PHASE':
-        return (
-          <div className="flex flex-col sm:flex-row items-center gap-3 w-full sm:w-auto">
-            {/* Slot Spins Info */}
-            <div className="text-slate-400 text-sm">
-              Spins: {slotSpinsRemaining}
-            </div>
-
-            {/* Action Buttons */}
-            <div className="flex items-center gap-3">
-              <Button
-                variant="ghost"
-                size="lg"
-                onClick={onSkipSlot}
-              >
-                Skip
-              </Button>
-              <Button
-                variant="primary"
-                size="lg"
-                onClick={onSpinSlot}
-                disabled={!canSpin || slotSpinsRemaining <= 0}
-              >
-                Spin Slot ({slotSpinsRemaining})
-              </Button>
-            </div>
-          </div>
-        );
+        return null; // SlotMachine has its own SPIN button
 
       case 'DRAW_PHASE':
         return (

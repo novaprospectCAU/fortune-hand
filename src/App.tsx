@@ -48,12 +48,9 @@ function App() {
     maxJokers,
     handsRemaining,
     discardsRemaining,
-    slotSpinsRemaining,
     shopState,
     // Actions
     startGame,
-    spinSlot,
-    skipSlot,
     selectCard,
     deselectCard,
     playHand,
@@ -82,10 +79,9 @@ function App() {
     // TODO: Show joker detail modal
   }, []);
 
-  // Slot spin complete handler
-  const handleSlotSpinComplete = useCallback(() => {
-    // SlotMachine handles its own spin, but we need to call store action
-    // The store's spinSlot action will be called via the footer button
+  // Slot spin complete handler - save result to store and advance phase
+  const handleSlotSpinComplete = useCallback((result: import('@/types/interfaces').SlotResult) => {
+    useGameStore.getState().setSlotResult(result);
   }, []);
 
   // Roulette spin complete handler
@@ -413,14 +409,6 @@ function App() {
     }
   }, [selectedCards, discardsRemaining, discardSelected]);
 
-  const handleSpinSlot = useCallback(() => {
-    spinSlot();
-  }, [spinSlot]);
-
-  const handleSkipSlot = useCallback(() => {
-    skipSlot();
-  }, [skipSlot]);
-
   const handleSpinRoulette = useCallback(() => {
     spinRoulette();
   }, [spinRoulette]);
@@ -457,12 +445,9 @@ function App() {
         maxJokers,
         handsRemaining,
         discardsRemaining,
-        slotSpinsRemaining,
       }}
       onPlay={handlePlay}
       onDiscard={handleDiscard}
-      onSpinSlot={handleSpinSlot}
-      onSkipSlot={handleSkipSlot}
       onSpinRoulette={handleSpinRoulette}
       onSkipRoulette={handleSkipRoulette}
       onContinue={handleContinue}

@@ -408,6 +408,7 @@ export interface GameActions {
   
   // 슬롯 단계
   spinSlot(): void;
+  setSlotResult(result: SlotResult): void;
   skipSlot(): void;
   
   // 카드 단계

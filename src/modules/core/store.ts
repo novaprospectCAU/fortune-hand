@@ -407,6 +407,16 @@ export const useGameStore = create<GameStore>((set, get) => ({
     });
 
     const result = spin();
+    get().setSlotResult(result);
+  },
+
+  // Set slot result from external source (e.g., SlotMachine component)
+  setSlotResult: (result: SlotResult) => {
+    const state = get();
+    if (state.phase !== 'SLOT_PHASE') {
+      console.warn('setSlotResult is only valid in SLOT_PHASE');
+      return;
+    }
 
     // Apply instant gold
     const instantGold = result.effects.instant.gold;
@@ -415,7 +425,7 @@ export const useGameStore = create<GameStore>((set, get) => ({
     set({
       slotResult: result,
       gold: Math.max(0, state.gold + instantGold - goldPenalty),
-      slotSpinsRemaining: state.slotSpinsRemaining - 1,
+      slotSpinsRemaining: Math.max(0, state.slotSpinsRemaining - 1),
     });
 
     getGameEventEmitter().emit({

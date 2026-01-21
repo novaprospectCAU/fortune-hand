@@ -66,17 +66,10 @@ describe('Footer', () => {
     expect(screen.getByText(/Play Hand/)).toBeDisabled();
   });
 
-  it('renders Spin Slot button in SLOT_PHASE', () => {
+  it('renders nothing in SLOT_PHASE (SlotMachine has its own button)', () => {
     render(<Footer {...defaultProps} phase="SLOT_PHASE" />);
-    expect(screen.getByText(/Spin Slot/)).toBeInTheDocument();
-  });
-
-  it('calls onSpinSlot when Spin Slot button is clicked', () => {
-    const handleSpinSlot = vi.fn();
-    render(<Footer {...defaultProps} phase="SLOT_PHASE" slotSpinsRemaining={1} onSpinSlot={handleSpinSlot} />);
-
-    fireEvent.click(screen.getByText(/Spin Slot/));
-    expect(handleSpinSlot).toHaveBeenCalled();
+    // SlotMachine component handles its own SPIN button, Footer shows nothing
+    expect(screen.queryByRole('button')).not.toBeInTheDocument();
   });
 
   it('renders roulette buttons in ROULETTE_PHASE', () => {
