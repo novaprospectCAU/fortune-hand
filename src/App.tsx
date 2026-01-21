@@ -19,6 +19,7 @@ import { Hand } from '@/modules/cards';
 import { RouletteWheel, getDefaultConfig, applyBonuses } from '@/modules/roulette';
 import { Shop } from '@/modules/shop';
 import { getJokerById } from '@/modules/jokers';
+import { getSpecialCardById } from '@/modules/cards';
 
 // Types
 import type { Joker } from '@/types/interfaces';
@@ -104,17 +105,58 @@ function App() {
   // Get item details for shop display
   const getItemDetails = useCallback(
     (itemId: string, itemType: string): ShopItemProps['itemDetails'] | undefined => {
-      if (itemType === 'joker') {
-        const joker = getJokerById(itemId);
-        if (joker) {
-          return {
-            name: joker.name,
-            description: joker.description,
-            rarity: joker.rarity,
-          };
+      switch (itemType) {
+        case 'joker': {
+          const joker = getJokerById(itemId);
+          if (joker) {
+            return {
+              name: joker.name,
+              description: joker.description,
+              rarity: joker.rarity,
+            };
+          }
+          break;
+        }
+        case 'card': {
+          const card = getSpecialCardById(itemId);
+          if (card) {
+            // Get rarity from the card data
+            const cardData = {
+              wild_joker: { name: 'Wild Joker', description: 'Can be any rank or suit', rarity: 'rare' as const },
+              gold_ace: { name: 'Golden Ace', description: 'Gives +10 gold instead of chips', rarity: 'uncommon' as const },
+              slot_seven: { name: 'Lucky Seven', description: 'Triggers a mini slot spin when played', rarity: 'rare' as const },
+              roulette_king: { name: "Gambler's King", description: 'Grants an extra roulette spin', rarity: 'rare' as const },
+            }[itemId];
+            if (cardData) {
+              return cardData;
+            }
+          }
+          break;
+        }
+        case 'pack': {
+          const packInfo = {
+            standard_pack: { name: 'Standard Pack', description: 'Contains 3 random cards', rarity: 'common' as const },
+            jumbo_pack: { name: 'Jumbo Pack', description: 'Contains 4 random cards', rarity: 'uncommon' as const },
+            mega_pack: { name: 'Mega Pack', description: 'Contains 5 random cards', rarity: 'rare' as const },
+          }[itemId];
+          if (packInfo) {
+            return packInfo;
+          }
+          break;
+        }
+        case 'voucher': {
+          const voucherInfo = {
+            extra_hand: { name: 'Extra Hand', description: '+1 hand per round permanently', rarity: 'uncommon' as const },
+            extra_discard: { name: 'Extra Discard', description: '+1 discard per round permanently', rarity: 'uncommon' as const },
+            shop_discount: { name: 'Shop Discount', description: '10% off all shop items', rarity: 'rare' as const },
+            luck_boost: { name: 'Luck Boost', description: 'Better rarity chances in shop', rarity: 'rare' as const },
+          }[itemId];
+          if (voucherInfo) {
+            return voucherInfo;
+          }
+          break;
         }
       }
-      // TODO: Add support for other item types (card, pack, voucher)
       return undefined;
     },
     []

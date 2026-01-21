@@ -68,14 +68,14 @@ describe('Footer', () => {
 
   it('renders Spin Slot button in SLOT_PHASE', () => {
     render(<Footer {...defaultProps} phase="SLOT_PHASE" />);
-    expect(screen.getByText('Spin Slot')).toBeInTheDocument();
+    expect(screen.getByText(/Spin Slot/)).toBeInTheDocument();
   });
 
   it('calls onSpinSlot when Spin Slot button is clicked', () => {
     const handleSpinSlot = vi.fn();
-    render(<Footer {...defaultProps} phase="SLOT_PHASE" onSpinSlot={handleSpinSlot} />);
+    render(<Footer {...defaultProps} phase="SLOT_PHASE" slotSpinsRemaining={1} onSpinSlot={handleSpinSlot} />);
 
-    fireEvent.click(screen.getByText('Spin Slot'));
+    fireEvent.click(screen.getByText(/Spin Slot/));
     expect(handleSpinSlot).toHaveBeenCalled();
   });
 

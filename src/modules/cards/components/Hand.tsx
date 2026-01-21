@@ -18,21 +18,21 @@ export interface HandProps {
 }
 
 /**
- * 카드 겹침 정도 (음수 마진) - 값이 작을수록 간격이 넓어짐
+ * 카드 겹침 정도 (음수 마진) - 모바일에서는 더 많이 겹침
  */
 const OVERLAP_STYLES = {
-  sm: '-ml-4',
-  md: '-ml-6',
-  lg: '-ml-8',
+  sm: '-ml-6 sm:-ml-4',
+  md: '-ml-8 sm:-ml-6',
+  lg: '-ml-10 sm:-ml-8',
 };
 
 /**
  * 손패 컨테이너 패딩
  */
 const CONTAINER_PADDING = {
-  sm: 'pl-4',
-  md: 'pl-6',
-  lg: 'pl-8',
+  sm: 'pl-6 sm:pl-4',
+  md: 'pl-8 sm:pl-6',
+  lg: 'pl-10 sm:pl-8',
 };
 
 /**
@@ -70,25 +70,27 @@ function HandComponent({
     [selectedSet, isMaxSelected, onCardClick]
   );
 
-  // 카드 각도 계산 (부채꼴 배치)
+  // 카드 각도 계산 (부채꼴 배치) - 모바일에서는 각도 감소
   const getCardRotation = (index: number, total: number): number => {
     if (total <= 1) return 0;
-    const maxAngle = Math.min(total * 3, 20); // 최대 20도
+    // 모바일에서는 더 평평하게
+    const maxAngle = Math.min(total * 2.5, 15); // 최대 15도 (기존 20도)
     const step = maxAngle / (total - 1);
     return -maxAngle / 2 + step * index;
   };
 
-  // 카드 Y 오프셋 계산 (아치 형태)
+  // 카드 Y 오프셋 계산 (아치 형태) - 모바일에서는 더 평평하게
   const getCardYOffset = (index: number, total: number): number => {
     if (total <= 1) return 0;
     const middle = (total - 1) / 2;
     const distance = Math.abs(index - middle);
-    return distance * distance * 2; // 가장자리 카드가 더 아래로
+    // 모바일에서는 아치 효과 감소
+    return distance * distance * 1.5; // 기존 2에서 1.5로 감소
   };
 
   return (
     <div
-      className={`flex items-end justify-center ${CONTAINER_PADDING[size]} py-4`}
+      className={`flex items-end justify-center ${CONTAINER_PADDING[size]} py-2 sm:py-4 overflow-x-auto`}
     >
       <AnimatePresence mode="popLayout">
         {cards.map((card, index) => {
@@ -120,10 +122,10 @@ function HandComponent({
               style={{
                 transformOrigin: 'bottom center',
               }}
-              whileHover={{
-                y: isSelected ? yOffset - 12 : yOffset - 8,
+              whileHover={!disabled && !isDisabled ? {
+                y: isSelected ? yOffset - 8 : yOffset - 6,
                 zIndex: 100,
-              }}
+              } : undefined}
             >
               <Card
                 card={card}

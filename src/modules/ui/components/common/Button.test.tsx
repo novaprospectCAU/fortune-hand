@@ -57,10 +57,10 @@ describe('Button', () => {
     const { rerender } = render(
       <Button onClick={() => {}} size="sm">Small</Button>
     );
-    expect(screen.getByRole('button')).toHaveClass('px-3', 'py-1.5');
+    expect(screen.getByRole('button')).toHaveClass('px-3', 'py-2');
 
     rerender(<Button onClick={() => {}} size="lg">Large</Button>);
-    expect(screen.getByRole('button')).toHaveClass('px-6', 'py-3');
+    expect(screen.getByRole('button')).toHaveClass('px-5', 'py-3');
   });
 
   it('applies fullWidth style when specified', () => {

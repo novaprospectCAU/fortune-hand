@@ -23,6 +23,10 @@ export {
   type BadgeProps,
   ProgressBar,
   type ProgressBarProps,
+  ErrorBoundary,
+  type ErrorBoundaryProps,
+  ErrorFallback,
+  type ErrorFallbackProps,
 } from './components/common';
 
 // Layout Components
@@ -63,6 +67,16 @@ export {
   type MultiEffectTextProps,
 } from './components/feedback';
 
+// Tutorial Components
+export {
+  TutorialOverlay,
+  type TutorialOverlayProps,
+  TutorialStep,
+  type TutorialStepProps,
+  TutorialHighlight,
+  type TutorialHighlightProps,
+} from './components/tutorial';
+
 // Hooks
 export {
   useAnimation,
@@ -82,4 +96,9 @@ export {
   type UseTooltipReturn,
   type UseTooltipGroupOptions,
   type UseTooltipGroupReturn,
+  useTutorial,
+  type TutorialStep as TutorialStepData,
+  type TutorialState,
+  type TutorialActions,
+  type UseTutorialReturn,
 } from './hooks';

@@ -28,6 +28,7 @@ export {
   getCardChipValue,
   formatScoreBreakdown,
   createEmptyScoreCalculation,
+  calculateGoldFromEnhancements,
 } from './scoring';
 
 // Hand Ranks & Constants

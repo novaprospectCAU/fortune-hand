@@ -58,26 +58,26 @@ export interface CardProps {
 }
 
 /**
- * 카드 크기별 스타일
+ * 카드 크기별 스타일 (모바일 반응형)
  */
 const SIZE_STYLES = {
   sm: {
-    width: 'w-14',
-    height: 'h-20',
-    fontSize: 'text-sm',
-    rankSize: 'text-lg',
+    width: 'w-12 sm:w-14',
+    height: 'h-16 sm:h-20',
+    fontSize: 'text-xs sm:text-sm',
+    rankSize: 'text-base sm:text-lg',
   },
   md: {
-    width: 'w-20',
-    height: 'h-28',
-    fontSize: 'text-base',
-    rankSize: 'text-xl',
+    width: 'w-16 sm:w-20',
+    height: 'h-24 sm:h-28',
+    fontSize: 'text-sm sm:text-base',
+    rankSize: 'text-lg sm:text-xl',
   },
   lg: {
-    width: 'w-28',
-    height: 'h-40',
-    fontSize: 'text-lg',
-    rankSize: 'text-3xl',
+    width: 'w-20 sm:w-24 md:w-28',
+    height: 'h-28 sm:h-36 md:h-40',
+    fontSize: 'text-base sm:text-lg',
+    rankSize: 'text-xl sm:text-2xl md:text-3xl',
   },
 };
 
@@ -135,7 +135,8 @@ function CardComponent({
         bg-white border-2 shadow-md
         flex flex-col relative
         ${disabled ? 'opacity-50 cursor-not-allowed' : 'cursor-pointer'}
-        ${selected ? 'ring-2 ring-yellow-400 ring-offset-2' : ''}
+        ${selected ? 'ring-2 ring-yellow-400 ring-offset-1 sm:ring-offset-2' : ''}
+        touch-manipulation select-none
       `}
       style={{
         borderColor: specialBorder || '#d1d5db',
@@ -143,7 +144,7 @@ function CardComponent({
       }}
       initial={false}
       animate={{
-        y: selected ? -12 : 0,
+        y: selected ? -8 : 0,
         boxShadow: selected
           ? '0 8px 25px rgba(0, 0, 0, 0.2)'
           : '0 2px 8px rgba(0, 0, 0, 0.1)',

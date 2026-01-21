@@ -40,8 +40,17 @@ import {
   generateShop,
   buyItem as shopBuyItem,
   rerollShop,
+  countSlotTriggers,
+  countRouletteTriggers,
+  mergeSlotResults,
 } from './moduleIntegration';
 import { getJokerById } from '@/modules/jokers';
+import { getSpecialCardById, addToDeck } from '@/modules/cards';
+import {
+  getVoucherById,
+  calculateVoucherModifiers,
+  calculateInterest,
+} from '@/modules/shop';
 
 /**
  * Extended store interface combining state and actions
@@ -78,8 +87,11 @@ function createInitialState(): Omit<GameState, keyof GameActions> & {
     handResult: null,
     scoreCalculation: null,
     rouletteResult: null,
+    triggeredSlotResults: [],
+    rouletteSpinsGranted: 0,
     jokers: [],
     maxJokers: DEFAULT_GAME_CONFIG.maxJokers,
+    purchasedVouchers: [],
     handsRemaining: DEFAULT_GAME_CONFIG.startingHands,
     discardsRemaining: DEFAULT_GAME_CONFIG.startingDiscards,
     slotSpinsRemaining: DEFAULT_GAME_CONFIG.startingSlotSpins,
@@ -111,7 +123,8 @@ export const useGameStore = create<GameStore>((set, get) => ({
   _drawCards: (count: number) => {
     const state = get();
     let deck = state.deck;
-    const handSize = state.config.handSize + (state.slotResult?.effects.cardBonus.handSize ?? 0);
+    const voucherMods = calculateVoucherModifiers(state.purchasedVouchers);
+    const handSize = state.config.handSize + voucherMods.handSizeBonus + (state.slotResult?.effects.cardBonus.handSize ?? 0);
 
     // Check if we need to reshuffle discard pile
     if (deck.cards.length < count && deck.discardPile.length > 0) {
@@ -139,6 +152,8 @@ export const useGameStore = create<GameStore>((set, get) => ({
       handResult: null,
       scoreCalculation: null,
       rouletteResult: null,
+      triggeredSlotResults: [],
+      rouletteSpinsGranted: 0,
       selectedCards: [],
     });
   },
@@ -150,6 +165,9 @@ export const useGameStore = create<GameStore>((set, get) => ({
   startGame: (partialConfig?: Partial<GameConfig>) => {
     const config = mergeGameConfig(partialConfig);
 
+    // Preserve vouchers before resetting state
+    const preservedVouchers = get().purchasedVouchers;
+
     // Create and shuffle deck
     const cards = shuffle(createStandardDeck());
     const deck: Deck = { cards, discardPile: [] };
@@ -158,6 +176,9 @@ export const useGameStore = create<GameStore>((set, get) => ({
     const targetScore = getTargetScoreForRound(1);
     const bonuses = getRoundBonuses(1);
 
+    // Apply voucher modifiers (vouchers persist from previous games)
+    const voucherMods = calculateVoucherModifiers(preservedVouchers);
+
     set({
       ...createInitialState(),
       config,
@@ -165,12 +186,13 @@ export const useGameStore = create<GameStore>((set, get) => ({
       round: 1,
       turn: 1,
       targetScore,
-      gold: config.startingGold,
+      gold: config.startingGold + voucherMods.startingGoldBonus,
       deck,
-      maxJokers: config.maxJokers,
-      handsRemaining: config.startingHands + bonuses.handsBonus,
-      discardsRemaining: config.startingDiscards + bonuses.discardsBonus,
-      slotSpinsRemaining: config.startingSlotSpins,
+      maxJokers: config.maxJokers + voucherMods.maxJokersBonus,
+      purchasedVouchers: preservedVouchers, // Preserve vouchers
+      handsRemaining: config.startingHands + bonuses.handsBonus + voucherMods.handsBonus,
+      discardsRemaining: config.startingDiscards + bonuses.discardsBonus + voucherMods.discardsBonus,
+      slotSpinsRemaining: config.startingSlotSpins + voucherMods.slotSpinsBonus,
     });
 
     getGameEventEmitter().emit({
@@ -307,8 +329,15 @@ export const useGameStore = create<GameStore>((set, get) => ({
           });
 
           if (success) {
-            // Generate shop for next round
-            const shopState = generateShop(state.round, 0);
+            // Apply interest from vouchers before shop phase
+            const voucherMods = calculateVoucherModifiers(state.purchasedVouchers);
+            const interest = calculateInterest(state.gold, voucherMods);
+            if (interest > 0) {
+              set({ gold: state.gold + interest });
+            }
+
+            // Generate shop with luck bonus from vouchers
+            const shopState = generateShop(state.round, voucherMods.luckBonus);
             set({ shopState });
             get()._setPhase('SHOP_PHASE');
           } else {
@@ -331,7 +360,9 @@ export const useGameStore = create<GameStore>((set, get) => ({
       case 'SHOP_PHASE': {
         get()._setPhase('SHOP_PHASE');
         if (!get().shopState) {
-          const shopState = generateShop(get().round, 0);
+          const state = get();
+          const voucherMods = calculateVoucherModifiers(state.purchasedVouchers);
+          const shopState = generateShop(state.round, voucherMods.luckBonus);
           set({ shopState });
         }
         break;
@@ -477,9 +508,50 @@ export const useGameStore = create<GameStore>((set, get) => ({
       return;
     }
 
+    // Detect special card triggers
+    const triggeredSlotResults: typeof state.triggeredSlotResults = [];
+    let rouletteSpinsGranted = 0;
+
+    // Process slot triggers - spin mini slots for each trigger
+    const slotTriggerCount = countSlotTriggers(state.selectedCards);
+    if (slotTriggerCount > 0) {
+      for (let i = 0; i < slotTriggerCount; i++) {
+        const miniSlotResult = spin();
+        triggeredSlotResults.push(miniSlotResult);
+
+        // Emit event for mini slot spin
+        getGameEventEmitter().emit({
+          type: 'SLOT_SPIN',
+          result: miniSlotResult,
+        });
+      }
+
+      // Merge triggered slot results with main slot result
+      if (state.slotResult && triggeredSlotResults.length > 0) {
+        const allResults = [state.slotResult, ...triggeredSlotResults];
+        const mergedResult = mergeSlotResults(allResults);
+        if (mergedResult) {
+          set({ slotResult: mergedResult });
+        }
+      } else if (triggeredSlotResults.length > 0) {
+        // No main slot result yet, use merged triggered results
+        const mergedResult = mergeSlotResults(triggeredSlotResults);
+        if (mergedResult) {
+          set({ slotResult: mergedResult });
+        }
+      }
+    }
+
+    // Process roulette triggers - grant extra spins
+    rouletteSpinsGranted = countRouletteTriggers(state.selectedCards);
+
     const handResult = evaluateHand(state.selectedCards);
 
-    set({ handResult });
+    set({
+      handResult,
+      triggeredSlotResults,
+      rouletteSpinsGranted,
+    });
 
     getGameEventEmitter().emit({
       type: 'CARDS_PLAYED',
@@ -545,6 +617,10 @@ export const useGameStore = create<GameStore>((set, get) => ({
       get().skipRoulette();
       return;
     }
+
+    // TODO: Implement multiple roulette spins based on rouletteSpinsGranted
+    // For now, rouletteSpinsGranted is tracked but only one spin is performed
+    // Future enhancement: Allow player to spin multiple times if rouletteSpinsGranted > 0
 
     const baseScore = state.scoreCalculation?.finalScore ?? 0;
     let config = getDefaultRouletteConfig();
@@ -629,22 +705,55 @@ export const useGameStore = create<GameStore>((set, get) => ({
     // Handle purchased item based on type
     const purchasedItem = transaction.item;
     let newJokers = state.jokers;
+    let newDeck = state.deck;
+    let newPurchasedVouchers = state.purchasedVouchers;
 
-    if (purchasedItem?.type === 'joker') {
-      // Add joker to player's collection
-      const joker = getJokerById(purchasedItem.itemId);
-      if (joker && state.jokers.length < state.maxJokers) {
-        newJokers = [...state.jokers, joker];
-      } else if (state.jokers.length >= state.maxJokers) {
-        console.warn('Max jokers reached');
+    if (purchasedItem) {
+      switch (purchasedItem.type) {
+        case 'joker': {
+          // Add joker to player's collection
+          const joker = getJokerById(purchasedItem.itemId);
+          if (joker && state.jokers.length < state.maxJokers) {
+            newJokers = [...state.jokers, joker];
+          } else if (state.jokers.length >= state.maxJokers) {
+            console.warn('Max jokers reached');
+          }
+          break;
+        }
+        case 'card': {
+          // Add special card to deck
+          const specialCard = getSpecialCardById(purchasedItem.itemId);
+          if (specialCard) {
+            newDeck = addToDeck(state.deck, [specialCard]);
+          }
+          break;
+        }
+        case 'pack': {
+          // Use pack cards from transaction if available
+          if (transaction.packCards && transaction.packCards.length > 0) {
+            newDeck = addToDeck(state.deck, transaction.packCards);
+          }
+          break;
+        }
+        case 'voucher': {
+          // Add voucher to purchased list
+          const voucher = getVoucherById(purchasedItem.itemId);
+          if (voucher && !newPurchasedVouchers.includes(purchasedItem.itemId)) {
+            newPurchasedVouchers = [...newPurchasedVouchers, purchasedItem.itemId];
+          } else if (newPurchasedVouchers.includes(purchasedItem.itemId)) {
+            console.warn('Voucher already purchased');
+          }
+          break;
+        }
       }
     }
-    // TODO: Handle other item types (card, pack, voucher)
 
     set({
       gold: transaction.newGold,
       shopState: newShopState,
       jokers: newJokers,
+      deck: newDeck,
+      purchasedVouchers: newPurchasedVouchers,
     });
 
     if (transaction.item) {
@@ -667,7 +776,15 @@ export const useGameStore = create<GameStore>((set, get) => ({
       return;
     }
 
-    const result = rerollShop(state.shopState, state.gold, state.round);
+    // Apply reroll discount from vouchers
+    const voucherMods = calculateVoucherModifiers(state.purchasedVouchers);
+    const result = rerollShop(
+      state.shopState,
+      state.gold,
+      state.round,
+      voucherMods.luckBonus,
+      voucherMods.rerollDiscount
+    );
 
     if (!result.success) {
       console.warn('Reroll failed: not enough gold');
@@ -692,6 +809,9 @@ export const useGameStore = create<GameStore>((set, get) => ({
     const targetScore = getTargetScoreForRound(nextRound);
     const bonuses = getRoundBonuses(nextRound);
 
+    // Apply voucher modifiers for next round
+    const voucherMods = calculateVoucherModifiers(state.purchasedVouchers);
+
     // Reshuffle discard pile back into deck
     const allCards = shuffle([...state.deck.cards, ...state.deck.discardPile]);
 
@@ -700,17 +820,21 @@ export const useGameStore = create<GameStore>((set, get) => ({
       turn: 1,
       targetScore,
       currentScore: 0,
+      gold: state.gold + voucherMods.startingGoldBonus,
       deck: { cards: allCards, discardPile: [] },
       hand: [],
       selectedCards: [],
-      handsRemaining: state.config.startingHands + bonuses.handsBonus,
-      discardsRemaining: state.config.startingDiscards + bonuses.discardsBonus,
-      slotSpinsRemaining: state.config.startingSlotSpins,
+      maxJokers: state.config.maxJokers + voucherMods.maxJokersBonus,
+      handsRemaining: state.config.startingHands + bonuses.handsBonus + voucherMods.handsBonus,
+      discardsRemaining: state.config.startingDiscards + bonuses.discardsBonus + voucherMods.discardsBonus,
+      slotSpinsRemaining: state.config.startingSlotSpins + voucherMods.slotSpinsBonus,
       shopState: null,
       slotResult: null,
       handResult: null,
       scoreCalculation: null,
       rouletteResult: null,
+      triggeredSlotResults: [],
+      rouletteSpinsGranted: 0,
     });
 
     get()._setPhase('SLOT_PHASE');

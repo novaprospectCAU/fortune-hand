@@ -1,0 +1,54 @@
+{
+  "packs": [
+    {
+      "id": "standard_pack",
+      "name": "Standard Pack",
+      "description": "Contains 3 random cards",
+      "cost": 30,
+      "cardCount": 3,
+      "guaranteedRarity": null,
+      "specialCardWeight": 0.2,
+      "rarity": "common"
+    },
+    {
+      "id": "jumbo_pack",
+      "name": "Jumbo Pack",
+      "description": "Contains 5 random cards",
+      "cost": 50,
+      "cardCount": 5,
+      "guaranteedRarity": null,
+      "specialCardWeight": 0.25,
+      "rarity": "uncommon"
+    },
+    {
+      "id": "mega_pack",
+      "name": "Mega Pack",
+      "description": "Contains 5 random cards with higher chance of special cards",
+      "cost": 70,
+      "cardCount": 5,
+      "guaranteedRarity": null,
+      "specialCardWeight": 0.4,
+      "rarity": "rare"
+    },
+    {
+      "id": "arcana_pack",
+      "name": "Arcana Pack",
+      "description": "Contains 3 cards, 1 guaranteed special card",
+      "cost": 80,
+      "cardCount": 3,
+      "guaranteedRarity": "rare",
+      "specialCardWeight": 0.5,
+      "rarity": "rare"
+    },
+    {
+      "id": "celestial_pack",
+      "name": "Celestial Pack",
+      "description": "Contains 4 cards, 2 guaranteed special cards",
+      "cost": 120,
+      "cardCount": 4,
+      "guaranteedRarity": "legendary",
+      "specialCardWeight": 0.75,
+      "rarity": "legendary"
+    }
+  ]
+}

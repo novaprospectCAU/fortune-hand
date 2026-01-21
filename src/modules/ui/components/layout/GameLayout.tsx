@@ -11,6 +11,7 @@ import type { GameState } from '@/types/interfaces';
 import { Header } from './Header';
 import { Sidebar } from './Sidebar';
 import { Footer } from './Footer';
+import { MobileHelper } from './MobileHelper';
 
 export interface GameLayoutProps {
   gameState: Partial<GameState>;
@@ -39,7 +40,7 @@ export function GameLayout({
   onContinue,
   onJokerClick,
 }: GameLayoutProps) {
-  const [sidebarCollapsed, setSidebarCollapsed] = useState(false);
+  const [sidebarOpen, setSidebarOpen] = useState(false);
 
   const {
     phase = 'IDLE',
@@ -58,13 +59,17 @@ export function GameLayout({
   const maxSelectCards = 5; // From game config
 
   return (
-    <div
-      className={clsx(
-        'min-h-screen bg-game-bg text-white',
-        'flex flex-col',
-        className
-      )}
-    >
+    <>
+      <MobileHelper />
+      <div
+        className={clsx(
+          'min-h-screen bg-game-bg text-white',
+          'flex flex-col',
+          // Safe area for mobile notches
+          'supports-[padding:max(0px)]:pb-[env(safe-area-inset-bottom)]',
+          className
+        )}
+      >
       {/* Header */}
       <Header
         round={round}
@@ -74,40 +79,44 @@ export function GameLayout({
       />
 
       {/* Main Content Area */}
-      <div className="flex-1 flex overflow-hidden">
+      <div className="flex-1 flex flex-col lg:flex-row overflow-hidden">
         {/* Main Game Area */}
-        <main className="flex-1 overflow-y-auto p-4 md:p-6">
+        <main className="flex-1 overflow-y-auto p-3 sm:p-4 md:p-6">
           {children}
         </main>
 
-        {/* Sidebar - Hidden on mobile by default */}
-        <div className="hidden md:block">
+        {/* Desktop Sidebar - Hidden on mobile/tablet */}
+        <div className="hidden lg:block">
           <Sidebar
             gold={gold}
             handsRemaining={handsRemaining}
             discardsRemaining={discardsRemaining}
             jokers={jokers}
             maxJokers={maxJokers}
-            collapsed={sidebarCollapsed}
+            collapsed={false}
             onJokerClick={onJokerClick}
           />
         </div>
       </div>
 
-      {/* Mobile Sidebar Toggle */}
+      {/* Mobile Sidebar Toggle Button */}
       <button
         type="button"
-        onClick={() => setSidebarCollapsed(!sidebarCollapsed)}
+        onClick={() => setSidebarOpen(!sidebarOpen)}
         className={clsx(
-          'md:hidden fixed bottom-20 right-4 z-20',
-          'w-12 h-12 rounded-full',
-          'bg-game-surface border border-game-border',
+          'lg:hidden fixed bottom-20 right-3 z-20',
+          'w-14 h-14 rounded-full',
+          'bg-game-surface border-2 border-game-border',
           'flex items-center justify-center',
-          'text-slate-400 hover:text-white',
-          'transition-colors duration-150',
-          'focus:outline-none focus:ring-2 focus:ring-primary'
+          'text-slate-400 hover:text-white active:text-white',
+          'transition-all duration-150',
+          'shadow-lg active:shadow-md',
+          'focus:outline-none focus:ring-2 focus:ring-primary focus:ring-offset-2',
+          // Touch-friendly sizing (min 44px)
+          'touch-manipulation'
         )}
         aria-label="Toggle sidebar"
+        aria-expanded={sidebarOpen}
       >
         <svg
           className="w-6 h-6"
@@ -116,24 +125,35 @@ export function GameLayout({
           viewBox="0 0 24 24"
           aria-hidden="true"
         >
-          <path
-            strokeLinecap="round"
-            strokeLinejoin="round"
-            strokeWidth={2}
-            d="M4 6h16M4 12h16M4 18h16"
-          />
+          {sidebarOpen ? (
+            <path
+              strokeLinecap="round"
+              strokeLinejoin="round"
+              strokeWidth={2}
+              d="M6 18L18 6M6 6l12 12"
+            />
+          ) : (
+            <path
+              strokeLinecap="round"
+              strokeLinejoin="round"
+              strokeWidth={2}
+              d="M4 6h16M4 12h16M4 18h16"
+            />
+          )}
         </svg>
       </button>
 
       {/* Mobile Sidebar Overlay */}
-      {!sidebarCollapsed && (
-        <div className="md:hidden fixed inset-0 z-30">
+      {sidebarOpen && (
+        <div className="lg:hidden fixed inset-0 z-30">
+          {/* Backdrop */}
           <div
-            className="absolute inset-0 bg-black/50"
-            onClick={() => setSidebarCollapsed(true)}
+            className="absolute inset-0 bg-black/60 backdrop-blur-sm"
+            onClick={() => setSidebarOpen(false)}
             aria-hidden="true"
           />
-          <div className="absolute right-0 top-0 bottom-0 w-64">
+          {/* Sidebar Panel */}
+          <div className="absolute right-0 top-0 bottom-0 w-72 sm:w-80 max-w-[85vw]">
             <Sidebar
               gold={gold}
               handsRemaining={handsRemaining}
@@ -141,8 +161,11 @@ export function GameLayout({
               jokers={jokers}
               maxJokers={maxJokers}
               collapsed={false}
-              onJokerClick={onJokerClick}
-              className="h-full"
+              onJokerClick={(joker) => {
+                onJokerClick?.(joker);
+                setSidebarOpen(false);
+              }}
+              className="h-full shadow-2xl"
             />
           </div>
         </div>
@@ -164,7 +187,8 @@ export function GameLayout({
         onSkipRoulette={onSkipRoulette}
         onContinue={onContinue}
       />
-    </div>
+      </div>
+    </>
   );
 }
 

@@ -465,6 +465,179 @@ describe('Reward Phase', () => {
       expect(result.isRoundComplete).toBe(true);
       expect(result.isRoundSuccess).toBe(false);
     });
+
+    it('should apply gold from card enhancements', () => {
+      const scoringCards: Card[] = [
+        {
+          id: 'A_hearts',
+          rank: 'A',
+          suit: 'hearts',
+          enhancement: { type: 'gold', value: 3 },
+        },
+        {
+          id: 'K_hearts',
+          rank: 'K',
+          suit: 'hearts',
+          enhancement: { type: 'gold', value: 3 },
+        },
+      ];
+
+      const result = executeRewardPhase({
+        currentScore: 100,
+        targetScore: 300,
+        gold: 100,
+        hand: [],
+        deck: { cards: [], discardPile: [] },
+        playedCards: scoringCards,
+        slotResult: null,
+        scoreCalculation: {
+          handResult: {
+            handType: 'pair',
+            rank: 10,
+            scoringCards,
+            baseChips: 10,
+            baseMult: 2,
+          },
+          chipTotal: 10,
+          multTotal: 2,
+          appliedBonuses: [],
+          finalScore: 20,
+        },
+        rouletteResult: null,
+        handsRemaining: 3,
+      });
+
+      // Should add 6 gold (3 + 3) from enhancements
+      expect(result.newGold).toBe(106); // 100 + 6
+    });
+
+    it('should combine gold from enhancements and slot bonus', () => {
+      const scoringCards: Card[] = [
+        {
+          id: 'A_hearts',
+          rank: 'A',
+          suit: 'hearts',
+          enhancement: { type: 'gold', value: 3 },
+        },
+      ];
+
+      const slotResult = createMockSlotResult({
+        effects: {
+          ...createMockSlotResult().effects,
+          instant: { gold: 10, chips: 0 },
+        },
+      });
+
+      const result = executeRewardPhase({
+        currentScore: 100,
+        targetScore: 300,
+        gold: 100,
+        hand: [],
+        deck: { cards: [], discardPile: [] },
+        playedCards: scoringCards,
+        slotResult,
+        scoreCalculation: {
+          handResult: {
+            handType: 'high_card',
+            rank: 0,
+            scoringCards,
+            baseChips: 5,
+            baseMult: 1,
+          },
+          chipTotal: 5,
+          multTotal: 1,
+          appliedBonuses: [],
+          finalScore: 5,
+        },
+        rouletteResult: null,
+        handsRemaining: 3,
+      });
+
+      // Should add 13 gold (10 from slot + 3 from enhancement)
+      expect(result.newGold).toBe(113); // 100 + 10 + 3
+    });
+
+    it('should apply gold penalty and enhancements correctly', () => {
+      const scoringCards: Card[] = [
+        {
+          id: 'A_hearts',
+          rank: 'A',
+          suit: 'hearts',
+          enhancement: { type: 'gold', value: 3 },
+        },
+      ];
+
+      const slotResult = createMockSlotResult({
+        effects: {
+          ...createMockSlotResult().effects,
+          instant: { gold: 5, chips: 0 },
+          penalty: { discardCards: 0, skipRoulette: false, loseGold: 10 },
+        },
+      });
+
+      const result = executeRewardPhase({
+        currentScore: 100,
+        targetScore: 300,
+        gold: 100,
+        hand: [],
+        deck: { cards: [], discardPile: [] },
+        playedCards: scoringCards,
+        slotResult,
+        scoreCalculation: {
+          handResult: {
+            handType: 'high_card',
+            rank: 0,
+            scoringCards,
+            baseChips: 5,
+            baseMult: 1,
+          },
+          chipTotal: 5,
+          multTotal: 1,
+          appliedBonuses: [],
+          finalScore: 5,
+        },
+        rouletteResult: null,
+        handsRemaining: 3,
+      });
+
+      // 100 + 5 (slot) + 3 (enhancement) - 10 (penalty) = 98
+      expect(result.newGold).toBe(98);
+    });
+
+    it('should not add gold when no enhancements present', () => {
+      const scoringCards: Card[] = [
+        { id: 'A_hearts', rank: 'A', suit: 'hearts' },
+        { id: 'K_hearts', rank: 'K', suit: 'hearts' },
+      ];
+
+      const result = executeRewardPhase({
+        currentScore: 100,
+        targetScore: 300,
+        gold: 100,
+        hand: [],
+        deck: { cards: [], discardPile: [] },
+        playedCards: scoringCards,
+        slotResult: null,
+        scoreCalculation: {
+          handResult: {
+            handType: 'pair',
+            rank: 10,
+            scoringCards,
+            baseChips: 10,
+            baseMult: 2,
+          },
+          chipTotal: 10,
+          multTotal: 2,
+          appliedBonuses: [],
+          finalScore: 20,
+        },
+        rouletteResult: null,
+        handsRemaining: 3,
+      });
+
+      // No gold change from enhancements
+      expect(result.newGold).toBe(100);
+    });
   });
 
   describe('getPhaseAfterReward', () => {

@@ -16,9 +16,10 @@ interface RouletteWheelProps {
   disabled?: boolean;
 }
 
-const WHEEL_SIZE = 300;
-const WHEEL_RADIUS = WHEEL_SIZE / 2 - 10; // Padding for stroke
-const CENTER = WHEEL_SIZE / 2;
+// Mobile-responsive wheel size
+const WHEEL_SIZE_DESKTOP = 300;
+const WHEEL_RADIUS_DESKTOP = WHEEL_SIZE_DESKTOP / 2 - 10;
+const CENTER_DESKTOP = WHEEL_SIZE_DESKTOP / 2;
 
 /**
  * Animated roulette wheel component.
@@ -97,11 +98,11 @@ export function RouletteWheel({
   const highlightedSegmentId = pendingResult?.segment.id;
 
   return (
-    <div className="relative inline-block">
+    <div className="relative inline-block w-full max-w-xs mx-auto">
       {/* Pointer indicator at top */}
-      <div className="absolute left-1/2 -top-2 -translate-x-1/2 z-10">
+      <div className="absolute left-1/2 -top-1 sm:-top-2 -translate-x-1/2 z-10">
         <div
-          className="w-0 h-0 border-l-[12px] border-r-[12px] border-t-[20px]
+          className="w-0 h-0 border-l-[10px] sm:border-l-[12px] border-r-[10px] sm:border-r-[12px] border-t-[16px] sm:border-t-[20px]
                      border-l-transparent border-r-transparent border-t-yellow-400
                      drop-shadow-lg"
         />
@@ -115,20 +116,22 @@ export function RouletteWheel({
           ease: [0.2, 0.8, 0.2, 1], // Custom easeOut curve
         }}
         onAnimationComplete={handleAnimationComplete}
-        className="cursor-pointer"
+        className="cursor-pointer touch-manipulation"
         onClick={handleSpin}
       >
+        {/* Mobile SVG */}
         <svg
-          width={WHEEL_SIZE}
-          height={WHEEL_SIZE}
-          viewBox={`0 0 ${WHEEL_SIZE} ${WHEEL_SIZE}`}
-          className="drop-shadow-xl"
+          width="100%"
+          height="100%"
+          viewBox={`0 0 ${WHEEL_SIZE_DESKTOP} ${WHEEL_SIZE_DESKTOP}`}
+          className="drop-shadow-xl w-full h-auto max-w-[240px] sm:max-w-[300px] mx-auto"
+          preserveAspectRatio="xMidYMid meet"
         >
           {/* Outer ring */}
           <circle
-            cx={CENTER}
-            cy={CENTER}
-            r={WHEEL_RADIUS + 5}
+            cx={CENTER_DESKTOP}
+            cy={CENTER_DESKTOP}
+            r={WHEEL_RADIUS_DESKTOP + 5}
             fill="none"
             stroke="#374151"
             strokeWidth="8"
@@ -141,9 +144,9 @@ export function RouletteWheel({
               segment={segment}
               startAngle={startAngle}
               sweepAngle={sweepAngle}
-              radius={WHEEL_RADIUS}
-              centerX={CENTER}
-              centerY={CENTER}
+              radius={WHEEL_RADIUS_DESKTOP}
+              centerX={CENTER_DESKTOP}
+              centerY={CENTER_DESKTOP}
               isHighlighted={
                 !isSpinning && highlightedSegmentId === segment.id
               }
@@ -152,19 +155,19 @@ export function RouletteWheel({
 
           {/* Center circle */}
           <circle
-            cx={CENTER}
-            cy={CENTER}
+            cx={CENTER_DESKTOP}
+            cy={CENTER_DESKTOP}
             r={30}
             fill="#1f2937"
             stroke="#374151"
             strokeWidth="3"
           />
-          <circle cx={CENTER} cy={CENTER} r={20} fill="#374151" />
+          <circle cx={CENTER_DESKTOP} cy={CENTER_DESKTOP} r={20} fill="#374151" />
 
           {/* Center decoration */}
           <text
-            x={CENTER}
-            y={CENTER}
+            x={CENTER_DESKTOP}
+            y={CENTER_DESKTOP}
             fill="#fbbf24"
             fontSize="14"
             fontWeight="bold"

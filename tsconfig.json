@@ -28,5 +28,10 @@
     }
   },
   "include": ["src"],
+  "exclude": [
+    "src/**/*.example.tsx",
+    "src/**/INTEGRATION_EXAMPLE.tsx",
+    "src/**/EXAMPLE_USAGE.ts"
+  ],
   "references": [{ "path": "./tsconfig.node.json" }]
 }

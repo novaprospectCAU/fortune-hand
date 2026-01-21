@@ -31,6 +31,16 @@ import { SUITS, RANKS, CARD_CHIP_VALUES, BASE_HAND_VALUES } from '@/data/constan
 // Cards Module Integration
 // ============================================================
 
+import {
+  detectTriggers,
+  countSlotTriggers,
+  countRouletteTriggers,
+  mergeSlotResults,
+} from '@/modules/cards/triggers';
+
+// Re-export trigger functions
+export { detectTriggers, countSlotTriggers, countRouletteTriggers, mergeSlotResults };
+
 /**
  * Create a standard 52-card deck
  */
@@ -625,7 +635,8 @@ export function evaluateJokers(
         triggered = context.phase === 'SCORE_PHASE';
         break;
       case 'on_play':
-        triggered = context.phase === 'PLAY_PHASE';
+        // on_play jokers also trigger during SCORE_PHASE since played cards affect scoring
+        triggered = context.phase === 'PLAY_PHASE' || context.phase === 'SCORE_PHASE';
         if (triggered && joker.trigger.cardCondition && context.playedCards) {
           const condition = joker.trigger.cardCondition;
           triggered = context.playedCards.some(card => {
@@ -756,9 +767,14 @@ export function buyItem(
 export function rerollShop(
   shopState: ShopState,
   playerGold: number,
-  round: number
+  round: number,
+  luck: number = 0,
+  discount: number = 0
 ): { shop: ShopState; cost: number; success: boolean; newGold: number } {
-  if (playerGold < shopState.rerollCost) {
+  const baseCost = shopState.rerollCost;
+  const cost = Math.max(0, baseCost - discount);
+
+  if (playerGold < cost) {
     return {
       shop: shopState,
       cost: 0,
@@ -767,11 +783,12 @@ export function rerollShop(
     };
   }
 
-  const cost = shopState.rerollCost;
-  const newShop = generateShop(round, 0);
+  const newShop = generateShop(round, luck);
   newShop.rerollsUsed = shopState.rerollsUsed + 1;
-  newShop.rerollCost = balanceData.shop.rerollBaseCost +
-    newShop.rerollsUsed * balanceData.shop.rerollCostIncrease;
+  newShop.rerollCost = Math.max(0,
+    balanceData.shop.rerollBaseCost +
+    newShop.rerollsUsed * balanceData.shop.rerollCostIncrease
+  );
 
   return {
     shop: newShop,

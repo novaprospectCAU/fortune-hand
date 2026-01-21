@@ -7,7 +7,9 @@
 
 import type { ShopState, ShopItem } from '@/types/interfaces';
 import type { Rarity } from '@/data/constants';
-import { calculatePriceWithRoundScaling, getBasePrice } from './pricing';
+import { calculatePriceWithRoundScaling } from './pricing';
+import { getPacksByRarity, getAllPacks } from './packs';
+import { getVouchersByRarity } from './vouchers';
 import balanceData from '@/data/balance.json';
 import jokersData from '@/data/jokers.json';
 import cardsData from '@/data/cards.json';
@@ -180,17 +182,31 @@ function generateCardItem(rarity: Rarity, round: number): ShopItem | null {
  *
  * @param rarity - The rarity tier of the pack
  * @param round - Current game round
- * @returns A shop item for a pack
+ * @returns A shop item for a pack, or null if none available
  */
-function generatePackItem(rarity: Rarity, round: number): ShopItem {
-  const packTypes = ['standard', 'jumbo', 'mega'];
-  const packId = `${packTypes[Math.floor(Math.random() * packTypes.length)]}_pack`;
+function generatePackItem(rarity: Rarity, round: number): ShopItem | null {
+  const availablePacks = getPacksByRarity(rarity);
 
+  if (availablePacks.length === 0) {
+    // Fallback to any pack if none of this rarity
+    const allPacks = getAllPacks();
+    if (allPacks.length === 0) return null;
+    const pack = allPacks[Math.floor(Math.random() * allPacks.length)]!;
+    return {
+      id: generateItemId(),
+      type: 'pack',
+      itemId: pack.id,
+      cost: calculatePriceWithRoundScaling(pack.cost, pack.rarity, round),
+      sold: false,
+    };
+  }
+
+  const pack = availablePacks[Math.floor(Math.random() * availablePacks.length)]!;
   return {
     id: generateItemId(),
     type: 'pack',
-    itemId: packId,
-    cost: calculatePriceWithRoundScaling(getBasePrice('pack'), rarity, round),
+    itemId: pack.id,
+    cost: calculatePriceWithRoundScaling(pack.cost, rarity, round),
     sold: false,
   };
 }
@@ -201,17 +217,35 @@ function generatePackItem(rarity: Rarity, round: number): ShopItem {
  *
  * @param rarity - The rarity tier of the voucher
  * @param round - Current game round
- * @returns A shop item for a voucher
+ * @returns A shop item for a voucher, or null if none available
  */
-function generateVoucherItem(rarity: Rarity, round: number): ShopItem {
-  const voucherTypes = ['extra_hand', 'extra_discard', 'shop_discount', 'luck_boost'];
-  const voucherId = voucherTypes[Math.floor(Math.random() * voucherTypes.length)]!;
+function generateVoucherItem(rarity: Rarity, round: number): ShopItem | null {
+  const availableVouchers = getVouchersByRarity(rarity);
 
+  if (availableVouchers.length === 0) {
+    // Fallback to any voucher if none of this rarity
+    const allVouchers = getVouchersByRarity('common')
+      .concat(getVouchersByRarity('uncommon'))
+      .concat(getVouchersByRarity('rare'))
+      .concat(getVouchersByRarity('legendary'));
+
+    if (allVouchers.length === 0) return null;
+    const voucher = allVouchers[Math.floor(Math.random() * allVouchers.length)]!;
+    return {
+      id: generateItemId(),
+      type: 'voucher',
+      itemId: voucher.id,
+      cost: calculatePriceWithRoundScaling(voucher.cost, voucher.rarity, round),
+      sold: false,
+    };
+  }
+
+  const voucher = availableVouchers[Math.floor(Math.random() * availableVouchers.length)]!;
   return {
     id: generateItemId(),
     type: 'voucher',
-    itemId: voucherId,
-    cost: calculatePriceWithRoundScaling(getBasePrice('voucher'), rarity, round),
+    itemId: voucher.id,
+    cost: calculatePriceWithRoundScaling(voucher.cost, rarity, round),
     sold: false,
   };
 }

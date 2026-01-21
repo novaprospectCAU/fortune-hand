@@ -24,3 +24,11 @@ export {
   type UseTooltipGroupOptions,
   type UseTooltipGroupReturn,
 } from './useTooltip';
+
+export {
+  useTutorial,
+  type TutorialStep,
+  type TutorialState,
+  type TutorialActions,
+  type UseTutorialReturn,
+} from './useTutorial';

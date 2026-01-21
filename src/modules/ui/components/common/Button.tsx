@@ -52,9 +52,9 @@ const variantStyles = {
 };
 
 const sizeStyles = {
-  sm: 'px-3 py-1.5 text-sm rounded-md gap-1.5',
-  md: 'px-4 py-2 text-base rounded-lg gap-2',
-  lg: 'px-6 py-3 text-lg rounded-xl gap-2.5',
+  sm: 'px-3 py-2 text-sm rounded-md gap-1.5 min-h-[36px]',
+  md: 'px-4 py-2.5 sm:py-3 text-sm sm:text-base rounded-lg gap-2 min-h-[44px]',
+  lg: 'px-5 py-3 sm:px-6 sm:py-3.5 text-base sm:text-lg rounded-xl gap-2.5 min-h-[48px]',
 };
 
 const disabledStyles = clsx(
@@ -99,6 +99,8 @@ export function Button({
         'inline-flex items-center justify-center',
         'font-medium transition-colors duration-150',
         'border focus:outline-none focus:ring-2 focus:ring-primary focus:ring-offset-2 focus:ring-offset-game-bg',
+        // Touch optimization
+        'touch-manipulation select-none',
         variantStyles[variant],
         sizeStyles[size],
         isDisabled && disabledStyles,

@@ -28,27 +28,27 @@ describe('Header', () => {
 
   it('renders phase label', () => {
     render(<Header {...defaultProps} />);
-    expect(screen.getAllByText('Play Hand')).toHaveLength(2); // Desktop and mobile
+    expect(screen.getByText('Play Hand')).toBeInTheDocument();
   });
 
   it('shows correct phase for each game phase', () => {
     const { rerender } = render(<Header {...defaultProps} phase="SLOT_PHASE" />);
-    expect(screen.getAllByText('Slot Spin')).toHaveLength(2);
+    expect(screen.getByText('Slot Spin')).toBeInTheDocument();
 
     rerender(<Header {...defaultProps} phase="DRAW_PHASE" />);
-    expect(screen.getAllByText('Draw Cards')).toHaveLength(2);
+    expect(screen.getByText('Draw Cards')).toBeInTheDocument();
 
     rerender(<Header {...defaultProps} phase="SCORE_PHASE" />);
-    expect(screen.getAllByText('Scoring')).toHaveLength(2);
+    expect(screen.getByText('Scoring')).toBeInTheDocument();
 
     rerender(<Header {...defaultProps} phase="ROULETTE_PHASE" />);
-    expect(screen.getAllByText('Roulette')).toHaveLength(2);
+    expect(screen.getByText('Roulette')).toBeInTheDocument();
 
     rerender(<Header {...defaultProps} phase="SHOP_PHASE" />);
-    expect(screen.getAllByText('Shop')).toHaveLength(2);
+    expect(screen.getByText('Shop')).toBeInTheDocument();
 
     rerender(<Header {...defaultProps} phase="GAME_OVER" />);
-    expect(screen.getAllByText('Game Over')).toHaveLength(2);
+    expect(screen.getByText('Game Over')).toBeInTheDocument();
   });
 
   it('shows green color when score meets target', () => {

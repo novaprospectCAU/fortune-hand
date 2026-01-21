@@ -297,6 +297,7 @@ export interface Transaction {
   item?: ShopItem;
   newGold: number;
   error?: string;
+  packCards?: Card[]; // Cards from opened pack (if item was a pack)
 }
 
 // shop 모듈이 제공하는 함수 시그니처
@@ -304,6 +305,44 @@ export interface ShopModule {
   generateShop(round: number, luck: number): ShopState;
   buyItem(shopState: ShopState, itemId: string, playerGold: number): Transaction;
   reroll(shopState: ShopState, playerGold: number): { shop: ShopState; cost: number };
+}
+
+// ============================================================
+// 바우처 모듈 (vouchers)
+// ============================================================
+
+export interface Voucher {
+  id: string;
+  name: string;
+  description: string;
+  rarity: 'common' | 'uncommon' | 'rare' | 'legendary';
+  cost: number;
+  effect: VoucherEffect;
+}
+
+export type VoucherEffect =
+  | { type: 'hands_bonus'; value: number }
+  | { type: 'discards_bonus'; value: number }
+  | { type: 'hand_size_bonus'; value: number }
+  | { type: 'max_jokers_bonus'; value: number }
+  | { type: 'slot_spins_bonus'; value: number }
+  | { type: 'starting_gold_bonus'; value: number }
+  | { type: 'reroll_discount'; value: number }
+  | { type: 'luck_bonus'; value: number }
+  | { type: 'interest'; rate: number; max: number }
+  | { type: 'combo'; effects: Exclude<VoucherEffect, { type: 'combo' }>[] };
+
+export interface VoucherModifiers {
+  handsBonus: number;
+  discardsBonus: number;
+  handSizeBonus: number;
+  maxJokersBonus: number;
+  slotSpinsBonus: number;
+  startingGoldBonus: number;
+  rerollDiscount: number;
+  luckBonus: number;
+  interestRate: number;
+  interestMax: number;
 }
 
 // ============================================================
@@ -315,29 +354,36 @@ export interface GameState {
   phase: GamePhase;
   round: number;
   turn: number;
-  
+
   // 목표
   targetScore: number;
   currentScore: number;
-  
+
   // 자원
   gold: number;
-  
+
   // 핸드 & 덱
   deck: Deck;
   hand: Card[];
   selectedCards: Card[];
-  
+
   // 턴 결과
   slotResult: SlotResult | null;
   handResult: HandResult | null;
   scoreCalculation: ScoreCalculation | null;
   rouletteResult: RouletteResult | null;
-  
+
+  // 특수 카드 트리거 결과
+  triggeredSlotResults: SlotResult[];  // 카드 트리거로 발동된 슬롯 결과들
+  rouletteSpinsGranted: number;        // 카드 트리거로 부여받은 룰렛 스핀 수
+
   // 보유 조커
   jokers: Joker[];
   maxJokers: number;
-  
+
+  // 보유 바우처
+  purchasedVouchers: string[];         // 구매한 바우처 ID 목록
+
   // 플레이 제한
   handsRemaining: number;
   discardsRemaining: number;

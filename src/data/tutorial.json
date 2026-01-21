@@ -1,0 +1,90 @@
+{
+  "steps": [
+    {
+      "id": "welcome",
+      "title": "Welcome to Fortune's Hand!",
+      "content": "A deckbuilder roguelike combining cards, slots, and roulette. Match poker hands, spin slots for bonuses, and risk it all on the roulette!",
+      "phase": "IDLE",
+      "highlight": null,
+      "position": "center"
+    },
+    {
+      "id": "slot_intro",
+      "title": "Slot Machine",
+      "content": "Each turn starts with a slot spin. Match 3 symbols for powerful bonuses!\n\n🃏 Card = Extra draws\n🎯 Target = Roulette bonuses\n💰 Gold = Instant gold\n⭐ Star = JACKPOT!",
+      "phase": "SLOT_PHASE",
+      "highlight": "slot-machine",
+      "position": "bottom"
+    },
+    {
+      "id": "card_draw",
+      "title": "Draw Your Hand",
+      "content": "After the slot spin, you'll draw 8 cards. Use slot bonuses to draw more cards!",
+      "phase": "DRAW_PHASE",
+      "highlight": "hand-area",
+      "position": "top"
+    },
+    {
+      "id": "card_select",
+      "title": "Select Cards",
+      "content": "Click on cards to select them (up to 5). Make the best poker hand you can!",
+      "phase": "PLAY_PHASE",
+      "highlight": "hand-area",
+      "position": "top"
+    },
+    {
+      "id": "card_play",
+      "title": "Play Your Hand",
+      "content": "Click 'Play Hand' to score your selected cards. Higher poker hands = more points!\n\nYou can also discard cards to draw new ones (limited uses).",
+      "phase": "PLAY_PHASE",
+      "highlight": "action-buttons",
+      "position": "top"
+    },
+    {
+      "id": "score_calculation",
+      "title": "Score Calculation",
+      "content": "Your score is calculated based on:\n• Poker hand type (Pair, Flush, etc.)\n• Card chips and multipliers\n• Joker bonuses\n• Slot bonuses",
+      "phase": "SCORE_PHASE",
+      "highlight": "score-display",
+      "position": "right"
+    },
+    {
+      "id": "roulette_intro",
+      "title": "Roulette - Risk It All!",
+      "content": "Spin the roulette to multiply your score... or land on 0 and lose it all!\n\nYou can skip the roulette to keep your current score safely.",
+      "phase": "ROULETTE_PHASE",
+      "highlight": "roulette-wheel",
+      "position": "bottom"
+    },
+    {
+      "id": "goal_intro",
+      "title": "Reach the Goal",
+      "content": "Score enough points before running out of hands to beat the round!\n\nEach successful round unlocks the shop where you can buy powerful Jokers.",
+      "phase": "REWARD_PHASE",
+      "highlight": "score-display",
+      "position": "right"
+    },
+    {
+      "id": "shop_intro",
+      "title": "The Shop",
+      "content": "Buy Jokers to gain powerful effects!\n\nJokers activate during specific phases to boost your score, modify slots, or enhance roulette.",
+      "phase": "SHOP_PHASE",
+      "highlight": "shop-items",
+      "position": "center"
+    },
+    {
+      "id": "tutorial_complete",
+      "title": "Ready to Play!",
+      "content": "You're all set! Good luck on your run.\n\nRemember: Fortune favors the bold... but not the reckless!",
+      "phase": null,
+      "highlight": null,
+      "position": "center"
+    }
+  ],
+  "settings": {
+    "autoAdvance": false,
+    "pauseGameDuringTutorial": true,
+    "allowSkip": true,
+    "showProgressIndicator": true
+  }
+}

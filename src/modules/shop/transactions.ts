@@ -6,8 +6,9 @@
  * It returns Transaction objects that the core module uses to update state.
  */
 
-import type { ShopState, ShopItem, Transaction } from '@/types/interfaces';
+import type { ShopState, ShopItem, Transaction, Card } from '@/types/interfaces';
 import { generateShop } from './shopGenerator';
+import { openPack } from './packs';
 import balanceData from '@/data/balance.json';
 
 /**
@@ -15,6 +16,13 @@ import balanceData from '@/data/balance.json';
  * Loaded from balance.json
  */
 const REROLL_COST_INCREASE = balanceData.shop.rerollCostIncrease;
+
+/**
+ * Extended transaction result that includes pack contents
+ */
+export interface ExtendedTransaction extends Transaction {
+  packCards?: Card[]; // Cards from opened pack (if item was a pack)
+}
 
 /**
  * Attempt to buy an item from the shop
@@ -28,7 +36,7 @@ export function buyItem(
   shopState: ShopState,
   itemId: string,
   playerGold: number
-): Transaction {
+): ExtendedTransaction {
   const item = shopState.items.find((i) => i.id === itemId);
 
   if (!item) {
@@ -55,10 +63,20 @@ export function buyItem(
     };
   }
 
+  // If item is a pack, open it and include the cards
+  let packCards: Card[] | undefined;
+  if (item.type === 'pack') {
+    const packResult = openPack(item.itemId);
+    if (packResult) {
+      packCards = packResult.cards;
+    }
+  }
+
   return {
     success: true,
     item,
     newGold: playerGold - item.cost,
+    packCards,
   };
 }
 
@@ -100,10 +118,12 @@ export interface RerollError {
  * Calculate the current reroll cost based on shop state
  *
  * @param shopState - Current shop state
+ * @param discount - Optional discount from vouchers
  * @returns The cost of the next reroll
  */
-export function calculateRerollCost(shopState: ShopState): number {
-  return shopState.rerollCost + shopState.rerollsUsed * REROLL_COST_INCREASE;
+export function calculateRerollCost(shopState: ShopState, discount: number = 0): number {
+  const baseCost = shopState.rerollCost + shopState.rerollsUsed * REROLL_COST_INCREASE;
+  return Math.max(0, baseCost - discount);
 }
 
 /**
@@ -113,15 +133,17 @@ export function calculateRerollCost(shopState: ShopState): number {
  * @param playerGold - The player's current gold
  * @param round - Current game round
  * @param luck - Player's luck stat (affects item quality)
+ * @param discount - Discount from vouchers
  * @returns New shop state and cost, or error if cannot afford
  */
 export function reroll(
   shopState: ShopState,
   playerGold: number,
   round: number = 1,
-  luck: number = 0
+  luck: number = 0,
+  discount: number = 0
 ): RerollResult | RerollError {
-  const cost = calculateRerollCost(shopState);
+  const cost = calculateRerollCost(shopState, discount);
 
   if (playerGold < cost) {
     return {
@@ -160,8 +182,13 @@ export function canAffordItem(item: ShopItem, playerGold: number): boolean {
  *
  * @param shopState - Current shop state
  * @param playerGold - The player's current gold
+ * @param discount - Optional discount from vouchers
  * @returns True if player can afford to reroll
  */
-export function canAffordReroll(shopState: ShopState, playerGold: number): boolean {
-  return playerGold >= calculateRerollCost(shopState);
+export function canAffordReroll(
+  shopState: ShopState,
+  playerGold: number,
+  discount: number = 0
+): boolean {
+  return playerGold >= calculateRerollCost(shopState, discount);
 }

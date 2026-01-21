@@ -22,6 +22,7 @@ export {
   canAffordReroll,
   type RerollResult,
   type RerollError,
+  type ExtendedTransaction,
 } from './transactions';
 export {
   calculatePrice,
@@ -30,10 +31,30 @@ export {
   BASE_PRICES,
   RARITY_MULTIPLIERS,
 } from './pricing';
+export {
+  openPack,
+  getAllPacks,
+  getPackById,
+  getPacksByRarity,
+  getPackName,
+  getPackDescription,
+  getPackRarity,
+  calculatePackValue,
+  type PackData,
+  type PackResult,
+} from './packs';
+export {
+  getVoucherById,
+  getAllVouchers,
+  getVouchersByRarity,
+  calculateVoucherModifiers,
+  calculateInterest,
+  isVoucherPurchased,
+} from './vouchers';
 
 // Component exports
-export { Shop, ShopItem, RerollButton } from './components';
-export type { ShopProps, ShopItemProps, RerollButtonProps } from './components';
+export { Shop, ShopItem, RerollButton, PackDisplay } from './components';
+export type { ShopProps, ShopItemProps, RerollButtonProps, PackDisplayProps } from './components';
 
 // Re-export types from interfaces for convenience
 export type { ShopState, ShopItem as ShopItemType, Transaction } from '@/types/interfaces';

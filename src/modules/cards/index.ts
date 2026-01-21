@@ -57,6 +57,23 @@ export {
 } from './specialCards';
 
 // ============================================================
+// 특수 카드 트리거 시스템
+// ============================================================
+export {
+  detectTriggers,
+  getTriggerEffects,
+  countSlotTriggers,
+  countRouletteTriggers,
+  hasTriggerType,
+  mergeSlotResults,
+} from './triggers';
+
+export type {
+  TriggerResult,
+  TriggerEffect,
+} from './triggers';
+
+// ============================================================
 // UI 컴포넌트
 // ============================================================
 export {

@@ -1,0 +1,119 @@
+{
+  "vouchers": [
+    {
+      "id": "extra_hand",
+      "name": "Extra Hand",
+      "description": "+1 Hand per round",
+      "cost": 100,
+      "rarity": "uncommon",
+      "effect": {
+        "type": "hands_bonus",
+        "value": 1
+      }
+    },
+    {
+      "id": "extra_discard",
+      "name": "Extra Discard",
+      "description": "+1 Discard per round",
+      "cost": 80,
+      "rarity": "common",
+      "effect": {
+        "type": "discards_bonus",
+        "value": 1
+      }
+    },
+    {
+      "id": "interest",
+      "name": "Seed Money",
+      "description": "Earn interest on gold (10% per round, max 25)",
+      "cost": 150,
+      "rarity": "rare",
+      "effect": {
+        "type": "interest",
+        "rate": 0.1,
+        "max": 25
+      }
+    },
+    {
+      "id": "hand_size",
+      "name": "Bigger Hands",
+      "description": "+1 Hand size",
+      "cost": 120,
+      "rarity": "uncommon",
+      "effect": {
+        "type": "hand_size_bonus",
+        "value": 1
+      }
+    },
+    {
+      "id": "reroll_discount",
+      "name": "Clearance Sale",
+      "description": "Rerolls cost $2 less",
+      "cost": 60,
+      "rarity": "common",
+      "effect": {
+        "type": "reroll_discount",
+        "value": 2
+      }
+    },
+    {
+      "id": "max_jokers",
+      "name": "Joker's Gambit",
+      "description": "+1 Joker slot",
+      "cost": 200,
+      "rarity": "rare",
+      "effect": {
+        "type": "max_jokers_bonus",
+        "value": 1
+      }
+    },
+    {
+      "id": "slot_spins",
+      "name": "Slot Master",
+      "description": "+1 Slot spin per turn",
+      "cost": 120,
+      "rarity": "uncommon",
+      "effect": {
+        "type": "slot_spins_bonus",
+        "value": 1
+      }
+    },
+    {
+      "id": "starting_gold",
+      "name": "Rich Start",
+      "description": "+50 starting gold each round",
+      "cost": 180,
+      "rarity": "rare",
+      "effect": {
+        "type": "starting_gold_bonus",
+        "value": 50
+      }
+    },
+    {
+      "id": "lucky_charm",
+      "name": "Lucky Charm",
+      "description": "Increased rare item chance in shop",
+      "cost": 140,
+      "rarity": "uncommon",
+      "effect": {
+        "type": "luck_bonus",
+        "value": 10
+      }
+    },
+    {
+      "id": "mega_voucher",
+      "name": "Fortune's Blessing",
+      "description": "+1 Hand, +1 Discard, +1 Hand size",
+      "cost": 300,
+      "rarity": "legendary",
+      "effect": {
+        "type": "combo",
+        "effects": [
+          { "type": "hands_bonus", "value": 1 },
+          { "type": "discards_bonus", "value": 1 },
+          { "type": "hand_size_bonus", "value": 1 }
+        ]
+      }
+    }
+  ]
+}

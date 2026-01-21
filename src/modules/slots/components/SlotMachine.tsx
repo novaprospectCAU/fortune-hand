@@ -92,20 +92,20 @@ export function SlotMachine({
   const isPositive = currentResult ? isPositiveEffect(currentResult.effects) : true;
 
   return (
-    <div className="flex flex-col items-center gap-4">
+    <div className="flex flex-col items-center gap-3 sm:gap-4 w-full max-w-md mx-auto px-2">
       {/* 슬롯 머신 본체 */}
-      <div className="relative">
-        {/* 배경 프레임 */}
-        <div className="absolute -inset-4 bg-gradient-to-b from-amber-900 to-amber-950 rounded-2xl shadow-2xl" />
-        <div className="absolute -inset-3 bg-gradient-to-b from-amber-800 to-amber-900 rounded-xl" />
+      <div className="relative w-full">
+        {/* 배경 프레임 - 모바일에서는 크기 축소 */}
+        <div className="absolute -inset-3 sm:-inset-4 bg-gradient-to-b from-amber-900 to-amber-950 rounded-xl sm:rounded-2xl shadow-2xl" />
+        <div className="absolute -inset-2 sm:-inset-3 bg-gradient-to-b from-amber-800 to-amber-900 rounded-lg sm:rounded-xl" />
 
         {/* 릴 컨테이너 */}
-        <div className="relative flex gap-3 p-4 bg-slate-950 rounded-lg border-4 border-amber-700">
-          {/* 장식 볼트 */}
-          <div className="absolute -top-2 -left-2 w-4 h-4 bg-amber-600 rounded-full border-2 border-amber-400" />
-          <div className="absolute -top-2 -right-2 w-4 h-4 bg-amber-600 rounded-full border-2 border-amber-400" />
-          <div className="absolute -bottom-2 -left-2 w-4 h-4 bg-amber-600 rounded-full border-2 border-amber-400" />
-          <div className="absolute -bottom-2 -right-2 w-4 h-4 bg-amber-600 rounded-full border-2 border-amber-400" />
+        <div className="relative flex gap-2 sm:gap-3 p-3 sm:p-4 bg-slate-950 rounded-lg border-2 sm:border-4 border-amber-700">
+          {/* 장식 볼트 - 모바일에서는 작게 */}
+          <div className="absolute -top-1 sm:-top-2 -left-1 sm:-left-2 w-3 h-3 sm:w-4 sm:h-4 bg-amber-600 rounded-full border border-amber-400 sm:border-2" />
+          <div className="absolute -top-1 sm:-top-2 -right-1 sm:-right-2 w-3 h-3 sm:w-4 sm:h-4 bg-amber-600 rounded-full border border-amber-400 sm:border-2" />
+          <div className="absolute -bottom-1 sm:-bottom-2 -left-1 sm:-left-2 w-3 h-3 sm:w-4 sm:h-4 bg-amber-600 rounded-full border border-amber-400 sm:border-2" />
+          <div className="absolute -bottom-1 sm:-bottom-2 -right-1 sm:-right-2 w-3 h-3 sm:w-4 sm:h-4 bg-amber-600 rounded-full border border-amber-400 sm:border-2" />
 
           {/* 릴 */}
           <Reel finalSymbol={symbols[0]} state={reelStates[0]} delay={100} />
@@ -138,10 +138,10 @@ export function SlotMachine({
             initial={{ opacity: 0, y: -10 }}
             animate={{ opacity: 1, y: 0 }}
             exit={{ opacity: 0 }}
-            className="text-center"
+            className="text-center px-2"
           >
             <span
-              className={`text-lg font-bold ${
+              className={`text-base sm:text-lg font-bold ${
                 currentResult?.isJackpot ? 'text-yellow-400' : 'text-slate-300'
               }`}
             >
@@ -158,7 +158,7 @@ export function SlotMachine({
             initial={{ opacity: 0, height: 0 }}
             animate={{ opacity: 1, height: 'auto' }}
             exit={{ opacity: 0, height: 0 }}
-            className="flex flex-wrap justify-center gap-2 max-w-xs"
+            className="flex flex-wrap justify-center gap-1.5 sm:gap-2 max-w-full px-2"
           >
             {effectSummary.map((effect, index) => (
               <motion.span
@@ -179,21 +179,23 @@ export function SlotMachine({
         )}
       </AnimatePresence>
 
-      {/* 스핀 버튼 */}
+      {/* 스핀 버튼 - 터치 친화적 */}
       <motion.button
         onClick={handleSpin}
         disabled={isSpinning || disabled}
         className={`
-          px-8 py-3 rounded-full font-bold text-lg uppercase tracking-wider
+          px-6 py-3 sm:px-8 sm:py-3.5 rounded-full font-bold
+          text-base sm:text-lg uppercase tracking-wider
           transition-all duration-200 shadow-lg
+          min-h-[48px] touch-manipulation w-full max-w-xs
           ${
             isSpinning || disabled
               ? 'bg-slate-700 text-slate-500 cursor-not-allowed'
               : 'bg-gradient-to-b from-red-500 to-red-700 text-white hover:from-red-400 hover:to-red-600 active:from-red-600 active:to-red-800'
           }
         `}
-        whileHover={!isSpinning && !disabled ? { scale: 1.05 } : undefined}
-        whileTap={!isSpinning && !disabled ? { scale: 0.95 } : undefined}
+        whileHover={!isSpinning && !disabled ? { scale: 1.02 } : undefined}
+        whileTap={!isSpinning && !disabled ? { scale: 0.98 } : undefined}
       >
         {isSpinning ? 'Spinning...' : 'SPIN'}
       </motion.button>

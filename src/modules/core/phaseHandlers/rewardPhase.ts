@@ -13,6 +13,7 @@ import type {
   GamePhase,
 } from '@/types/interfaces';
 import { discard } from '../moduleIntegration';
+import { calculateGoldFromEnhancements } from '@/modules/poker/scoring';
 
 export interface RewardPhaseInput {
   currentScore: number;
@@ -69,7 +70,14 @@ export function executeRewardPhase(input: RewardPhaseInput): RewardPhaseOutput {
   // Calculate gold changes
   const goldFromSlot = slotResult?.effects.instant.gold ?? 0;
   const goldPenalty = slotResult?.effects.penalty.loseGold ?? 0;
-  const newGold = Math.max(0, gold + goldFromSlot - goldPenalty);
+
+  // Calculate gold from card enhancements (gold seal)
+  const goldFromEnhancements =
+    scoreCalculation?.handResult.scoringCards
+      ? calculateGoldFromEnhancements(scoreCalculation.handResult.scoringCards)
+      : 0;
+
+  const newGold = Math.max(0, gold + goldFromSlot + goldFromEnhancements - goldPenalty);
 
   // Update score
   const newScore = currentScore + turnScore;

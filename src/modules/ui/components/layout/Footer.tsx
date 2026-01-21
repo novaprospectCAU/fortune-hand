@@ -201,7 +201,9 @@ export function Footer({
     <footer
       className={clsx(
         'w-full bg-game-surface border-t border-game-border',
-        'px-4 py-4 md:px-6',
+        'px-3 py-3 sm:px-4 sm:py-4 md:px-6',
+        // Safe area for mobile home indicators
+        'pb-[calc(0.75rem+env(safe-area-inset-bottom))] sm:pb-[calc(1rem+env(safe-area-inset-bottom))]',
         className
       )}
     >
@@ -213,7 +215,7 @@ export function Footer({
             initial="initial"
             animate="animate"
             exit="exit"
-            className="flex items-center justify-center"
+            className="flex items-center justify-center w-full max-w-2xl"
           >
             {renderActions()}
           </motion.div>
