@@ -4,14 +4,14 @@
  * Integrates all game modules into a cohesive game experience.
  */
 
-import { useCallback } from 'react';
+import { useCallback, useState, useEffect } from 'react';
 import { AnimatePresence, motion } from 'framer-motion';
 
 // Core module - state management
 import { useGameStore } from '@/modules/core';
 
 // UI module - layout and common components
-import { GameLayout, ScoreDisplay } from '@/modules/ui';
+import { GameLayout, ScoreDisplay, DeckViewer, CardEffectTooltip } from '@/modules/ui';
 
 // Game modules - components
 import { SlotMachine } from '@/modules/slots';
@@ -51,6 +51,7 @@ function App() {
     shopState,
     // Actions
     startGame,
+    nextPhase,
     selectCard,
     deselectCard,
     playHand,
@@ -61,6 +62,28 @@ function App() {
     rerollShop,
     leaveShop,
   } = useGameStore();
+
+  // Deck viewer state
+  const [isDeckViewerOpen, setIsDeckViewerOpen] = useState(false);
+
+  // Hovered card state (for effect tooltip)
+  const [hoveredCard, setHoveredCard] = useState<import('@/types/interfaces').Card | null>(null);
+
+  // Keyboard shortcut for deck viewer (D key)
+  useEffect(() => {
+    const handleKeyDown = (e: KeyboardEvent) => {
+      // Don't trigger if user is typing in an input
+      if (e.target instanceof HTMLInputElement || e.target instanceof HTMLTextAreaElement) {
+        return;
+      }
+      if (e.key === 'd' || e.key === 'D') {
+        setIsDeckViewerOpen((prev) => !prev);
+      }
+    };
+
+    window.addEventListener('keydown', handleKeyDown);
+    return () => window.removeEventListener('keydown', handleKeyDown);
+  }, []);
 
   // Card click handler - toggle selection
   const handleCardClick = useCallback(
@@ -204,12 +227,32 @@ function App() {
               <h2 className="text-2xl font-bold text-white mb-2">
                 Round {round} - Turn {turn}
               </h2>
-              <p className="text-gray-400">Spin the slot to begin your turn!</p>
+              {!slotResult && (
+                <p className="text-gray-400">Spin the slot to begin your turn!</p>
+              )}
             </motion.div>
             <SlotMachine
               onSpinComplete={handleSlotSpinComplete}
-              disabled={false}
+              disabled={!!slotResult}
             />
+            {/* Show slot effects after spinning */}
+            {slotResult && (
+              <motion.div
+                initial={{ opacity: 0, y: 20 }}
+                animate={{ opacity: 1, y: 0 }}
+                className="mt-6 bg-game-surface rounded-lg p-4 max-w-md"
+              >
+                <h3 className="text-lg font-bold text-white text-center mb-2">
+                  {slotResult.isJackpot ? '🎉 JACKPOT! 🎉' : 'Slot Result'}
+                </h3>
+                <div className="text-center text-sm">
+                  {formatSlotEffects(slotResult.effects)}
+                </div>
+                <p className="text-gray-400 text-center text-sm mt-3">
+                  Click Continue to draw cards
+                </p>
+              </motion.div>
+            )}
           </div>
         );
 
@@ -248,6 +291,10 @@ function App() {
                     <span className="text-yellow-400 font-bold">JACKPOT!</span>
                   )}
                 </div>
+                {/* Slot Effects Description */}
+                <div className="text-center mt-2 text-sm">
+                  {formatSlotEffects(slotResult.effects)}
+                </div>
               </motion.div>
             )}
 
@@ -260,6 +307,7 @@ function App() {
                 cards={hand}
                 selectedIds={selectedCards.map((c) => c.id)}
                 onCardClick={handleCardClick}
+                onCardHover={setHoveredCard}
                 maxSelect={5}
                 disabled={false}
               />
@@ -420,12 +468,15 @@ function App() {
   const handleContinue = useCallback(() => {
     if (phase === 'IDLE' || phase === 'GAME_OVER') {
       startGame();
+    } else if (phase === 'SLOT_PHASE') {
+      nextPhase();
     } else if (phase === 'SHOP_PHASE') {
       leaveShop();
     }
-  }, [phase, startGame, leaveShop]);
+  }, [phase, startGame, nextPhase, leaveShop]);
 
   return (
+    <>
     <GameLayout
       gameState={{
         phase,
@@ -452,6 +503,8 @@ function App() {
       onSkipRoulette={handleSkipRoulette}
       onContinue={handleContinue}
       onJokerClick={handleJokerClick}
+      deckCount={deck.cards.length}
+      onViewDeck={() => setIsDeckViewerOpen(true)}
     >
       <AnimatePresence mode="wait">
         <motion.div
@@ -465,6 +518,17 @@ function App() {
         </motion.div>
       </AnimatePresence>
     </GameLayout>
+
+    {/* Deck Viewer Modal */}
+    <DeckViewer
+      deck={deck}
+      isOpen={isDeckViewerOpen}
+      onClose={() => setIsDeckViewerOpen(false)}
+    />
+
+    {/* Card Effect Tooltip (centered) */}
+    <CardEffectTooltip card={hoveredCard} />
+  </>
   );
 }
 
@@ -482,6 +546,70 @@ function getSymbolEmoji(symbol: string): string {
     wild: '\u{1F31F}',    // Glowing star
   };
   return symbolMap[symbol] || '\u2753'; // Question mark as fallback
+}
+
+/**
+ * Format slot effects for display
+ */
+function formatSlotEffects(effects: import('@/types/interfaces').SlotEffects): React.ReactNode {
+  const parts: string[] = [];
+
+  // Card bonuses
+  if (effects.cardBonus.extraDraw > 0) {
+    parts.push(`+${effects.cardBonus.extraDraw} extra draw`);
+  }
+  if (effects.cardBonus.handSize > 0) {
+    parts.push(`+${effects.cardBonus.handSize} hand size`);
+  }
+  if (effects.cardBonus.scoreMultiplier > 1) {
+    parts.push(`x${effects.cardBonus.scoreMultiplier} score`);
+  }
+
+  // Roulette bonuses
+  if (effects.rouletteBonus.safeZoneBonus > 0) {
+    parts.push(`+${effects.rouletteBonus.safeZoneBonus}% safe zone`);
+  }
+  if (effects.rouletteBonus.maxMultiplier > 0) {
+    parts.push(`+${effects.rouletteBonus.maxMultiplier}x max mult`);
+  }
+  if (effects.rouletteBonus.freeSpins > 0) {
+    parts.push(`${effects.rouletteBonus.freeSpins} free spin`);
+  }
+
+  // Instant rewards
+  if (effects.instant.gold > 0) {
+    parts.push(`+${effects.instant.gold} gold`);
+  }
+  if (effects.instant.chips > 0) {
+    parts.push(`+${effects.instant.chips} chips`);
+  }
+
+  // Penalties
+  const penalties: string[] = [];
+  if (effects.penalty.discardCards > 0) {
+    penalties.push(`-${effects.penalty.discardCards} cards discarded`);
+  }
+  if (effects.penalty.skipRoulette) {
+    penalties.push('roulette skipped');
+  }
+  if (effects.penalty.loseGold > 0) {
+    penalties.push(`-${effects.penalty.loseGold} gold`);
+  }
+
+  if (parts.length === 0 && penalties.length === 0) {
+    return <span className="text-gray-500">No effects</span>;
+  }
+
+  return (
+    <>
+      {parts.length > 0 && (
+        <span className="text-green-400">{parts.join(' · ')}</span>
+      )}
+      {penalties.length > 0 && (
+        <span className="text-red-400 ml-2">{penalties.join(' · ')}</span>
+      )}
+    </>
+  );
 }
 
 /**

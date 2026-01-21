@@ -15,9 +15,11 @@ export interface SidebarProps {
   discardsRemaining: number;
   jokers: Joker[];
   maxJokers: number;
+  deckCount?: number;
   className?: string;
   collapsed?: boolean;
   onJokerClick?: (joker: Joker) => void;
+  onViewDeck?: () => void;
 }
 
 const rarityBorderColors = {
@@ -33,9 +35,11 @@ export function Sidebar({
   discardsRemaining,
   jokers,
   maxJokers,
+  deckCount,
   className,
   collapsed = false,
   onJokerClick,
+  onViewDeck,
 }: SidebarProps) {
   return (
     <aside
@@ -117,6 +121,32 @@ export function Sidebar({
             </div>
           )}
         </div>
+
+        {/* View Deck Button */}
+        {onViewDeck && (
+          <button
+            onClick={onViewDeck}
+            className={clsx(
+              'mt-4 w-full py-2 px-3 rounded-lg',
+              'bg-game-card hover:bg-game-border transition-colors',
+              'text-slate-400 hover:text-white text-sm',
+              'flex items-center justify-center gap-2',
+              'focus:outline-none focus:ring-2 focus:ring-primary'
+            )}
+          >
+            {collapsed ? (
+              <span title="View Deck">D</span>
+            ) : (
+              <>
+                <span>View Deck</span>
+                {deckCount !== undefined && (
+                  <span className="text-xs text-slate-500">({deckCount})</span>
+                )}
+                <span className="text-xs text-slate-600 ml-auto">[D]</span>
+              </>
+            )}
+          </button>
+        )}
       </div>
 
       {/* Jokers Section */}

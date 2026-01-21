@@ -51,6 +51,8 @@ export {
   type RoundInfoProps,
   PhaseIndicator,
   type PhaseIndicatorProps,
+  DeckViewer,
+  type DeckViewerProps,
 } from './components/display';
 
 // Feedback Components
@@ -65,6 +67,8 @@ export {
   MultiEffectText,
   type EffectTextProps,
   type MultiEffectTextProps,
+  CardEffectTooltip,
+  type CardEffectTooltipProps,
 } from './components/feedback';
 
 // Tutorial Components

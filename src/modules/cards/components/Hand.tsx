@@ -12,6 +12,7 @@ export interface HandProps {
   cards: CardType[];
   selectedIds: string[];
   onCardClick: (cardId: string) => void;
+  onCardHover?: (card: CardType | null) => void;
   maxSelect?: number;
   disabled?: boolean;
   size?: 'sm' | 'md' | 'lg';
@@ -43,6 +44,7 @@ function HandComponent({
   cards,
   selectedIds,
   onCardClick,
+  onCardHover,
   maxSelect = 5,
   disabled = false,
   size = 'md',
@@ -126,6 +128,8 @@ function HandComponent({
                 y: isSelected ? yOffset - 8 : yOffset - 6,
                 zIndex: 100,
               } : undefined}
+              onMouseEnter={() => onCardHover?.(card)}
+              onMouseLeave={() => onCardHover?.(null)}
             >
               <Card
                 card={card}

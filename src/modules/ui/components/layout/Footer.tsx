@@ -16,6 +16,7 @@ export interface FooterProps {
   maxSelectCards: number;
   handsRemaining: number;
   discardsRemaining: number;
+  hasSlotResult?: boolean;
   className?: string;
   onPlay?: () => void;
   onDiscard?: () => void;
@@ -30,6 +31,7 @@ export function Footer({
   maxSelectCards,
   handsRemaining,
   discardsRemaining,
+  hasSlotResult = false,
   className,
   onPlay,
   onDiscard,
@@ -51,6 +53,18 @@ export function Footer({
         );
 
       case 'SLOT_PHASE':
+        // Show Continue button after slot has been spun
+        if (hasSlotResult) {
+          return (
+            <Button
+              variant="primary"
+              size="lg"
+              onClick={onContinue}
+            >
+              Continue
+            </Button>
+          );
+        }
         return null; // SlotMachine has its own SPIN button
 
       case 'DRAW_PHASE':
@@ -113,14 +127,14 @@ export function Footer({
               size="lg"
               onClick={onSkipRoulette}
             >
-              Keep Score
+              Skip (x1 Safe)
             </Button>
             <Button
               variant="secondary"
               size="lg"
               onClick={onSpinRoulette}
             >
-              Spin Roulette
+              Gamble!
             </Button>
           </div>
         );

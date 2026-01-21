@@ -23,6 +23,8 @@ export interface GameLayoutProps {
   onSkipRoulette?: () => void;
   onContinue?: () => void;
   onJokerClick?: (joker: GameState['jokers'][0]) => void;
+  deckCount?: number;
+  onViewDeck?: () => void;
 }
 
 export function GameLayout({
@@ -35,6 +37,8 @@ export function GameLayout({
   onSkipRoulette,
   onContinue,
   onJokerClick,
+  deckCount,
+  onViewDeck,
 }: GameLayoutProps) {
   const [sidebarOpen, setSidebarOpen] = useState(false);
 
@@ -49,6 +53,7 @@ export function GameLayout({
     jokers = [],
     maxJokers = 5,
     selectedCards = [],
+    slotResult = null,
   } = gameState;
 
   const maxSelectCards = 5; // From game config
@@ -90,6 +95,8 @@ export function GameLayout({
             maxJokers={maxJokers}
             collapsed={false}
             onJokerClick={onJokerClick}
+            deckCount={deckCount}
+            onViewDeck={onViewDeck}
           />
         </div>
       </div>
@@ -160,6 +167,8 @@ export function GameLayout({
                 onJokerClick?.(joker);
                 setSidebarOpen(false);
               }}
+              deckCount={deckCount}
+              onViewDeck={onViewDeck}
               className="h-full shadow-2xl"
             />
           </div>
@@ -173,6 +182,7 @@ export function GameLayout({
         maxSelectCards={maxSelectCards}
         handsRemaining={handsRemaining}
         discardsRemaining={discardsRemaining}
+        hasSlotResult={!!slotResult}
         onPlay={onPlay}
         onDiscard={onDiscard}
         onSpinRoulette={onSpinRoulette}

@@ -433,8 +433,7 @@ export const useGameStore = create<GameStore>((set, get) => ({
       result,
     });
 
-    // Automatically advance to draw phase
-    get().nextPhase();
+    // Don't auto-advance - let the user click Continue to proceed
   },
 
   skipSlot: () => {
