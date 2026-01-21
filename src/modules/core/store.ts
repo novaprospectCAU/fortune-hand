@@ -773,20 +773,29 @@ export const useGameStore = create<GameStore>((set, get) => ({
           break;
         }
         case 'card': {
-          // Add special card to deck
+          // Add special card to deck and shuffle so it can appear
           const specialCard = getSpecialCardById(purchasedItem.itemId);
           if (specialCard) {
-            newDeck = addToDeck(state.deck, [specialCard]);
-            console.log('Special card added:', specialCard.id);
+            const deckWithCard = addToDeck(state.deck, [specialCard]);
+            newDeck = {
+              ...deckWithCard,
+              cards: shuffle(deckWithCard.cards),
+            };
+            console.log('Special card added and deck shuffled:', specialCard.id);
           } else {
             console.warn('Special card not found:', purchasedItem.itemId);
           }
           break;
         }
         case 'pack': {
-          // Use pack cards from transaction if available
+          // Use pack cards from transaction if available, then shuffle
           if (transaction.packCards && transaction.packCards.length > 0) {
-            newDeck = addToDeck(state.deck, transaction.packCards);
+            const deckWithCards = addToDeck(state.deck, transaction.packCards);
+            newDeck = {
+              ...deckWithCards,
+              cards: shuffle(deckWithCards.cards),
+            };
+            console.log('Pack cards added and deck shuffled:', transaction.packCards.length, 'cards');
           }
           break;
         }
