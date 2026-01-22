@@ -62,6 +62,202 @@
       "rarity": "legendary",
       "cost": 100,
       "selectLimit": 2
+    },
+    {
+      "id": "hand_boost_high_card",
+      "name": "High Card Boost",
+      "description": "Permanently +1 to High Card multiplier",
+      "type": "hand_booster",
+      "rarity": "common",
+      "cost": 15,
+      "handType": "high_card",
+      "boostValue": 1
+    },
+    {
+      "id": "hand_boost_pair",
+      "name": "Pair Boost",
+      "description": "Permanently +2 to Pair multiplier",
+      "type": "hand_booster",
+      "rarity": "common",
+      "cost": 20,
+      "handType": "pair",
+      "boostValue": 2
+    },
+    {
+      "id": "hand_boost_two_pair",
+      "name": "Two Pair Boost",
+      "description": "Permanently +2 to Two Pair multiplier",
+      "type": "hand_booster",
+      "rarity": "common",
+      "cost": 25,
+      "handType": "two_pair",
+      "boostValue": 2
+    },
+    {
+      "id": "hand_boost_three_of_a_kind",
+      "name": "Triple Boost",
+      "description": "Permanently +4 to Three of a Kind multiplier",
+      "type": "hand_booster",
+      "rarity": "uncommon",
+      "cost": 35,
+      "handType": "three_of_a_kind",
+      "boostValue": 4
+    },
+    {
+      "id": "hand_boost_straight",
+      "name": "Straight Boost",
+      "description": "Permanently +4 to Straight multiplier",
+      "type": "hand_booster",
+      "rarity": "uncommon",
+      "cost": 40,
+      "handType": "straight",
+      "boostValue": 4
+    },
+    {
+      "id": "hand_boost_flush",
+      "name": "Flush Boost",
+      "description": "Permanently +4 to Flush multiplier",
+      "type": "hand_booster",
+      "rarity": "uncommon",
+      "cost": 45,
+      "handType": "flush",
+      "boostValue": 4
+    },
+    {
+      "id": "hand_boost_full_house",
+      "name": "Full House Boost",
+      "description": "Permanently +8 to Full House multiplier",
+      "type": "hand_booster",
+      "rarity": "rare",
+      "cost": 60,
+      "handType": "full_house",
+      "boostValue": 8
+    },
+    {
+      "id": "hand_boost_straight_flush",
+      "name": "Straight Flush Boost",
+      "description": "Permanently +8 to Straight Flush multiplier",
+      "type": "hand_booster",
+      "rarity": "rare",
+      "cost": 70,
+      "handType": "straight_flush",
+      "boostValue": 8
+    },
+    {
+      "id": "hand_boost_four_of_a_kind",
+      "name": "Four of a Kind Boost",
+      "description": "Permanently +15 to Four of a Kind multiplier",
+      "type": "hand_booster",
+      "rarity": "rare",
+      "cost": 80,
+      "handType": "four_of_a_kind",
+      "boostValue": 15
+    },
+    {
+      "id": "hand_boost_quintuple",
+      "name": "Quintuple Boost",
+      "description": "Permanently +15 to Quintuple multiplier",
+      "type": "hand_booster",
+      "rarity": "rare",
+      "cost": 85,
+      "handType": "quintuple",
+      "boostValue": 15
+    },
+    {
+      "id": "hand_boost_royal_flush",
+      "name": "Royal Flush Boost",
+      "description": "Permanently +30 to Royal Flush multiplier",
+      "type": "hand_booster",
+      "rarity": "legendary",
+      "cost": 100,
+      "handType": "royal_flush",
+      "boostValue": 30
+    },
+    {
+      "id": "hand_boost_royal_quintuple",
+      "name": "Royal Quintuple Boost",
+      "description": "Permanently +30 to Royal Quintuple multiplier",
+      "type": "hand_booster",
+      "rarity": "legendary",
+      "cost": 110,
+      "handType": "royal_quintuple",
+      "boostValue": 30
+    },
+    {
+      "id": "hand_boost_pentagon",
+      "name": "Pentagon Boost",
+      "description": "Permanently +50 to Pentagon multiplier",
+      "type": "hand_booster",
+      "rarity": "legendary",
+      "cost": 150,
+      "handType": "pentagon",
+      "boostValue": 50
+    }
+  ],
+  "packs": [
+    {
+      "id": "standard_pack",
+      "name": "Standard Pack",
+      "description": "Contains 3 random cards",
+      "rarity": "common",
+      "cost": 30,
+      "cardCount": 3
+    },
+    {
+      "id": "jumbo_pack",
+      "name": "Jumbo Pack",
+      "description": "Contains 4 random cards",
+      "rarity": "uncommon",
+      "cost": 50,
+      "cardCount": 4
+    },
+    {
+      "id": "mega_pack",
+      "name": "Mega Pack",
+      "description": "Contains 5 random cards",
+      "rarity": "rare",
+      "cost": 80,
+      "cardCount": 5
+    },
+    {
+      "id": "hand_boost_pack_basic",
+      "name": "Basic Hand Boost Pack",
+      "description": "Contains 2 random basic hand boost items",
+      "rarity": "common",
+      "cost": 35,
+      "packType": "hand_boost",
+      "itemCount": 2,
+      "rarityFilter": ["common"]
+    },
+    {
+      "id": "hand_boost_pack_advanced",
+      "name": "Advanced Hand Boost Pack",
+      "description": "Contains 2 random advanced hand boost items",
+      "rarity": "uncommon",
+      "cost": 70,
+      "packType": "hand_boost",
+      "itemCount": 2,
+      "rarityFilter": ["common", "uncommon"]
+    },
+    {
+      "id": "hand_boost_pack_premium",
+      "name": "Premium Hand Boost Pack",
+      "description": "Contains 2 random rare+ hand boost items",
+      "rarity": "rare",
+      "cost": 120,
+      "packType": "hand_boost",
+      "itemCount": 2,
+      "rarityFilter": ["uncommon", "rare"]
+    },
+    {
+      "id": "hand_boost_pack_legendary",
+      "name": "Legendary Hand Boost Pack",
+      "description": "Contains 1 legendary hand boost item",
+      "rarity": "legendary",
+      "cost": 150,
+      "packType": "hand_boost",
+      "itemCount": 1,
+      "rarityFilter": ["legendary"]
     }
   ]
 }

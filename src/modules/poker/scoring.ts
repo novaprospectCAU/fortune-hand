@@ -150,17 +150,21 @@ function getScoringCardSum(handType: HandType, scoringCards: Card[]): number {
  *
  * @param handResult 핸드 판정 결과
  * @param bonuses 적용할 보너스 배열 (조커, 슬롯 등에서 제공)
+ * @param handMultiplierBonuses 영구 족보 배수 보너스 (아이템으로 획득)
  * @returns ScoreCalculation - 점수 계산 과정 및 최종 점수
  */
 export function calculateScore(
   handResult: HandResult,
-  bonuses: AppliedBonus[] = []
+  bonuses: AppliedBonus[] = [],
+  handMultiplierBonuses: Partial<Record<HandType, number>> = {}
 ): ScoreCalculation {
   // 1. 핸드 타입에 따른 카드 합 계산
   let chipTotal = getScoringCardSum(handResult.handType, handResult.scoringCards);
 
-  // 2. 기본 배수 (핸드 타입별 배수)
-  let multTotal = HAND_MULTIPLIERS[handResult.handType] ?? 1;
+  // 2. 기본 배수 (핸드 타입별 배수) + 영구 보너스
+  const baseMultiplier = HAND_MULTIPLIERS[handResult.handType] ?? 1;
+  const permanentBonus = handMultiplierBonuses[handResult.handType] ?? 0;
+  let multTotal = baseMultiplier + permanentBonus;
 
   // 카드 강화 보너스 (mult 타입, retrigger 적용)
   for (const card of handResult.scoringCards) {
@@ -179,6 +183,15 @@ export function calculateScore(
       source: 'Card sum',
       type: 'chips',
       value: chipTotal,
+    });
+  }
+
+  // 영구 족보 보너스 추적
+  if (permanentBonus > 0) {
+    appliedBonuses.push({
+      source: 'Hand Boost',
+      type: 'mult',
+      value: permanentBonus,
     });
   }
 

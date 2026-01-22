@@ -12,7 +12,6 @@ import type {
   SlotEffects,
   SlotModifiers,
   HandResult,
-  ScoreCalculation,
   AppliedBonus,
   RouletteResult,
   RouletteConfig,
@@ -23,7 +22,7 @@ import type {
   Suit,
   Rank,
 } from '@/types/interfaces';
-import { SUITS, RANKS, CARD_CHIP_VALUES, BASE_HAND_VALUES } from '@/data/constants';
+import { SUITS, RANKS, BASE_HAND_VALUES } from '@/data/constants';
 
 // ============================================================
 // Cards Module Integration
@@ -488,47 +487,8 @@ export function evaluateHand(cards: Card[]): HandResult {
   };
 }
 
-/**
- * Calculate score from hand result and bonuses
- */
-export function calculateScore(
-  handResult: HandResult,
-  bonuses: AppliedBonus[]
-): ScoreCalculation {
-  // Start with base chips and mult
-  let chipTotal = handResult.baseChips;
-  let multTotal = handResult.baseMult;
-
-  // Add chip values from scoring cards
-  for (const card of handResult.scoringCards) {
-    chipTotal += CARD_CHIP_VALUES[card.rank];
-  }
-
-  // Apply bonuses
-  for (const bonus of bonuses) {
-    switch (bonus.type) {
-      case 'chips':
-        chipTotal += bonus.value;
-        break;
-      case 'mult':
-        multTotal += bonus.value;
-        break;
-      case 'xmult':
-        multTotal *= bonus.value;
-        break;
-    }
-  }
-
-  const finalScore = Math.floor(chipTotal * multTotal);
-
-  return {
-    handResult,
-    chipTotal,
-    multTotal,
-    appliedBonuses: bonuses,
-    finalScore,
-  };
-}
+// Re-export calculateScore from poker module
+export { calculateScore } from '@/modules/poker/scoring';
 
 // ============================================================
 // Roulette Module Integration

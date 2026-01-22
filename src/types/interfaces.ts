@@ -294,7 +294,7 @@ export interface ShopItem {
 // 소모품 (Consumables)
 // ============================================================
 
-export type ConsumableType = 'card_remover' | 'card_transformer' | 'card_duplicator';
+export type ConsumableType = 'card_remover' | 'card_transformer' | 'card_duplicator' | 'hand_booster';
 
 export interface Consumable {
   id: string;
@@ -303,7 +303,9 @@ export interface Consumable {
   type: ConsumableType;
   rarity: 'common' | 'uncommon' | 'rare' | 'legendary';
   cost: number;
-  selectLimit: number;  // 선택 가능한 카드 수
+  selectLimit?: number;  // 선택 가능한 카드 수 (card_ 타입용)
+  handType?: HandType;   // 강화할 핸드 타입 (hand_booster용)
+  boostValue?: number;   // 배수 증가량 (hand_booster용)
 }
 
 export interface ConsumableOverlayState {
@@ -409,6 +411,9 @@ export interface GameState {
 
   // 보유 바우처
   purchasedVouchers: string[];         // 구매한 바우처 ID 목록
+
+  // 족보 배수 보너스 (영구적)
+  handMultiplierBonuses: Partial<Record<HandType, number>>;
 
   // 플레이 제한
   handsRemaining: number;

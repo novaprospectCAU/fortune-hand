@@ -85,7 +85,7 @@ export function CardSelectionOverlay({
         if (prev.includes(cardId)) {
           // Deselect
           return prev.filter((id) => id !== cardId);
-        } else if (prev.length < consumable.selectLimit) {
+        } else if (prev.length < (consumable.selectLimit ?? 1)) {
           // Select (if under limit)
           return [...prev, cardId];
         }
@@ -101,7 +101,7 @@ export function CardSelectionOverlay({
 
   const title = getTitle(consumable.type, t);
   const icon = getIcon(consumable.type);
-  const description = getDescription(consumable.type, consumable.selectLimit, t);
+  const description = getDescription(consumable.type, consumable.selectLimit ?? 1, t);
 
   return (
     <AnimatePresence>
@@ -184,7 +184,7 @@ export function CardSelectionOverlay({
                     onClick={() => handleCardClick(card.id)}
                     disabled={
                       !selectedIds.includes(card.id) &&
-                      selectedIds.length >= consumable.selectLimit
+                      selectedIds.length >= (consumable.selectLimit ?? 1)
                     }
                   />
                 </motion.div>

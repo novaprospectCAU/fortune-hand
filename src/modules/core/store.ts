@@ -100,6 +100,7 @@ function createInitialState(): Omit<GameState, keyof GameActions> & {
     slotSpinsRemaining: DEFAULT_GAME_CONFIG.startingSlotSpins,
     openedPackCards: null,
     consumableOverlay: null,
+    handMultiplierBonuses: {},
     config: mergeGameConfig(),
     shopState: null,
   };
@@ -270,7 +271,9 @@ export const useGameStore = create<GameStore>((set, get) => ({
           });
         }
 
-        const scoreCalc = calculateScore(handResult, jokerBonuses);
+        // Get hand multiplier bonuses from state
+        const { handMultiplierBonuses } = get();
+        const scoreCalc = calculateScore(handResult, jokerBonuses, handMultiplierBonuses);
 
         set({
           handResult,
@@ -1080,6 +1083,24 @@ export const useGameStore = create<GameStore>((set, get) => ({
             discardPile: newDeck.discardPile,
           };
           console.log(`Duplicated ${selectedCardIds.length} card(s)`);
+        }
+        break;
+      }
+
+      case 'hand_booster': {
+        // Apply hand multiplier boost immediately
+        if (consumable.handType && consumable.boostValue) {
+          const currentBonuses = state.handMultiplierBonuses;
+          const currentValue = currentBonuses[consumable.handType] ?? 0;
+          set({
+            handMultiplierBonuses: {
+              ...currentBonuses,
+              [consumable.handType]: currentValue + consumable.boostValue,
+            },
+            consumableOverlay: null,
+          });
+          console.log(`Boosted ${consumable.handType} multiplier by +${consumable.boostValue}`);
+          return; // Early return since we handled state update
         }
         break;
       }

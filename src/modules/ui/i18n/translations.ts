@@ -266,6 +266,36 @@ export const translations = {
     consumable_card_duplicator_1_desc: "Duplicate 1 card",
     consumable_card_duplicator_2_desc: "Duplicate up to 2 cards",
 
+    // Hand boost consumable names
+    consumable_hand_boost_high_card: "High Card Boost",
+    consumable_hand_boost_pair: "Pair Boost",
+    consumable_hand_boost_two_pair: "Two Pair Boost",
+    consumable_hand_boost_three_of_a_kind: "Triple Boost",
+    consumable_hand_boost_straight: "Straight Boost",
+    consumable_hand_boost_flush: "Flush Boost",
+    consumable_hand_boost_full_house: "Full House Boost",
+    consumable_hand_boost_straight_flush: "Straight Flush Boost",
+    consumable_hand_boost_four_of_a_kind: "Four of a Kind Boost",
+    consumable_hand_boost_quintuple: "Quintuple Boost",
+    consumable_hand_boost_royal_flush: "Royal Flush Boost",
+    consumable_hand_boost_royal_quintuple: "Royal Quintuple Boost",
+    consumable_hand_boost_pentagon: "Pentagon Boost",
+
+    // Hand boost consumable descriptions
+    consumable_hand_boost_high_card_desc: "Permanently +1 to High Card multiplier",
+    consumable_hand_boost_pair_desc: "Permanently +2 to Pair multiplier",
+    consumable_hand_boost_two_pair_desc: "Permanently +2 to Two Pair multiplier",
+    consumable_hand_boost_three_of_a_kind_desc: "Permanently +4 to Three of a Kind multiplier",
+    consumable_hand_boost_straight_desc: "Permanently +4 to Straight multiplier",
+    consumable_hand_boost_flush_desc: "Permanently +4 to Flush multiplier",
+    consumable_hand_boost_full_house_desc: "Permanently +8 to Full House multiplier",
+    consumable_hand_boost_straight_flush_desc: "Permanently +8 to Straight Flush multiplier",
+    consumable_hand_boost_four_of_a_kind_desc: "Permanently +15 to Four of a Kind multiplier",
+    consumable_hand_boost_quintuple_desc: "Permanently +15 to Quintuple multiplier",
+    consumable_hand_boost_royal_flush_desc: "Permanently +30 to Royal Flush multiplier",
+    consumable_hand_boost_royal_quintuple_desc: "Permanently +30 to Royal Quintuple multiplier",
+    consumable_hand_boost_pentagon_desc: "Permanently +50 to Pentagon multiplier",
+
     // Shop UI
     leaveShop: "Leave Shop",
     noItemsAvailable: "No items available",
@@ -274,11 +304,19 @@ export const translations = {
     pack_standard: "Standard Pack",
     pack_jumbo: "Jumbo Pack",
     pack_mega: "Mega Pack",
+    pack_hand_boost_pack_basic: "Basic Hand Boost Pack",
+    pack_hand_boost_pack_advanced: "Advanced Hand Boost Pack",
+    pack_hand_boost_pack_premium: "Premium Hand Boost Pack",
+    pack_hand_boost_pack_legendary: "Legendary Hand Boost Pack",
 
     // Pack descriptions
     pack_standard_desc: "Contains 3 random cards",
     pack_jumbo_desc: "Contains 4 random cards",
     pack_mega_desc: "Contains 5 random cards",
+    pack_hand_boost_pack_basic_desc: "Contains 2 random basic hand boost items",
+    pack_hand_boost_pack_advanced_desc: "Contains 2 random advanced hand boost items",
+    pack_hand_boost_pack_premium_desc: "Contains 2 random rare+ hand boost items",
+    pack_hand_boost_pack_legendary_desc: "Contains 1 legendary hand boost item",
 
     // Voucher names
     voucher_extra_hand: "Extra Hand",
@@ -564,6 +602,36 @@ export const translations = {
     consumable_card_duplicator_1_desc: "카드 1장 복제",
     consumable_card_duplicator_2_desc: "최대 2장 복제",
 
+    // Hand boost consumable names
+    consumable_hand_boost_high_card: "노 페어 강화",
+    consumable_hand_boost_pair: "원 페어 강화",
+    consumable_hand_boost_two_pair: "투 페어 강화",
+    consumable_hand_boost_three_of_a_kind: "트리플 강화",
+    consumable_hand_boost_straight: "스트레이트 강화",
+    consumable_hand_boost_flush: "플러시 강화",
+    consumable_hand_boost_full_house: "풀 하우스 강화",
+    consumable_hand_boost_straight_flush: "스트레이트 플러시 강화",
+    consumable_hand_boost_four_of_a_kind: "포커 강화",
+    consumable_hand_boost_quintuple: "퀸튜플 강화",
+    consumable_hand_boost_royal_flush: "로열 플러시 강화",
+    consumable_hand_boost_royal_quintuple: "로열 퀸튜플 강화",
+    consumable_hand_boost_pentagon: "펜타곤 강화",
+
+    // Hand boost consumable descriptions
+    consumable_hand_boost_high_card_desc: "노 페어 배수 영구 +1",
+    consumable_hand_boost_pair_desc: "원 페어 배수 영구 +2",
+    consumable_hand_boost_two_pair_desc: "투 페어 배수 영구 +2",
+    consumable_hand_boost_three_of_a_kind_desc: "트리플 배수 영구 +4",
+    consumable_hand_boost_straight_desc: "스트레이트 배수 영구 +4",
+    consumable_hand_boost_flush_desc: "플러시 배수 영구 +4",
+    consumable_hand_boost_full_house_desc: "풀 하우스 배수 영구 +8",
+    consumable_hand_boost_straight_flush_desc: "스트레이트 플러시 배수 영구 +8",
+    consumable_hand_boost_four_of_a_kind_desc: "포커 배수 영구 +15",
+    consumable_hand_boost_quintuple_desc: "퀸튜플 배수 영구 +15",
+    consumable_hand_boost_royal_flush_desc: "로열 플러시 배수 영구 +30",
+    consumable_hand_boost_royal_quintuple_desc: "로열 퀸튜플 배수 영구 +30",
+    consumable_hand_boost_pentagon_desc: "펜타곤 배수 영구 +50",
+
     // Shop UI
     leaveShop: "상점 나가기",
     noItemsAvailable: "상품 없음",
@@ -572,11 +640,19 @@ export const translations = {
     pack_standard: "기본 팩",
     pack_jumbo: "점보 팩",
     pack_mega: "메가 팩",
+    pack_hand_boost_pack_basic: "기본 족보 강화 팩",
+    pack_hand_boost_pack_advanced: "고급 족보 강화 팩",
+    pack_hand_boost_pack_premium: "프리미엄 족보 강화 팩",
+    pack_hand_boost_pack_legendary: "전설 족보 강화 팩",
 
     // Pack descriptions
     pack_standard_desc: "랜덤 카드 3장 포함",
     pack_jumbo_desc: "랜덤 카드 4장 포함",
     pack_mega_desc: "랜덤 카드 5장 포함",
+    pack_hand_boost_pack_basic_desc: "기본 족보 강화 아이템 2개 포함",
+    pack_hand_boost_pack_advanced_desc: "고급 족보 강화 아이템 2개 포함",
+    pack_hand_boost_pack_premium_desc: "희귀 이상 족보 강화 아이템 2개 포함",
+    pack_hand_boost_pack_legendary_desc: "전설 족보 강화 아이템 1개 포함",
 
     // Voucher names
     voucher_extra_hand: "추가 핸드",
