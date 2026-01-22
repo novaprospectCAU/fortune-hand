@@ -9,6 +9,7 @@ import React, { useState } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { useI18n, type TranslationKey } from '../../i18n';
 import { HAND_MULTIPLIERS } from '@/data/constants';
+import { useGameStore } from '@/modules/core/store';
 import type { HandType, Suit, Rank } from '@/types/interfaces';
 
 interface ExampleCard {
@@ -215,13 +216,16 @@ function MiniCard({ card }: { card: ExampleCard }) {
 // Detail overlay component
 function HandDetailOverlay({
   hand,
+  bonus,
   onClose,
 }: {
   hand: HandInfo;
+  bonus: number;
   onClose: () => void;
 }) {
   const { t } = useI18n();
-  const multiplier = HAND_MULTIPLIERS[hand.type];
+  const baseMultiplier = HAND_MULTIPLIERS[hand.type];
+  const totalMultiplier = baseMultiplier + bonus;
 
   return (
     <motion.div
@@ -243,9 +247,16 @@ function HandDetailOverlay({
           <h3 className="text-xl font-bold text-white">
             {t(hand.translationKey)}
           </h3>
-          <span className="text-2xl font-bold text-yellow-400">
-            x{multiplier}
-          </span>
+          <div className="text-right">
+            <span className={`text-2xl font-bold ${bonus > 0 ? 'text-green-400' : 'text-yellow-400'}`}>
+              x{totalMultiplier}
+            </span>
+            {bonus > 0 && (
+              <div className="text-xs text-green-400">
+                (x{baseMultiplier} +{bonus})
+              </div>
+            )}
+          </div>
         </div>
 
         {/* Description */}
@@ -285,6 +296,14 @@ export interface HandGuideProps {
 export function HandGuide({ className = '', compact = false }: HandGuideProps): React.ReactElement {
   const { t } = useI18n();
   const [selectedHand, setSelectedHand] = useState<HandInfo | null>(null);
+  const handMultiplierBonuses = useGameStore((state) => state.handMultiplierBonuses);
+
+  // Calculate total multipliers with bonuses
+  const getMultiplier = (handType: HandType) => {
+    const base = HAND_MULTIPLIERS[handType];
+    const bonus = handMultiplierBonuses[handType] ?? 0;
+    return { base, bonus, total: base + bonus };
+  };
 
   return (
     <>
@@ -293,25 +312,31 @@ export function HandGuide({ className = '', compact = false }: HandGuideProps): 
           {t('handGuide')}
         </h3>
         <div className="space-y-0.5">
-          {SORTED_HANDS.map((hand) => (
-            <button
-              key={hand.type}
-              onClick={() => setSelectedHand(hand)}
-              className={`
-                w-full flex items-center justify-between text-xs
-                ${compact ? 'py-0.5' : 'py-1'} px-1 rounded
-                hover:bg-gray-700/50 transition-colors cursor-pointer
-                text-left
-              `}
-            >
-              <span className="text-white font-medium truncate flex-1">
-                {t(hand.translationKey)}
-              </span>
-              <span className="text-yellow-400 font-mono ml-2 shrink-0">
-                x{HAND_MULTIPLIERS[hand.type]}
-              </span>
-            </button>
-          ))}
+          {SORTED_HANDS.map((hand) => {
+            const { bonus, total } = getMultiplier(hand.type);
+            const hasBonus = bonus > 0;
+
+            return (
+              <button
+                key={hand.type}
+                onClick={() => setSelectedHand(hand)}
+                className={`
+                  w-full flex items-center justify-between text-xs
+                  ${compact ? 'py-0.5' : 'py-1'} px-1 rounded
+                  hover:bg-gray-700/50 transition-colors cursor-pointer
+                  text-left
+                  ${hasBonus ? 'bg-green-900/20' : ''}
+                `}
+              >
+                <span className="text-white font-medium truncate flex-1">
+                  {t(hand.translationKey)}
+                </span>
+                <span className={`font-mono ml-2 shrink-0 ${hasBonus ? 'text-green-400' : 'text-yellow-400'}`}>
+                  x{total}{hasBonus && <span className="text-xs"> (+{bonus})</span>}
+                </span>
+              </button>
+            );
+          })}
         </div>
       </div>
 
@@ -320,6 +345,7 @@ export function HandGuide({ className = '', compact = false }: HandGuideProps): 
         {selectedHand && (
           <HandDetailOverlay
             hand={selectedHand}
+            bonus={getMultiplier(selectedHand.type).bonus}
             onClose={() => setSelectedHand(null)}
           />
         )}
