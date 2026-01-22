@@ -828,10 +828,31 @@ export const useGameStore = create<GameStore>((set, get) => ({
           break;
         }
         case 'consumable': {
-          // Open consumable overlay for card selection
+          // Get consumable data
           const consumable = getConsumableById(purchasedItem.itemId);
           if (consumable) {
-            // Update shop first, then open overlay
+            // Hand booster applies immediately without card selection
+            if (consumable.type === 'hand_booster' && consumable.handType && consumable.boostValue) {
+              const currentBonuses = state.handMultiplierBonuses;
+              const currentValue = currentBonuses[consumable.handType] ?? 0;
+              set({
+                gold: transaction.newGold,
+                shopState: {
+                  ...state.shopState!,
+                  items: state.shopState!.items.map(item =>
+                    item.id === itemId ? { ...item, sold: true } : item
+                  ),
+                },
+                handMultiplierBonuses: {
+                  ...currentBonuses,
+                  [consumable.handType]: currentValue + consumable.boostValue,
+                },
+              });
+              console.log(`Boosted ${consumable.handType} multiplier by +${consumable.boostValue}`);
+              return;
+            }
+
+            // Other consumables open card selection overlay
             set({
               gold: transaction.newGold,
               shopState: {
