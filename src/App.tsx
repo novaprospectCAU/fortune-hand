@@ -432,6 +432,7 @@ function App() {
               <motion.div
                 initial={{ opacity: 0, y: 20 }}
                 animate={{ opacity: 1, y: 0 }}
+                transition={{ duration: 0.2 }}
                 className="flex gap-3 mt-4"
               >
                 {!rouletteRetryUsed && (
@@ -440,14 +441,14 @@ function App() {
                       setRouletteRetryUsed(true);
                       retryRoulette();
                     }}
-                    className="px-4 py-2 bg-orange-600 hover:bg-orange-500 text-white rounded-lg font-medium transition-colors"
+                    className="px-5 py-3 min-h-[48px] bg-orange-600 hover:bg-orange-500 active:bg-orange-700 text-white rounded-lg font-medium transition-colors touch-manipulation select-none"
                   >
                     {t('retryWithPenalty')}
                   </button>
                 )}
                 <button
                   onClick={confirmRoulette}
-                  className="px-6 py-2 bg-green-600 hover:bg-green-500 text-white rounded-lg font-medium transition-colors"
+                  className="px-8 py-3 min-h-[48px] bg-green-600 hover:bg-green-500 active:bg-green-700 text-white rounded-lg font-bold transition-colors touch-manipulation select-none"
                 >
                   {t('accept')}
                 </button>
