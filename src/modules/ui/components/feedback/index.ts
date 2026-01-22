@@ -7,3 +7,4 @@ export { Toast, ToastContainer, type ToastProps, type ToastContainerProps } from
 export { EffectText, MultiEffectText, type EffectTextProps, type MultiEffectTextProps } from './EffectText';
 export { CardEffectTooltip, type CardEffectTooltipProps } from './CardEffectTooltip';
 export { RoundClearCelebration, type RoundClearCelebrationProps } from './RoundClearCelebration';
+export { RoundRewardSelection, type RoundRewardSelectionProps } from './RoundRewardSelection';

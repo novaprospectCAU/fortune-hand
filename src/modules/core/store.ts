@@ -17,6 +17,10 @@ import type {
   SlotResult,
   Consumable,
   Card,
+  TreasureChestRewardType,
+  TreasureChestReward,
+  HandType,
+  SlotSymbol,
 } from '@/types/interfaces';
 import { DEFAULT_GAME_CONFIG, calculateGoldReward } from '@/data/constants';
 import {
@@ -101,6 +105,16 @@ function createInitialState(): Omit<GameState, keyof GameActions> & {
     openedPackCards: null,
     consumableOverlay: null,
     handMultiplierBonuses: {},
+    roundRewardState: null,
+    rouletteProbabilityMods: {
+      safeBonus: 0,
+      riskyBonus: 0,
+      halfPenalty: 0,
+    },
+    permanentSlotBuffs: {
+      symbolWeightBonuses: {},
+    },
+    nextRoundStartScoreRatio: 0,
     config: mergeGameConfig(),
     shopState: null,
   };
@@ -944,11 +958,14 @@ export const useGameStore = create<GameStore>((set, get) => ({
     // Reshuffle discard pile back into deck
     const allCards = shuffle([...state.deck.cards, ...state.deck.discardPile]);
 
+    // Apply starting score ratio if set (from round reward)
+    const startingScore = Math.floor(targetScore * state.nextRoundStartScoreRatio);
+
     set({
       round: nextRound,
       turn: 1,
       targetScore,
-      currentScore: 0,
+      currentScore: startingScore,
       gold: state.gold + voucherMods.startingGoldBonus,
       deck: { cards: allCards, discardPile: [] },
       hand: [],
@@ -964,6 +981,7 @@ export const useGameStore = create<GameStore>((set, get) => ({
       rouletteResult: null,
       triggeredSlotResults: [],
       rouletteSpinsGranted: 0,
+      nextRoundStartScoreRatio: 0, // Reset after applying
     });
 
     get()._setPhase('SLOT_PHASE');
@@ -1130,6 +1148,250 @@ export const useGameStore = create<GameStore>((set, get) => ({
     set({
       deck: newDeck,
       consumableOverlay: null,
+    });
+  },
+
+  // ============================================================
+  // Round Reward Actions
+  // ============================================================
+
+  openRoundReward: () => {
+    set({
+      roundRewardState: {
+        isOpen: true,
+        selectedReward: null,
+        chestRewards: [],
+        chestPhase: 'closed',
+        pendingCardRemoval: false,
+      },
+    });
+  },
+
+  selectRoundReward: (reward: 'quota' | 'chest' | 'gold') => {
+    const state = get();
+
+    if (reward === 'quota') {
+      // 다음 라운드 20% 채우고 시작
+      set({
+        nextRoundStartScoreRatio: 0.2,
+        roundRewardState: {
+          ...state.roundRewardState!,
+          selectedReward: 'quota',
+        },
+      });
+    } else if (reward === 'gold') {
+      // 100$ 받기
+      set({
+        gold: state.gold + 100,
+        roundRewardState: {
+          ...state.roundRewardState!,
+          selectedReward: 'gold',
+        },
+      });
+    } else if (reward === 'chest') {
+      // 보물 상자 열기 모드로 전환
+      set({
+        roundRewardState: {
+          ...state.roundRewardState!,
+          selectedReward: 'chest',
+          chestPhase: 'closed',
+        },
+      });
+    }
+  },
+
+  openTreasureChest: () => {
+    const state = get();
+    if (!state.roundRewardState) return;
+
+    // 보물 상자 확률에 따라 보상 결정
+    const roll = Math.random() * 100;
+    let rewardType: TreasureChestRewardType;
+
+    if (roll < 10) {
+      rewardType = 'hand_upgrades';
+    } else if (roll < 30) {
+      rewardType = 'high_rarity_item';
+    } else if (roll < 40) {
+      rewardType = 'remove_cards';
+    } else if (roll < 50) {
+      rewardType = 'roulette_safe';
+    } else if (roll < 60) {
+      rewardType = 'roulette_risky';
+    } else if (roll < 70) {
+      rewardType = 'slot_buffs';
+    } else if (roll < 75) {
+      rewardType = 'jackpot';
+    } else {
+      rewardType = 'reroll';
+    }
+
+    const newReward: TreasureChestReward = {
+      type: rewardType,
+      applied: false,
+    };
+
+    set({
+      roundRewardState: {
+        ...state.roundRewardState,
+        chestPhase: 'opening',
+        chestRewards: [...state.roundRewardState.chestRewards, newReward],
+      },
+    });
+
+    // 애니메이션 후 revealed 상태로 전환 (UI에서 처리)
+  },
+
+  applyChestReward: () => {
+    const state = get();
+    if (!state.roundRewardState || state.roundRewardState.chestRewards.length === 0) return;
+
+    const rewards = state.roundRewardState.chestRewards;
+    const currentReward = rewards[rewards.length - 1];
+    if (!currentReward || currentReward.applied) return;
+
+    let details = '';
+    let shouldReroll = false;
+    let pendingCardRemoval = false;
+
+    const applyReward = (rewardType: TreasureChestRewardType): string => {
+      switch (rewardType) {
+        case 'hand_upgrades': {
+          // 랜덤 3가지 족보 업그레이드
+          const handTypes: HandType[] = [
+            'high_card', 'pair', 'two_pair', 'three_of_a_kind', 'straight',
+            'flush', 'full_house', 'four_of_a_kind', 'straight_flush',
+            'royal_flush', 'quintuple', 'royal_quintuple', 'pentagon'
+          ];
+          const shuffled = [...handTypes].sort(() => Math.random() - 0.5);
+          const selected = shuffled.slice(0, 3);
+          const currentBonuses = { ...state.handMultiplierBonuses };
+
+          for (const handType of selected) {
+            const current = currentBonuses[handType] ?? 0;
+            currentBonuses[handType] = current + 1;
+          }
+
+          set({ handMultiplierBonuses: currentBonuses });
+          return `+1 to ${selected.join(', ')}`;
+        }
+
+        case 'high_rarity_item': {
+          // 높은 등급 카드 또는 조커 (상점에서 가져옴)
+          // 간단히 골드로 대체
+          set({ gold: state.gold + 50 });
+          return 'High rarity item (50G bonus)';
+        }
+
+        case 'remove_cards': {
+          // 카드 3장 제거 (선택 필요)
+          pendingCardRemoval = true;
+          return 'Select 3 cards to remove';
+        }
+
+        case 'roulette_safe': {
+          // 1x/2x/3x 확률 증가, 0.5x 감소
+          const currentMods = state.rouletteProbabilityMods;
+          set({
+            rouletteProbabilityMods: {
+              ...currentMods,
+              safeBonus: currentMods.safeBonus + 3,
+              halfPenalty: currentMods.halfPenalty + 2,
+            },
+          });
+          return '+3% to 1x/2x/3x, -2% to 0.5x';
+        }
+
+        case 'roulette_risky': {
+          // 0.5x/4x/6x/100x 확률 증가
+          const currentMods = state.rouletteProbabilityMods;
+          set({
+            rouletteProbabilityMods: {
+              ...currentMods,
+              riskyBonus: currentMods.riskyBonus + 2,
+            },
+          });
+          return '+2% to 0.5x/4x/6x/100x';
+        }
+
+        case 'slot_buffs': {
+          // 긍정적 슬롯 심볼 2개 강화
+          const positiveSymbols: SlotSymbol[] = ['card', 'target', 'gold', 'chip', 'star', 'wild'];
+          const shuffled = [...positiveSymbols].sort(() => Math.random() - 0.5);
+          const selected = shuffled.slice(0, 2);
+
+          const currentBuffs = { ...state.permanentSlotBuffs.symbolWeightBonuses };
+          for (const symbol of selected) {
+            const current = currentBuffs[symbol] ?? 0;
+            currentBuffs[symbol] = current + 5;
+          }
+
+          set({
+            permanentSlotBuffs: {
+              symbolWeightBonuses: currentBuffs,
+            },
+          });
+          return `+5 weight to ${selected.join(', ')}`;
+        }
+
+        case 'jackpot': {
+          // 모든 효과 발동!
+          const results: string[] = [];
+          results.push('JACKPOT! All effects:');
+          results.push(applyReward('hand_upgrades'));
+          results.push(applyReward('high_rarity_item'));
+          results.push(applyReward('roulette_safe'));
+          results.push(applyReward('roulette_risky'));
+          results.push(applyReward('slot_buffs'));
+          return results.join('\n');
+        }
+
+        case 'reroll': {
+          // 하나 발동 + 다시 열기
+          const otherTypes: TreasureChestRewardType[] = [
+            'hand_upgrades', 'high_rarity_item', 'roulette_safe',
+            'roulette_risky', 'slot_buffs'
+          ];
+          const randomType = otherTypes[Math.floor(Math.random() * otherTypes.length)] as TreasureChestRewardType;
+          const result = applyReward(randomType);
+          shouldReroll = true;
+          return `${result} + Reroll!`;
+        }
+
+        default:
+          return 'Unknown reward';
+      }
+    };
+
+    details = applyReward(currentReward.type);
+
+    // 보상 적용 완료 표시
+    const updatedRewards = state.roundRewardState.chestRewards.map((r, i) =>
+      i === state.roundRewardState!.chestRewards.length - 1
+        ? { ...r, applied: true, details }
+        : r
+    );
+
+    set({
+      roundRewardState: {
+        ...state.roundRewardState,
+        chestRewards: updatedRewards,
+        chestPhase: shouldReroll ? 'closed' : 'revealed',
+        pendingCardRemoval,
+      },
+    });
+
+    // Reroll인 경우 자동으로 다시 열기
+    if (shouldReroll) {
+      setTimeout(() => {
+        get().openTreasureChest();
+      }, 1500);
+    }
+  },
+
+  completeRoundReward: () => {
+    set({
+      roundRewardState: null,
     });
   },
 }));

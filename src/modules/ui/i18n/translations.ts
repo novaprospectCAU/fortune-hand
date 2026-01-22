@@ -360,6 +360,32 @@ export const translations = {
     slotSymbol_wild_desc: "Matches any symbol for combinations.",
     slotSymbol_skull: "Skull",
     slotSymbol_skull_desc: "Penalty! Discard cards or skip roulette.",
+
+    // Round Rewards
+    chooseYourReward: "Choose your reward!",
+    rewardQuota: "Head Start",
+    rewardQuotaDesc: "Start next round with 20% of quota filled",
+    rewardChest: "Treasure Chest",
+    rewardChestDesc: "Open a mystery chest with random rewards",
+    rewardGold: "$100 Gold",
+    rewardGoldDesc: "Get 100 gold immediately",
+    rewardQuotaApplied: "Head Start Ready!",
+    rewardQuotaAppliedDesc: "Next round will start with 20% progress",
+    rewardGoldApplied: "Gold received!",
+    clickToOpenChest: "Click the chest to open!",
+    applyReward: "Apply Reward",
+    openingAgain: "Opening again",
+    previousRewards: "Previous rewards",
+
+    // Chest Rewards
+    chestReward_handUpgrades: "Hand Upgrades",
+    chestReward_highRarity: "High Rarity Item",
+    chestReward_removeCards: "Remove Cards",
+    chestReward_rouletteSafe: "Safe Roulette",
+    chestReward_rouletteRisky: "Risky Roulette",
+    chestReward_slotBuffs: "Slot Buffs",
+    chestReward_jackpot: "JACKPOT!",
+    chestReward_reroll: "Reroll + Bonus",
   },
 
   ko: {
@@ -717,6 +743,32 @@ export const translations = {
     slotSymbol_wild_desc: "조합에서 어떤 심볼과도 매칭됩니다.",
     slotSymbol_skull: "해골",
     slotSymbol_skull_desc: "페널티! 카드 버리기 또는 룰렛 스킵.",
+
+    // Round Rewards
+    chooseYourReward: "보상을 선택하세요!",
+    rewardQuota: "선행 시작",
+    rewardQuotaDesc: "다음 라운드 할당량 20% 채우고 시작",
+    rewardChest: "보물 상자",
+    rewardChestDesc: "랜덤 보상이 담긴 미스터리 상자 열기",
+    rewardGold: "$100 골드",
+    rewardGoldDesc: "즉시 100 골드 획득",
+    rewardQuotaApplied: "선행 시작 준비 완료!",
+    rewardQuotaAppliedDesc: "다음 라운드 20% 진행 상태로 시작합니다",
+    rewardGoldApplied: "골드를 받았습니다!",
+    clickToOpenChest: "상자를 클릭해서 열어보세요!",
+    applyReward: "보상 적용",
+    openingAgain: "다시 여는 중",
+    previousRewards: "이전 보상",
+
+    // Chest Rewards
+    chestReward_handUpgrades: "족보 강화",
+    chestReward_highRarity: "고급 아이템",
+    chestReward_removeCards: "카드 제거",
+    chestReward_rouletteSafe: "안전 룰렛",
+    chestReward_rouletteRisky: "위험 룰렛",
+    chestReward_slotBuffs: "슬롯 버프",
+    chestReward_jackpot: "잭팟!",
+    chestReward_reroll: "리롤 + 보너스",
   },
 } as const;
 

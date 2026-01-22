@@ -75,6 +75,8 @@ export {
   type CardEffectTooltipProps,
   RoundClearCelebration,
   type RoundClearCelebrationProps,
+  RoundRewardSelection,
+  type RoundRewardSelectionProps,
 } from './components/feedback';
 
 // Tutorial Components

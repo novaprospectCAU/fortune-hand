@@ -425,6 +425,57 @@ export interface GameState {
 
   // 소모품 오버레이 상태
   consumableOverlay: ConsumableOverlayState | null;
+
+  // 라운드 보상 선택 상태
+  roundRewardState: RoundRewardState | null;
+
+  // 영구 룰렛 확률 수정치
+  rouletteProbabilityMods: RouletteProbabilityMods;
+
+  // 영구 슬롯 버프
+  permanentSlotBuffs: PermanentSlotBuffs;
+
+  // 다음 라운드 시작 점수 비율 (0-1)
+  nextRoundStartScoreRatio: number;
+}
+
+// 보물 상자 보상 타입
+export type TreasureChestRewardType =
+  | 'hand_upgrades'      // 랜덤 3 족보 업그레이드 (10%)
+  | 'high_rarity_item'   // 높은 등급 카드/조커 (20%)
+  | 'remove_cards'       // 카드 3장 제거 (10%)
+  | 'roulette_safe'      // 1x/2x/3x 확률 증가, 0.5x 감소 (10%)
+  | 'roulette_risky'     // 0.5x/4x/6x/100x 확률 증가 (10%)
+  | 'slot_buffs'         // 슬롯 2가지 강화 (10%)
+  | 'jackpot'            // 모든 효과 (5%)
+  | 'reroll';            // 하나 발동 + 다시 열기 (25%)
+
+export interface TreasureChestReward {
+  type: TreasureChestRewardType;
+  applied: boolean;
+  details?: string; // 적용된 효과 상세 내용
+}
+
+export interface RoundRewardState {
+  isOpen: boolean;
+  selectedReward: 'quota' | 'chest' | 'gold' | null;
+  chestRewards: TreasureChestReward[];
+  chestPhase: 'closed' | 'opening' | 'revealed' | 'applying';
+  pendingCardRemoval: boolean; // 카드 제거 대기 중
+}
+
+export interface RouletteProbabilityMods {
+  // 안전한 배수 확률 증가량
+  safeBonus: number;    // 1x, 2x, 3x 확률 추가 (각각)
+  // 위험한 배수 확률 증가량
+  riskyBonus: number;   // 0.5x, 4x, 6x, 100x 확률 추가 (각각)
+  // 0.5x 확률 감소량 (safeBonus로 인한)
+  halfPenalty: number;
+}
+
+export interface PermanentSlotBuffs {
+  // 심볼별 가중치 보너스
+  symbolWeightBonuses: Partial<Record<SlotSymbol, number>>;
 }
 
 export interface GameConfig {
@@ -476,6 +527,13 @@ export interface GameActions {
   openConsumableOverlay(consumable: Consumable): void;
   closeConsumableOverlay(): void;
   applyConsumable(selectedCardIds: string[]): void;
+
+  // 라운드 보상 관련
+  openRoundReward(): void;
+  selectRoundReward(reward: 'quota' | 'chest' | 'gold'): void;
+  openTreasureChest(): void;
+  applyChestReward(): void;
+  completeRoundReward(): void;
 }
 
 // ============================================================

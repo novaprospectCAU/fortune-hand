@@ -11,7 +11,7 @@ import { AnimatePresence, motion } from 'framer-motion';
 import { useGameStore } from '@/modules/core';
 
 // UI module - layout and common components
-import { GameLayout, ScoreDisplay, DeckViewer, CardEffectTooltip, Modal, Button, RoundClearCelebration, useI18n, TranslationKey, HandGuide, SlotGuide } from '@/modules/ui';
+import { GameLayout, ScoreDisplay, DeckViewer, CardEffectTooltip, Modal, Button, RoundClearCelebration, RoundRewardSelection, useI18n, TranslationKey, HandGuide, SlotGuide } from '@/modules/ui';
 
 // Game modules - components
 import { SlotMachine } from '@/modules/slots';
@@ -72,6 +72,8 @@ function App() {
     consumableOverlay,
     closeConsumableOverlay,
     applyConsumable,
+    roundRewardState,
+    openRoundReward,
   } = useGameStore();
 
   // Deck viewer state
@@ -737,9 +739,19 @@ function App() {
       targetScore={clearedRoundInfo?.target ?? targetScore}
       onComplete={() => {
         setShowRoundClear(false);
-        setClearedRoundInfo(null);
+        // Open round reward selection after celebration
+        openRoundReward();
       }}
     />
+
+    {/* Round reward selection */}
+    {roundRewardState?.isOpen && (
+      <RoundRewardSelection
+        onComplete={() => {
+          setClearedRoundInfo(null);
+        }}
+      />
+    )}
 
     {/* Consumable card selection overlay */}
     {consumableOverlay?.isOpen && consumableOverlay.consumable && (
