@@ -48,6 +48,7 @@ export {
   getSpecialCardById,
   getSpecialCardCost,
   getSpecialCardRarity,
+  getSpecialCardDetails,
   getAllEnhancements,
   getEnhancementById,
   applyEnhancement,

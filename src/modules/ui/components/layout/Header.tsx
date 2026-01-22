@@ -15,6 +15,8 @@ export interface HeaderProps {
   targetScore: number;
   currentScore: number;
   phase: GamePhase;
+  handsRemaining?: number;
+  maxHands?: number;
   className?: string;
 }
 
@@ -35,11 +37,18 @@ export function Header({
   targetScore,
   currentScore,
   phase,
+  handsRemaining,
+  maxHands,
   className,
 }: HeaderProps) {
   const { t } = useI18n();
   const progress = Math.min(100, (currentScore / targetScore) * 100);
   const isWinning = currentScore >= targetScore;
+
+  // Calculate current cycle (1-based)
+  const currentCycle = maxHands !== undefined && handsRemaining !== undefined
+    ? maxHands - handsRemaining + 1
+    : undefined;
 
   return (
     <header
@@ -66,6 +75,22 @@ export function Header({
               {round}
             </motion.span>
           </div>
+
+          {/* Cycle Display */}
+          {currentCycle !== undefined && maxHands !== undefined && (
+            <div className="flex items-center gap-1.5 sm:gap-2 px-2 py-0.5 rounded bg-game-card">
+              <span className="text-slate-400 text-xs sm:text-sm">Cycle</span>
+              <motion.span
+                key={currentCycle}
+                initial={{ scale: 1.1 }}
+                animate={{ scale: 1 }}
+                className="text-amber-400 font-bold text-sm sm:text-base"
+              >
+                {currentCycle}
+              </motion.span>
+              <span className="text-slate-500 text-xs sm:text-sm">/{maxHands}</span>
+            </div>
+          )}
 
           {/* Phase Indicator - Always visible on mobile */}
           <div className="flex items-center gap-1.5 sm:gap-2 px-2.5 sm:px-3 py-1 rounded-full bg-game-card">

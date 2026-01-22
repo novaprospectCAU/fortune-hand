@@ -17,6 +17,8 @@ export interface GameLayoutProps {
   gameState: Partial<GameState>;
   children: React.ReactNode;
   className?: string;
+  /** Maximum hands per round (for cycle display) */
+  maxHands?: number;
   onPlay?: () => void;
   onDiscard?: () => void;
   onSpinRoulette?: () => void;
@@ -31,6 +33,7 @@ export function GameLayout({
   gameState,
   children,
   className,
+  maxHands,
   onPlay,
   onDiscard,
   onSpinRoulette,
@@ -77,6 +80,8 @@ export function GameLayout({
         targetScore={targetScore}
         currentScore={currentScore}
         phase={phase}
+        handsRemaining={handsRemaining}
+        maxHands={maxHands}
       />
 
       {/* Main Content Area */}

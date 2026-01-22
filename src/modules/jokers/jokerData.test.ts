@@ -30,11 +30,11 @@ describe('jokerData', () => {
       expect(joker).toMatchObject({
         id: 'lucky_seven',
         name: 'Lucky Seven',
-        description: '+77 Mult if hand contains a 7',
-        rarity: 'common',
-        cost: 40,
+        description: '×7 Mult if hand has a 7',
+        rarity: 'uncommon',
+        cost: 65,
         trigger: { type: 'on_play', cardCondition: { rank: '7' } },
-        effect: { type: 'add_mult', value: 77 },
+        effect: { type: 'multiply', value: 7 },
       });
     });
   });
@@ -56,9 +56,9 @@ describe('jokerData', () => {
       const jokers = getAllJokers();
       const ids = jokers.map((j) => j.id);
       expect(ids).toContain('lucky_seven');
-      expect(ids).toContain('slot_master');
       expect(ids).toContain('high_roller');
       expect(ids).toContain('echo');
+      expect(ids).toContain('fortune_teller');
     });
   });
 

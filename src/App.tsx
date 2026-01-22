@@ -15,11 +15,10 @@ import { GameLayout, ScoreDisplay, DeckViewer, CardEffectTooltip, Modal, Button,
 
 // Game modules - components
 import { SlotMachine } from '@/modules/slots';
-import { Hand } from '@/modules/cards';
+import { Hand, getSpecialCardDetails } from '@/modules/cards';
 import { RouletteWheel, getDefaultConfig, applyBonuses } from '@/modules/roulette';
 import { Shop, PackOpenOverlay } from '@/modules/shop';
 import { getJokerById } from '@/modules/jokers';
-import { getSpecialCardById } from '@/modules/cards';
 
 // Types
 import type { Joker } from '@/types/interfaces';
@@ -52,6 +51,7 @@ function App() {
     handsRemaining,
     discardsRemaining,
     shopState,
+    config,
     // Actions
     startGame,
     nextPhase,
@@ -173,18 +173,9 @@ function App() {
           break;
         }
         case 'card': {
-          const card = getSpecialCardById(itemId);
-          if (card) {
-            // Get rarity from the card data
-            const cardData = {
-              wild_joker: { name: 'Wild Joker', description: 'Can be any rank or suit', rarity: 'rare' as const },
-              gold_ace: { name: 'Golden Ace', description: 'Gives +10 gold instead of chips', rarity: 'uncommon' as const },
-              slot_seven: { name: 'Lucky Seven', description: 'Triggers a mini slot spin when played', rarity: 'rare' as const },
-              roulette_king: { name: "Gambler's King", description: 'Grants an extra roulette spin', rarity: 'rare' as const },
-            }[itemId];
-            if (cardData) {
-              return cardData;
-            }
+          const cardDetails = getSpecialCardDetails(itemId);
+          if (cardDetails) {
+            return cardDetails;
           }
           break;
         }
@@ -596,6 +587,7 @@ function App() {
         handsRemaining,
         discardsRemaining,
       }}
+      maxHands={config.startingHands}
       onPlay={handlePlay}
       onDiscard={handleDiscard}
       onSpinRoulette={handleSpinRoulette}

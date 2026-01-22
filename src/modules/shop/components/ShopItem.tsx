@@ -5,7 +5,7 @@
  */
 
 import React from 'react';
-import type { ShopItem as ShopItemType } from '@/types/interfaces';
+import type { ShopItem as ShopItemType, Suit, Rank } from '@/types/interfaces';
 import { RARITY_COLORS } from '@/data/constants';
 
 export interface ShopItemProps {
@@ -17,8 +17,33 @@ export interface ShopItemProps {
     name: string;
     description: string;
     rarity: 'common' | 'uncommon' | 'rare' | 'legendary';
+    /** Card-specific details for displaying actual card */
+    cardInfo?: {
+      suit: Suit;
+      rank: Rank;
+      isWild?: boolean;
+      isGold?: boolean;
+      triggerSlot?: boolean;
+      triggerRoulette?: boolean;
+    };
   };
 }
+
+/** Suit symbols */
+const SUIT_SYMBOLS: Record<Suit, string> = {
+  hearts: '♥',
+  diamonds: '♦',
+  clubs: '♣',
+  spades: '♠',
+};
+
+/** Suit colors */
+const SUIT_COLORS: Record<Suit, string> = {
+  hearts: '#ef4444',
+  diamonds: '#ef4444',
+  clubs: '#1f2937',
+  spades: '#1f2937',
+};
 
 /**
  * Get display icon for item type
@@ -80,9 +105,60 @@ export function ShopItem({ item, canAfford, onBuy, itemDetails }: ShopItemProps)
         {getItemTypeIcon(item.type)}
       </div>
 
-      {/* Item Display - 더 큰 아이콘 */}
-      <div className="w-28 h-32 sm:w-32 sm:h-36 flex items-center justify-center text-5xl sm:text-6xl mb-3">
-        {isSold ? '✕' : getItemTypeIcon(item.type)}
+      {/* Item Display - 카드는 실제 카드 비주얼 표시 */}
+      <div className="w-28 h-32 sm:w-32 sm:h-36 flex items-center justify-center mb-3">
+        {isSold ? (
+          <span className="text-5xl sm:text-6xl">✕</span>
+        ) : item.type === 'card' && itemDetails?.cardInfo ? (
+          <div
+            className="w-20 h-28 sm:w-24 sm:h-32 rounded-lg bg-white border-2 flex flex-col items-center justify-between p-1 shadow-lg relative"
+            style={{
+              borderColor: itemDetails.cardInfo.isWild ? '#a855f7' :
+                          itemDetails.cardInfo.isGold ? '#f59e0b' :
+                          itemDetails.cardInfo.triggerSlot ? '#22c55e' :
+                          itemDetails.cardInfo.triggerRoulette ? '#3b82f6' : '#d1d5db',
+              boxShadow: itemDetails.cardInfo.isWild ? '0 0 12px rgba(168, 85, 247, 0.4)' :
+                         itemDetails.cardInfo.isGold ? '0 0 12px rgba(245, 158, 11, 0.4)' :
+                         itemDetails.cardInfo.triggerSlot ? '0 0 12px rgba(34, 197, 94, 0.4)' :
+                         itemDetails.cardInfo.triggerRoulette ? '0 0 12px rgba(59, 130, 246, 0.4)' : undefined,
+            }}
+          >
+            {/* Top left rank/suit */}
+            <div
+              className="self-start text-sm font-bold leading-tight"
+              style={{ color: SUIT_COLORS[itemDetails.cardInfo.suit] }}
+            >
+              <div>{itemDetails.cardInfo.rank}</div>
+              <div>{SUIT_SYMBOLS[itemDetails.cardInfo.suit]}</div>
+            </div>
+            {/* Center suit */}
+            <div
+              className="text-3xl sm:text-4xl"
+              style={{ color: SUIT_COLORS[itemDetails.cardInfo.suit] }}
+            >
+              {SUIT_SYMBOLS[itemDetails.cardInfo.suit]}
+            </div>
+            {/* Bottom right rank/suit (rotated) */}
+            <div
+              className="self-end text-sm font-bold leading-tight rotate-180"
+              style={{ color: SUIT_COLORS[itemDetails.cardInfo.suit] }}
+            >
+              <div>{itemDetails.cardInfo.rank}</div>
+              <div>{SUIT_SYMBOLS[itemDetails.cardInfo.suit]}</div>
+            </div>
+            {/* Special card indicator */}
+            {(itemDetails.cardInfo.isWild || itemDetails.cardInfo.isGold || itemDetails.cardInfo.triggerSlot || itemDetails.cardInfo.triggerRoulette) && (
+              <div className="absolute top-1 right-1 text-xs">
+                {itemDetails.cardInfo.isWild && <span title="Wild">🌟</span>}
+                {itemDetails.cardInfo.isGold && <span title="Gold">💰</span>}
+                {itemDetails.cardInfo.triggerSlot && <span title="Slot">🎰</span>}
+                {itemDetails.cardInfo.triggerRoulette && <span title="Roulette">🎯</span>}
+              </div>
+            )}
+          </div>
+        ) : (
+          <span className="text-5xl sm:text-6xl">{getItemTypeIcon(item.type)}</span>
+        )}
       </div>
 
       {/* Item Info */}

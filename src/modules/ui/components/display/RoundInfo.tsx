@@ -13,6 +13,8 @@ export interface RoundInfoProps {
   discardsRemaining: number;
   maxHands?: number;
   maxDiscards?: number;
+  /** Show current cycle (turn) out of total */
+  showCycle?: boolean;
   layout?: 'horizontal' | 'vertical' | 'compact';
   className?: string;
 }
@@ -23,11 +25,15 @@ export function RoundInfo({
   discardsRemaining,
   maxHands,
   maxDiscards,
+  showCycle = false,
   layout = 'horizontal',
   className,
 }: RoundInfoProps) {
   const isHorizontal = layout === 'horizontal';
   const isCompact = layout === 'compact';
+
+  // Calculate current cycle (1-based)
+  const currentCycle = maxHands !== undefined ? maxHands - handsRemaining + 1 : undefined;
 
   return (
     <div
@@ -65,6 +71,40 @@ export function RoundInfo({
           {round}
         </motion.span>
       </div>
+
+      {/* Cycle Display */}
+      {showCycle && maxHands !== undefined && currentCycle !== undefined && (
+        <div
+          className={clsx(
+            'flex items-center',
+            isCompact ? 'gap-1' : 'gap-2'
+          )}
+        >
+          <span
+            className={clsx(
+              'text-slate-400',
+              isCompact ? 'text-xs' : 'text-sm'
+            )}
+          >
+            Cycle
+          </span>
+          <motion.span
+            key={currentCycle}
+            initial={{ scale: 1.1 }}
+            animate={{ scale: 1 }}
+            className={clsx(
+              'font-bold',
+              isCompact ? 'text-sm' : 'text-base',
+              currentCycle > maxHands ? 'text-red-400' : 'text-amber-400'
+            )}
+          >
+            {currentCycle}
+          </motion.span>
+          <span className="text-slate-500 text-sm">
+            /{maxHands}
+          </span>
+        </div>
+      )}
 
       {/* Divider */}
       {!isCompact && (

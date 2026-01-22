@@ -98,6 +98,45 @@ export function getSpecialCardRarity(
 }
 
 /**
+ * 특수 카드 상세 정보 조회 (상점 표시용)
+ * @param id - 특수 카드 ID
+ * @returns 이름, 설명, 희귀도, 카드 정보
+ */
+export function getSpecialCardDetails(
+  id: string
+): {
+  name: string;
+  description: string;
+  rarity: 'common' | 'uncommon' | 'rare' | 'legendary';
+  cardInfo: {
+    suit: Suit;
+    rank: Rank;
+    isWild?: boolean;
+    isGold?: boolean;
+    triggerSlot?: boolean;
+    triggerRoulette?: boolean;
+  };
+} | undefined {
+  const specialCards = cardsData.specialCards as SpecialCardData[];
+  const data = specialCards.find((c) => c.id === id);
+  if (!data) return undefined;
+
+  return {
+    name: data.name,
+    description: data.description,
+    rarity: data.rarity,
+    cardInfo: {
+      suit: (data.baseSuit as Suit) || 'spades',
+      rank: (data.baseRank as Rank) || 'A',
+      isWild: data.isWild,
+      isGold: data.isGold,
+      triggerSlot: data.triggerSlot,
+      triggerRoulette: data.triggerRoulette,
+    },
+  };
+}
+
+/**
  * 모든 강화 종류 로드
  * @returns 강화 데이터 배열
  */
