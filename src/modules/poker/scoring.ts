@@ -156,17 +156,8 @@ export function calculateScore(
   handResult: HandResult,
   bonuses: AppliedBonus[] = []
 ): ScoreCalculation {
-  // 1. 관련 카드들의 합 계산 (retrigger 적용)
-  let chipTotal = 0;
-
-  for (const card of handResult.scoringCards) {
-    const cardChipValue = getCardChipValue(card);
-    const triggerCount = getCardTriggerCount(card);
-    chipTotal += cardChipValue * triggerCount;
-  }
-
-  // 핸드 타입에 따른 카드 합 계산
-  const cardSum = getScoringCardSum(handResult.handType, handResult.scoringCards);
+  // 1. 핸드 타입에 따른 카드 합 계산
+  let chipTotal = getScoringCardSum(handResult.handType, handResult.scoringCards);
 
   // 2. 기본 배수 (핸드 타입별 배수)
   let multTotal = HAND_MULTIPLIERS[handResult.handType] ?? 1;
@@ -183,11 +174,11 @@ export function calculateScore(
   const appliedBonuses: AppliedBonus[] = [];
 
   // 카드 합계 기록
-  if (cardSum > 0) {
+  if (chipTotal > 0) {
     appliedBonuses.push({
       source: 'Card sum',
       type: 'chips',
-      value: cardSum,
+      value: chipTotal,
     });
   }
 
@@ -227,12 +218,12 @@ export function calculateScore(
     appliedBonuses.push(bonus);
   }
 
-  // 6. 최종 점수 계산: 카드 합 × 배수
-  const finalScore = Math.floor(cardSum * multTotal);
+  // 6. 최종 점수 계산: 칩 총합 × 배수
+  const finalScore = Math.floor(chipTotal * multTotal);
 
   return {
     handResult,
-    chipTotal: cardSum,  // 표시용으로 카드 합
+    chipTotal,
     multTotal,
     appliedBonuses,
     finalScore,
