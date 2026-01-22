@@ -67,7 +67,7 @@ export function ShopItem({ item, canAfford, onBuy, itemDetails }: ShopItemProps)
   return (
     <div
       className={`
-        relative flex flex-col items-center p-4 rounded-lg border-2 transition-all
+        relative flex flex-col items-center p-4 sm:p-5 rounded-lg border-2 transition-all min-w-[140px] sm:min-w-[160px]
         ${isSold ? 'opacity-50 bg-gray-800 border-gray-700' : 'bg-gray-900 border-gray-600 hover:border-gray-400'}
         ${!canAfford && !isSold ? 'border-red-900' : ''}
       `}
@@ -76,28 +76,28 @@ export function ShopItem({ item, canAfford, onBuy, itemDetails }: ShopItemProps)
       }}
     >
       {/* Item Type Badge */}
-      <div className="absolute -top-2 -right-2 text-2xl">
+      <div className="absolute -top-2 -right-2 text-2xl sm:text-3xl">
         {getItemTypeIcon(item.type)}
       </div>
 
-      {/* Item Display */}
-      <div className="w-20 h-24 flex items-center justify-center text-4xl mb-2">
+      {/* Item Display - 더 큰 아이콘 */}
+      <div className="w-28 h-32 sm:w-32 sm:h-36 flex items-center justify-center text-5xl sm:text-6xl mb-3">
         {isSold ? '✕' : getItemTypeIcon(item.type)}
       </div>
 
       {/* Item Info */}
-      <div className="text-center mb-3">
-        <h3 className="font-bold text-white text-sm">
+      <div className="text-center mb-3 w-full">
+        <h3 className="font-bold text-white text-sm sm:text-base">
           {itemDetails?.name ?? getItemTypeName(item.type)}
         </h3>
         {itemDetails?.description && (
-          <p className="text-xs text-gray-400 mt-1 line-clamp-2">
+          <p className="text-xs sm:text-sm text-gray-400 mt-1 line-clamp-2 px-1">
             {itemDetails.description}
           </p>
         )}
         {itemDetails?.rarity && (
           <span
-            className="text-xs font-medium"
+            className="text-xs sm:text-sm font-medium"
             style={{ color: rarityColor }}
           >
             {itemDetails.rarity.charAt(0).toUpperCase() + itemDetails.rarity.slice(1)}

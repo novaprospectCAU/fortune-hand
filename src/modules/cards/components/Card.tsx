@@ -69,26 +69,26 @@ export interface CardProps {
 }
 
 /**
- * 카드 크기별 스타일 (모바일 반응형 - 모바일에서 더 큰 카드)
+ * 카드 크기별 스타일 (모바일 반응형 - 더 큰 카드)
  */
 const SIZE_STYLES = {
   sm: {
-    width: 'w-14 sm:w-14',
-    height: 'h-20 sm:h-20',
-    fontSize: 'text-xs sm:text-sm',
-    rankSize: 'text-base sm:text-lg',
+    width: 'w-16 sm:w-18',
+    height: 'h-24 sm:h-26',
+    fontSize: 'text-sm sm:text-base',
+    rankSize: 'text-lg sm:text-xl',
   },
   md: {
-    width: 'w-[4.5rem] sm:w-20',
-    height: 'h-[6.5rem] sm:h-28',
-    fontSize: 'text-sm sm:text-base',
-    rankSize: 'text-xl sm:text-xl',
+    width: 'w-20 sm:w-24',
+    height: 'h-28 sm:h-34',
+    fontSize: 'text-base sm:text-lg',
+    rankSize: 'text-2xl sm:text-2xl',
   },
   lg: {
-    width: 'w-24 sm:w-24 md:w-28',
-    height: 'h-32 sm:h-36 md:h-40',
-    fontSize: 'text-base sm:text-lg',
-    rankSize: 'text-2xl sm:text-2xl md:text-3xl',
+    width: 'w-28 sm:w-32 md:w-36',
+    height: 'h-40 sm:h-44 md:h-52',
+    fontSize: 'text-lg sm:text-xl',
+    rankSize: 'text-3xl sm:text-3xl md:text-4xl',
   },
 };
 
