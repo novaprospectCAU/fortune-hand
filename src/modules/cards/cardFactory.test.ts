@@ -2,21 +2,27 @@
  * Card Factory 테스트
  */
 
-import { describe, it, expect } from 'vitest';
+import { describe, it, expect, beforeEach } from 'vitest';
 import {
   createCard,
   createStandardDeck,
   createEmptyDeck,
   createInitialDeck,
+  resetCardIdCounter,
 } from './cardFactory';
 import { RANKS, SUITS } from '@/data/constants';
 
 describe('cardFactory', () => {
+  beforeEach(() => {
+    resetCardIdCounter();
+  });
+
   describe('createCard', () => {
     it('should create a card with correct id format', () => {
       const card = createCard('A', 'hearts');
 
-      expect(card.id).toBe('A_hearts');
+      // ID format: {rank}_{suit}_{counter}
+      expect(card.id).toMatch(/^A_hearts_\d+$/);
       expect(card.rank).toBe('A');
       expect(card.suit).toBe('hearts');
     });
@@ -25,7 +31,7 @@ describe('cardFactory', () => {
       for (const rank of RANKS) {
         const card = createCard(rank, 'spades');
         expect(card.rank).toBe(rank);
-        expect(card.id).toBe(`${rank}_spades`);
+        expect(card.id).toMatch(new RegExp(`^${rank}_spades_\\d+$`));
       }
     });
 
@@ -33,7 +39,7 @@ describe('cardFactory', () => {
       for (const suit of SUITS) {
         const card = createCard('K', suit);
         expect(card.suit).toBe(suit);
-        expect(card.id).toBe(`K_${suit}`);
+        expect(card.id).toMatch(new RegExp(`^K_${suit}_\\d+$`));
       }
     });
 
@@ -45,6 +51,12 @@ describe('cardFactory', () => {
       expect(card.triggerSlot).toBeUndefined();
       expect(card.triggerRoulette).toBeUndefined();
       expect(card.enhancement).toBeUndefined();
+    });
+
+    it('should generate unique IDs for each card', () => {
+      const card1 = createCard('A', 'hearts');
+      const card2 = createCard('A', 'hearts');
+      expect(card1.id).not.toBe(card2.id);
     });
   });
 
@@ -80,23 +92,26 @@ describe('cardFactory', () => {
       }
     });
 
-    it('should contain all expected card combinations', () => {
+    it('should contain all expected rank and suit combinations', () => {
       const deck = createStandardDeck();
-      const idSet = new Set(deck.map((c) => c.id));
 
       for (const suit of SUITS) {
         for (const rank of RANKS) {
-          expect(idSet.has(`${rank}_${suit}`)).toBe(true);
+          const found = deck.find((c) => c.rank === rank && c.suit === suit);
+          expect(found).toBeDefined();
         }
       }
     });
 
     it('should return a new array on each call', () => {
+      resetCardIdCounter();
       const deck1 = createStandardDeck();
+      resetCardIdCounter();
       const deck2 = createStandardDeck();
 
       expect(deck1).not.toBe(deck2);
-      expect(deck1).toEqual(deck2);
+      // Cards should have same rank/suit but different IDs due to counter
+      expect(deck1.map(c => `${c.rank}_${c.suit}`)).toEqual(deck2.map(c => `${c.rank}_${c.suit}`));
     });
   });
 
@@ -123,11 +138,16 @@ describe('cardFactory', () => {
       expect(deck.discardPile).toEqual([]);
     });
 
-    it('should have the same cards as createStandardDeck', () => {
+    it('should have the same rank/suit combinations as createStandardDeck', () => {
+      resetCardIdCounter();
       const deck = createInitialDeck();
+      resetCardIdCounter();
       const standardDeck = createStandardDeck();
 
-      expect(deck.cards).toEqual(standardDeck);
+      const deckCombos = deck.cards.map(c => `${c.rank}_${c.suit}`);
+      const standardCombos = standardDeck.map(c => `${c.rank}_${c.suit}`);
+
+      expect(deckCombos).toEqual(standardCombos);
     });
   });
 });

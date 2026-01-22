@@ -3,7 +3,8 @@
  */
 
 import { describe, it, expect } from 'vitest';
-import { render, screen } from '@testing-library/react';
+import { screen } from '@testing-library/react';
+import { render } from '@/test/test-utils';
 import { Header } from './Header';
 
 describe('Header', () => {
@@ -28,24 +29,25 @@ describe('Header', () => {
 
   it('renders phase label', () => {
     render(<Header {...defaultProps} />);
-    expect(screen.getByText('Play Hand')).toBeInTheDocument();
+    // i18n key 'playPhase' -> "Play Phase" in English
+    expect(screen.getByText('Play Phase')).toBeInTheDocument();
   });
 
   it('shows correct phase for each game phase', () => {
     const { rerender } = render(<Header {...defaultProps} phase="SLOT_PHASE" />);
-    expect(screen.getByText('Slot Spin')).toBeInTheDocument();
+    expect(screen.getByText('Slot Phase')).toBeInTheDocument();
 
     rerender(<Header {...defaultProps} phase="DRAW_PHASE" />);
-    expect(screen.getByText('Draw Cards')).toBeInTheDocument();
+    expect(screen.getByText('Draw Phase')).toBeInTheDocument();
 
     rerender(<Header {...defaultProps} phase="SCORE_PHASE" />);
-    expect(screen.getByText('Scoring')).toBeInTheDocument();
+    expect(screen.getByText('Score Phase')).toBeInTheDocument();
 
     rerender(<Header {...defaultProps} phase="ROULETTE_PHASE" />);
-    expect(screen.getByText('Roulette')).toBeInTheDocument();
+    expect(screen.getByText('Roulette Phase')).toBeInTheDocument();
 
     rerender(<Header {...defaultProps} phase="SHOP_PHASE" />);
-    expect(screen.getByText('Shop')).toBeInTheDocument();
+    expect(screen.getByText('Shop Phase')).toBeInTheDocument();
 
     rerender(<Header {...defaultProps} phase="GAME_OVER" />);
     expect(screen.getByText('Game Over')).toBeInTheDocument();

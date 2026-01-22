@@ -79,7 +79,7 @@ describe('specialCards', () => {
     it('should return correct cost for existing card', () => {
       const cost = getSpecialCardCost('wild_joker');
 
-      expect(cost).toBe(50);
+      expect(cost).toBe(35); // shopCost from cards.json
     });
 
     it('should return 0 for non-existent card', () => {

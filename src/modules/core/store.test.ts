@@ -6,6 +6,31 @@ import { describe, it, expect, vi, beforeEach } from 'vitest';
 import { useGameStore } from './store';
 import { resetGameEventEmitter, getGameEventEmitter } from './eventSystem';
 
+/**
+ * Helper to advance game to PLAY_PHASE with cards in hand
+ * Note: DRAW_PHASE auto-advances to PLAY_PHASE after drawing cards
+ */
+function advanceToPlayPhase() {
+  const { startGame, spinSlot, nextPhase } = useGameStore.getState();
+  startGame();
+  spinSlot();
+  // After spinSlot, we're still in SLOT_PHASE with slotResult set
+  // nextPhase goes to DRAW_PHASE which auto-advances to PLAY_PHASE
+  nextPhase(); // SLOT_PHASE -> DRAW_PHASE -> PLAY_PHASE (auto)
+}
+
+/**
+ * Helper to advance game to ROULETTE_PHASE
+ */
+function advanceToRoulettePhase() {
+  advanceToPlayPhase();
+  const state = useGameStore.getState();
+  if (state.hand[0]) {
+    state.selectCard(state.hand[0].id);
+    state.playHand();
+  }
+}
+
 describe('Game Store', () => {
   beforeEach(() => {
     // Reset store to initial state
@@ -100,12 +125,23 @@ describe('Game Store', () => {
       startGame();
     });
 
-    it('should spin slot and advance to play phase', () => {
+    it('should spin slot and set result', () => {
       const { spinSlot } = useGameStore.getState();
       spinSlot();
 
       const state = useGameStore.getState();
       expect(state.slotResult).not.toBeNull();
+      // spinSlot doesn't auto-advance anymore, need to call nextPhase
+      expect(state.phase).toBe('SLOT_PHASE');
+    });
+
+    it('should advance to play phase after full flow', () => {
+      const { spinSlot, nextPhase } = useGameStore.getState();
+      spinSlot();
+      // DRAW_PHASE auto-advances to PLAY_PHASE
+      nextPhase(); // -> DRAW_PHASE -> PLAY_PHASE (auto)
+
+      const state = useGameStore.getState();
       expect(state.phase).toBe('PLAY_PHASE');
       expect(state.hand.length).toBeGreaterThan(0);
     });
@@ -135,9 +171,7 @@ describe('Game Store', () => {
 
   describe('Card Selection', () => {
     beforeEach(() => {
-      const { startGame, spinSlot } = useGameStore.getState();
-      startGame();
-      spinSlot();
+      advanceToPlayPhase();
     });
 
     it('should select a card from hand', () => {
@@ -187,9 +221,7 @@ describe('Game Store', () => {
 
   describe('playHand', () => {
     beforeEach(() => {
-      const { startGame, spinSlot } = useGameStore.getState();
-      startGame();
-      spinSlot();
+      advanceToPlayPhase();
     });
 
     it('should play selected cards', () => {
@@ -233,9 +265,7 @@ describe('Game Store', () => {
 
   describe('discardSelected', () => {
     beforeEach(() => {
-      const { startGame, spinSlot } = useGameStore.getState();
-      startGame();
-      spinSlot();
+      advanceToPlayPhase();
     });
 
     it('should discard selected cards and draw new ones', () => {
@@ -286,15 +316,7 @@ describe('Game Store', () => {
 
   describe('Roulette Actions', () => {
     beforeEach(() => {
-      const { startGame, spinSlot, selectCard, playHand } = useGameStore.getState();
-      startGame();
-      spinSlot();
-
-      const state = useGameStore.getState();
-      if (state.hand[0]) {
-        selectCard(state.hand[0].id);
-        playHand();
-      }
+      advanceToRoulettePhase();
     });
 
     it('should spin roulette and advance through reward phase', () => {
@@ -306,7 +328,14 @@ describe('Game Store', () => {
 
       state.spinRoulette();
 
-      // After spinRoulette, the game processes REWARD_PHASE and moves to next turn
+      // spinRoulette sets the result but doesn't auto-advance
+      // Need to call confirmRoulette to proceed to REWARD_PHASE
+      const afterSpinState = useGameStore.getState();
+      expect(afterSpinState.rouletteResult).not.toBeNull();
+
+      afterSpinState.confirmRoulette();
+
+      // After confirmRoulette, the game processes REWARD_PHASE and moves to next turn
       const newState = useGameStore.getState();
       // The score should have increased (roulette multiplied the score)
       expect(newState.currentScore).toBeGreaterThanOrEqual(scoreBefore);
@@ -420,9 +449,14 @@ describe('Game Store', () => {
       store.startGame();
       expect(useGameStore.getState().phase).toBe('SLOT_PHASE');
 
-      // Spin slot (auto-advances to PLAY_PHASE)
+      // Spin slot
       store.spinSlot();
+      expect(useGameStore.getState().slotResult).not.toBeNull();
+
+      // Advance through phases (DRAW_PHASE auto-advances to PLAY_PHASE)
+      store.nextPhase(); // -> DRAW_PHASE -> PLAY_PHASE (auto)
       expect(useGameStore.getState().phase).toBe('PLAY_PHASE');
+      expect(useGameStore.getState().hand.length).toBeGreaterThan(0);
 
       // Select and play cards
       const state = useGameStore.getState();

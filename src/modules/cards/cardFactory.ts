@@ -13,6 +13,13 @@ import { RANKS, SUITS } from '@/data/constants';
 let cardIdCounter = 0;
 
 /**
+ * 카드 ID 카운터 리셋 (테스트용)
+ */
+export function resetCardIdCounter(): void {
+  cardIdCounter = 0;
+}
+
+/**
  * 고유 카드 ID 생성
  */
 function generateCardId(rank: Rank, suit: Suit): string {

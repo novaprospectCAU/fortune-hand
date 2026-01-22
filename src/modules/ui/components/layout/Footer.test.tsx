@@ -72,26 +72,24 @@ describe('Footer', () => {
     expect(screen.queryByRole('button')).not.toBeInTheDocument();
   });
 
-  it('renders roulette buttons in ROULETTE_PHASE', () => {
+  it('renders skip button in ROULETTE_PHASE (before spin)', () => {
     render(<Footer {...defaultProps} phase="ROULETTE_PHASE" />);
-    expect(screen.getByText('Keep Score')).toBeInTheDocument();
-    expect(screen.getByText('Spin Roulette')).toBeInTheDocument();
+    // Footer shows Skip button and hint to click wheel for spin
+    expect(screen.getByText(/Skip/)).toBeInTheDocument();
+    expect(screen.getByText(/click the wheel to spin/)).toBeInTheDocument();
   });
 
-  it('calls onSpinRoulette when Spin Roulette is clicked', () => {
-    const handleSpinRoulette = vi.fn();
-    render(<Footer {...defaultProps} phase="ROULETTE_PHASE" onSpinRoulette={handleSpinRoulette} />);
-
-    fireEvent.click(screen.getByText('Spin Roulette'));
-    expect(handleSpinRoulette).toHaveBeenCalled();
-  });
-
-  it('calls onSkipRoulette when Keep Score is clicked', () => {
+  it('calls onSkipRoulette when Skip is clicked', () => {
     const handleSkipRoulette = vi.fn();
     render(<Footer {...defaultProps} phase="ROULETTE_PHASE" onSkipRoulette={handleSkipRoulette} />);
 
-    fireEvent.click(screen.getByText('Keep Score'));
+    fireEvent.click(screen.getByText(/Skip/));
     expect(handleSkipRoulette).toHaveBeenCalled();
+  });
+
+  it('renders nothing in ROULETTE_PHASE after result', () => {
+    render(<Footer {...defaultProps} phase="ROULETTE_PHASE" hasRouletteResult={true} />);
+    expect(screen.queryByRole('button')).not.toBeInTheDocument();
   });
 
   it('renders Continue button in SCORE_PHASE', () => {
@@ -112,5 +110,10 @@ describe('Footer', () => {
   it('renders Start Game button in IDLE', () => {
     render(<Footer {...defaultProps} phase="IDLE" />);
     expect(screen.getByText('Start Game')).toBeInTheDocument();
+  });
+
+  it('renders Continue button in SLOT_PHASE after slot result', () => {
+    render(<Footer {...defaultProps} phase="SLOT_PHASE" hasSlotResult={true} />);
+    expect(screen.getByText('Continue')).toBeInTheDocument();
   });
 });

@@ -19,28 +19,28 @@ describe('pricing', () => {
       expect(result).toBe(40); // 40 * 1 = 40
     });
 
-    it('should calculate price for uncommon rarity with 1.5x multiplier', () => {
+    it('should calculate price for uncommon rarity with 1.3x multiplier', () => {
       const basePrice = 40;
       const result = calculatePrice(basePrice, 'uncommon');
-      expect(result).toBe(60); // 40 * 1.5 = 60
+      expect(result).toBe(52); // 40 * 1.3 = 52
     });
 
-    it('should calculate price for rare rarity with 2.5x multiplier', () => {
+    it('should calculate price for rare rarity with 1.8x multiplier', () => {
       const basePrice = 40;
       const result = calculatePrice(basePrice, 'rare');
-      expect(result).toBe(100); // 40 * 2.5 = 100
+      expect(result).toBe(72); // 40 * 1.8 = 72
     });
 
-    it('should calculate price for legendary rarity with 5x multiplier', () => {
+    it('should calculate price for legendary rarity with 3x multiplier', () => {
       const basePrice = 40;
       const result = calculatePrice(basePrice, 'legendary');
-      expect(result).toBe(200); // 40 * 5 = 200
+      expect(result).toBe(120); // 40 * 3 = 120
     });
 
     it('should round prices to nearest integer', () => {
       const basePrice = 33;
       const result = calculatePrice(basePrice, 'uncommon');
-      expect(result).toBe(50); // 33 * 1.5 = 49.5 -> 50
+      expect(result).toBe(43); // 33 * 1.3 = 42.9 -> 43
     });
   });
 
@@ -67,8 +67,8 @@ describe('pricing', () => {
 
     it('should apply both rarity and round scaling', () => {
       const result = calculatePriceWithRoundScaling(40, 'rare', 3);
-      // 40 * 2.5 (rare) = 100, 100 * 1.10 (round 3) = 110
-      expect(result).toBe(110);
+      // 40 * 1.8 (rare) = 72, 72 * 1.10 (round 3) = 79.2 -> 79
+      expect(result).toBe(79);
     });
   });
 
@@ -97,9 +97,9 @@ describe('pricing', () => {
   describe('RARITY_MULTIPLIERS', () => {
     it('should have correct multiplier values', () => {
       expect(RARITY_MULTIPLIERS.common).toBe(1);
-      expect(RARITY_MULTIPLIERS.uncommon).toBe(1.5);
-      expect(RARITY_MULTIPLIERS.rare).toBe(2.5);
-      expect(RARITY_MULTIPLIERS.legendary).toBe(5);
+      expect(RARITY_MULTIPLIERS.uncommon).toBe(1.3);
+      expect(RARITY_MULTIPLIERS.rare).toBe(1.8);
+      expect(RARITY_MULTIPLIERS.legendary).toBe(3);
     });
   });
 });

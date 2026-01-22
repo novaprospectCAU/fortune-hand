@@ -2,7 +2,7 @@
  * Deck Management 테스트
  */
 
-import { describe, it, expect } from 'vitest';
+import { describe, it, expect, beforeEach } from 'vitest';
 import {
   shuffle,
   shuffleWithSeed,
@@ -14,10 +14,14 @@ import {
   getTotalCardCount,
   findCard,
 } from './deck';
-import { createStandardDeck, createCard, createInitialDeck } from './cardFactory';
+import { createStandardDeck, createCard, createInitialDeck, resetCardIdCounter } from './cardFactory';
 import type { Deck, Card } from '@/types/interfaces';
 
 describe('deck', () => {
+  beforeEach(() => {
+    resetCardIdCounter();
+  });
+
   describe('shuffle', () => {
     it('should return a new array (immutability)', () => {
       const original = createStandardDeck();
@@ -71,28 +75,36 @@ describe('deck', () => {
       const shuffled = shuffle(single);
 
       expect(shuffled).toHaveLength(1);
-      expect(shuffled[0]!.id).toBe('A_hearts');
+      expect(shuffled[0]!.rank).toBe('A');
+      expect(shuffled[0]!.suit).toBe('hearts');
     });
   });
 
   describe('shuffleWithSeed', () => {
     it('should produce the same result for the same seed', () => {
-      const original = createStandardDeck();
+      resetCardIdCounter();
+      const original1 = createStandardDeck();
+      resetCardIdCounter();
+      const original2 = createStandardDeck();
       const seed = 12345;
 
-      const result1 = shuffleWithSeed(original, seed);
-      const result2 = shuffleWithSeed(original, seed);
+      const result1 = shuffleWithSeed(original1, seed);
+      const result2 = shuffleWithSeed(original2, seed);
 
-      expect(result1.map((c) => c.id)).toEqual(result2.map((c) => c.id));
+      // Compare rank/suit combinations since IDs may differ
+      expect(result1.map((c) => `${c.rank}_${c.suit}`)).toEqual(result2.map((c) => `${c.rank}_${c.suit}`));
     });
 
     it('should produce different results for different seeds', () => {
-      const original = createStandardDeck();
+      resetCardIdCounter();
+      const original1 = createStandardDeck();
+      resetCardIdCounter();
+      const original2 = createStandardDeck();
 
-      const result1 = shuffleWithSeed(original, 12345);
-      const result2 = shuffleWithSeed(original, 54321);
+      const result1 = shuffleWithSeed(original1, 12345);
+      const result2 = shuffleWithSeed(original2, 54321);
 
-      expect(result1.map((c) => c.id)).not.toEqual(result2.map((c) => c.id));
+      expect(result1.map((c) => `${c.rank}_${c.suit}`)).not.toEqual(result2.map((c) => `${c.rank}_${c.suit}`));
     });
 
     it('should maintain immutability', () => {
@@ -181,46 +193,45 @@ describe('deck', () => {
 
   describe('discard', () => {
     it('should move cards to discard pile', () => {
+      const card1 = createCard('A', 'hearts');
+      const card2 = createCard('K', 'spades');
       const deck: Deck = {
         cards: [],
         discardPile: [],
       };
-      const cardsToDiscard = [
-        createCard('A', 'hearts'),
-        createCard('K', 'spades'),
-      ];
+      const cardsToDiscard = [card1, card2];
 
       const newDeck = discard(deck, cardsToDiscard);
 
       expect(newDeck.discardPile).toHaveLength(2);
-      expect(newDeck.discardPile.map((c) => c.id)).toContain('A_hearts');
-      expect(newDeck.discardPile.map((c) => c.id)).toContain('K_spades');
+      expect(newDeck.discardPile.some(c => c.rank === 'A' && c.suit === 'hearts')).toBe(true);
+      expect(newDeck.discardPile.some(c => c.rank === 'K' && c.suit === 'spades')).toBe(true);
     });
 
     it('should remove discarded cards from main deck', () => {
+      const cardA = createCard('A', 'hearts');
+      const cardK = createCard('K', 'spades');
+      const cardQ = createCard('Q', 'diamonds');
       const deck: Deck = {
-        cards: [
-          createCard('A', 'hearts'),
-          createCard('K', 'spades'),
-          createCard('Q', 'diamonds'),
-        ],
+        cards: [cardA, cardK, cardQ],
         discardPile: [],
       };
 
-      const newDeck = discard(deck, [createCard('K', 'spades')]);
+      const newDeck = discard(deck, [cardK]);
 
       expect(newDeck.cards).toHaveLength(2);
-      expect(newDeck.cards.map((c) => c.id)).not.toContain('K_spades');
+      expect(newDeck.cards.find(c => c.id === cardK.id)).toBeUndefined();
     });
 
     it('should maintain immutability', () => {
+      const card = createCard('A', 'hearts');
       const deck: Deck = {
-        cards: [createCard('A', 'hearts')],
+        cards: [card],
         discardPile: [],
       };
       const originalCardsLength = deck.cards.length;
 
-      const newDeck = discard(deck, [createCard('A', 'hearts')]);
+      const newDeck = discard(deck, [card]);
 
       expect(deck.cards).toHaveLength(originalCardsLength);
       expect(deck.discardPile).toHaveLength(0);
@@ -228,12 +239,14 @@ describe('deck', () => {
     });
 
     it('should append to existing discard pile', () => {
+      const card2 = createCard('2', 'clubs');
+      const card3 = createCard('3', 'clubs');
       const deck: Deck = {
         cards: [],
-        discardPile: [createCard('2', 'clubs')],
+        discardPile: [card2],
       };
 
-      const newDeck = discard(deck, [createCard('3', 'clubs')]);
+      const newDeck = discard(deck, [card3]);
 
       expect(newDeck.discardPile).toHaveLength(2);
     });
@@ -241,37 +254,43 @@ describe('deck', () => {
 
   describe('addToDeck', () => {
     it('should add cards to the bottom of the deck', () => {
+      const cardA = createCard('A', 'hearts');
+      const cardK = createCard('K', 'spades');
       const deck: Deck = {
-        cards: [createCard('A', 'hearts')],
+        cards: [cardA],
         discardPile: [],
       };
 
-      const newDeck = addToDeck(deck, [createCard('K', 'spades')]);
+      const newDeck = addToDeck(deck, [cardK]);
 
       expect(newDeck.cards).toHaveLength(2);
-      expect(newDeck.cards[0]!.id).toBe('A_hearts'); // 기존 카드가 맨 위
-      expect(newDeck.cards[1]!.id).toBe('K_spades'); // 새 카드가 맨 아래
+      expect(newDeck.cards[0]!.rank).toBe('A'); // 기존 카드가 맨 위
+      expect(newDeck.cards[1]!.rank).toBe('K'); // 새 카드가 맨 아래
     });
 
     it('should maintain immutability', () => {
+      const cardA = createCard('A', 'hearts');
+      const cardK = createCard('K', 'spades');
       const deck: Deck = {
-        cards: [createCard('A', 'hearts')],
+        cards: [cardA],
         discardPile: [],
       };
 
-      const newDeck = addToDeck(deck, [createCard('K', 'spades')]);
+      const newDeck = addToDeck(deck, [cardK]);
 
       expect(deck.cards).toHaveLength(1);
       expect(newDeck).not.toBe(deck);
     });
 
     it('should not modify discard pile', () => {
+      const cardQ = createCard('Q', 'diamonds');
+      const cardK = createCard('K', 'spades');
       const deck: Deck = {
         cards: [],
-        discardPile: [createCard('Q', 'diamonds')],
+        discardPile: [cardQ],
       };
 
-      const newDeck = addToDeck(deck, [createCard('K', 'spades')]);
+      const newDeck = addToDeck(deck, [cardK]);
 
       expect(newDeck.discardPile).toEqual(deck.discardPile);
     });
@@ -279,43 +298,43 @@ describe('deck', () => {
 
   describe('removeFromDeck', () => {
     it('should remove cards from main deck', () => {
+      const cardA = createCard('A', 'hearts');
+      const cardK = createCard('K', 'spades');
+      const cardQ = createCard('Q', 'diamonds');
       const deck: Deck = {
-        cards: [
-          createCard('A', 'hearts'),
-          createCard('K', 'spades'),
-          createCard('Q', 'diamonds'),
-        ],
+        cards: [cardA, cardK, cardQ],
         discardPile: [],
       };
 
-      const newDeck = removeFromDeck(deck, ['K_spades']);
+      const newDeck = removeFromDeck(deck, [cardK.id]);
 
       expect(newDeck.cards).toHaveLength(2);
-      expect(newDeck.cards.map((c) => c.id)).not.toContain('K_spades');
+      expect(newDeck.cards.find(c => c.id === cardK.id)).toBeUndefined();
     });
 
     it('should remove cards from discard pile', () => {
+      const cardA = createCard('A', 'hearts');
+      const cardK = createCard('K', 'spades');
       const deck: Deck = {
         cards: [],
-        discardPile: [
-          createCard('A', 'hearts'),
-          createCard('K', 'spades'),
-        ],
+        discardPile: [cardA, cardK],
       };
 
-      const newDeck = removeFromDeck(deck, ['A_hearts']);
+      const newDeck = removeFromDeck(deck, [cardA.id]);
 
       expect(newDeck.discardPile).toHaveLength(1);
-      expect(newDeck.discardPile.map((c) => c.id)).not.toContain('A_hearts');
+      expect(newDeck.discardPile.find(c => c.id === cardA.id)).toBeUndefined();
     });
 
     it('should remove from both piles simultaneously', () => {
+      const cardA = createCard('A', 'hearts');
+      const cardK = createCard('K', 'spades');
       const deck: Deck = {
-        cards: [createCard('A', 'hearts')],
-        discardPile: [createCard('K', 'spades')],
+        cards: [cardA],
+        discardPile: [cardK],
       };
 
-      const newDeck = removeFromDeck(deck, ['A_hearts', 'K_spades']);
+      const newDeck = removeFromDeck(deck, [cardA.id, cardK.id]);
 
       expect(newDeck.cards).toHaveLength(0);
       expect(newDeck.discardPile).toHaveLength(0);
@@ -336,6 +355,7 @@ describe('deck', () => {
     });
 
     it('should shuffle the combined deck', () => {
+      resetCardIdCounter();
       const deck: Deck = {
         cards: createStandardDeck().slice(0, 26),
         discardPile: createStandardDeck().slice(26),
@@ -385,32 +405,36 @@ describe('deck', () => {
 
   describe('findCard', () => {
     it('should find card in main deck', () => {
+      const cardA = createCard('A', 'hearts');
+      const cardK = createCard('K', 'spades');
       const deck: Deck = {
-        cards: [createCard('A', 'hearts'), createCard('K', 'spades')],
+        cards: [cardA, cardK],
         discardPile: [],
       };
 
-      const found = findCard(deck, 'A_hearts');
+      const found = findCard(deck, cardA.id);
 
       expect(found).toBeDefined();
-      expect(found?.id).toBe('A_hearts');
+      expect(found?.id).toBe(cardA.id);
     });
 
     it('should find card in discard pile', () => {
+      const cardQ = createCard('Q', 'diamonds');
       const deck: Deck = {
         cards: [],
-        discardPile: [createCard('Q', 'diamonds')],
+        discardPile: [cardQ],
       };
 
-      const found = findCard(deck, 'Q_diamonds');
+      const found = findCard(deck, cardQ.id);
 
       expect(found).toBeDefined();
-      expect(found?.id).toBe('Q_diamonds');
+      expect(found?.id).toBe(cardQ.id);
     });
 
     it('should return undefined for non-existent card', () => {
+      const cardA = createCard('A', 'hearts');
       const deck: Deck = {
-        cards: [createCard('A', 'hearts')],
+        cards: [cardA],
         discardPile: [],
       };
 
@@ -422,14 +446,14 @@ describe('deck', () => {
     it('should prefer card in main deck over discard pile', () => {
       // 동일한 ID의 카드가 양쪽에 있는 경우 (정상적으로는 발생하지 않음)
       const card1 = createCard('A', 'hearts');
-      const card2 = { ...createCard('A', 'hearts'), enhancement: { type: 'mult' as const, value: 4 } };
+      const card2 = { ...card1, enhancement: { type: 'mult' as const, value: 4 } };
 
       const deck: Deck = {
         cards: [card1],
         discardPile: [card2],
       };
 
-      const found = findCard(deck, 'A_hearts');
+      const found = findCard(deck, card1.id);
 
       // cards에서 먼저 찾으므로 enhancement가 없어야 함
       expect(found?.enhancement).toBeUndefined();

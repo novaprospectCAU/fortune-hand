@@ -242,7 +242,7 @@ describe('Pack Integration in Shop Generation', () => {
       shop.items
         .filter((item) => item.type === 'pack')
         .forEach((packItem) => {
-          expect(['standard_pack', 'jumbo_pack', 'mega_pack', 'arcana_pack', 'celestial_pack']).toContain(
+          expect(['standard_pack', 'buffoon_pack', 'jumbo_pack', 'mega_pack', 'arcana_pack', 'celestial_pack']).toContain(
             packItem.itemId
           );
         });
