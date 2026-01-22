@@ -91,7 +91,8 @@ export function RoundClearCelebration({
 
       return () => clearTimeout(timer);
     }
-  }, [isVisible, onComplete]);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [isVisible]); // Only depend on isVisible to prevent re-running on callback change
 
   return (
     <AnimatePresence>

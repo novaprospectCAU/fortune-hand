@@ -153,6 +153,13 @@ function App() {
     useGameStore.getState().setRouletteResult(result);
   }, []);
 
+  // Round clear celebration complete handler
+  const handleRoundClearComplete = useCallback(() => {
+    setShowRoundClear(false);
+    // Open round reward selection after celebration
+    openRoundReward();
+  }, [openRoundReward]);
+
   // Get roulette config with bonuses applied
   const getRouletteConfig = useCallback(() => {
     let config = getDefaultConfig();
@@ -737,11 +744,7 @@ function App() {
       round={clearedRoundInfo?.round ?? round}
       score={clearedRoundInfo?.score ?? currentScore}
       targetScore={clearedRoundInfo?.target ?? targetScore}
-      onComplete={() => {
-        setShowRoundClear(false);
-        // Open round reward selection after celebration
-        openRoundReward();
-      }}
+      onComplete={handleRoundClearComplete}
     />
 
     {/* Round reward selection */}
