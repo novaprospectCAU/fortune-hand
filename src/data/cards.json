@@ -112,6 +112,131 @@
       "goldValue": 15,
       "rarity": "rare",
       "shopCost": 32
+    },
+    {
+      "id": "wild_queen",
+      "name": "Wild Queen",
+      "description": "A wild Queen that can be any rank or suit",
+      "baseRank": "Q",
+      "baseSuit": "hearts",
+      "isWild": true,
+      "rarity": "rare",
+      "shopCost": 38
+    },
+    {
+      "id": "gold_jack",
+      "name": "Golden Jack",
+      "description": "Scores as Jack but gives +6 gold instead of chips",
+      "baseRank": "J",
+      "baseSuit": "spades",
+      "isGold": true,
+      "goldValue": 6,
+      "rarity": "common",
+      "shopCost": 12
+    },
+    {
+      "id": "gold_ten",
+      "name": "Golden Ten",
+      "description": "Scores as 10 but gives +5 gold instead of chips",
+      "baseRank": "10",
+      "baseSuit": "clubs",
+      "isGold": true,
+      "goldValue": 5,
+      "rarity": "common",
+      "shopCost": 10
+    },
+    {
+      "id": "slot_five",
+      "name": "High Five",
+      "description": "Triggers a mini slot spin when played",
+      "baseRank": "5",
+      "baseSuit": "diamonds",
+      "triggerSlot": true,
+      "rarity": "common",
+      "shopCost": 18
+    },
+    {
+      "id": "slot_ace",
+      "name": "Slot Ace",
+      "description": "Triggers a mini slot spin when played",
+      "baseRank": "A",
+      "baseSuit": "clubs",
+      "triggerSlot": true,
+      "rarity": "rare",
+      "shopCost": 35
+    },
+    {
+      "id": "roulette_queen",
+      "name": "Fortune Queen",
+      "description": "Grants an extra roulette spin",
+      "baseRank": "Q",
+      "baseSuit": "spades",
+      "triggerRoulette": true,
+      "rarity": "uncommon",
+      "shopCost": 24
+    },
+    {
+      "id": "roulette_ten",
+      "name": "Wheel of Ten",
+      "description": "Grants an extra roulette spin",
+      "baseRank": "10",
+      "baseSuit": "hearts",
+      "triggerRoulette": true,
+      "rarity": "common",
+      "shopCost": 16
+    },
+    {
+      "id": "wild_king",
+      "name": "Wild King",
+      "description": "A wild King that can be any rank or suit",
+      "baseRank": "K",
+      "baseSuit": "clubs",
+      "isWild": true,
+      "rarity": "legendary",
+      "shopCost": 55
+    },
+    {
+      "id": "gold_nine",
+      "name": "Golden Nine",
+      "description": "Scores as 9 but gives +5 gold instead of chips",
+      "baseRank": "9",
+      "baseSuit": "hearts",
+      "isGold": true,
+      "goldValue": 5,
+      "rarity": "common",
+      "shopCost": 10
+    },
+    {
+      "id": "combo_eight",
+      "name": "Lucky Eight",
+      "description": "Triggers both slot and gains +3 gold",
+      "baseRank": "8",
+      "baseSuit": "spades",
+      "triggerSlot": true,
+      "isGold": true,
+      "goldValue": 3,
+      "rarity": "rare",
+      "shopCost": 40
+    },
+    {
+      "id": "wild_four",
+      "name": "Wild Four",
+      "description": "A wild 4 that can be any rank or suit",
+      "baseRank": "4",
+      "baseSuit": "diamonds",
+      "isWild": true,
+      "rarity": "uncommon",
+      "shopCost": 20
+    },
+    {
+      "id": "mega_joker",
+      "name": "Mega Joker",
+      "description": "Ultimate wild card with +5 gold bonus",
+      "isWild": true,
+      "isGold": true,
+      "goldValue": 5,
+      "rarity": "legendary",
+      "shopCost": 65
     }
   ],
 

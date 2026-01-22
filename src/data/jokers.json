@@ -134,6 +134,159 @@
       "cost": 200,
       "trigger": { "type": "on_roulette" },
       "effect": { "type": "custom", "handler": "fortuneTeller" }
+    },
+    {
+      "id": "straight_shooter",
+      "name": "Straight Shooter",
+      "description": "+80 Chips if played hand is a Straight",
+      "rarity": "common",
+      "cost": 40,
+      "trigger": { "type": "on_score" },
+      "effect": { "type": "add_chips", "value": 80, "handCondition": "straight" }
+    },
+    {
+      "id": "full_house_party",
+      "name": "Full House Party",
+      "description": "×2.5 Mult if played hand is a Full House",
+      "rarity": "uncommon",
+      "cost": 65,
+      "trigger": { "type": "on_score" },
+      "effect": { "type": "multiply", "value": 2.5, "handCondition": "full_house" }
+    },
+    {
+      "id": "four_leaf",
+      "name": "Four Leaf",
+      "description": "×4 Mult if played hand is Four of a Kind",
+      "rarity": "rare",
+      "cost": 85,
+      "trigger": { "type": "on_score" },
+      "effect": { "type": "multiply", "value": 4, "handCondition": "four_of_a_kind" }
+    },
+    {
+      "id": "heart_breaker",
+      "name": "Heart Breaker",
+      "description": "+15 Mult for each Heart card played",
+      "rarity": "common",
+      "cost": 35,
+      "trigger": { "type": "on_play", "cardCondition": { "suit": "hearts" } },
+      "effect": { "type": "add_mult", "value": 15 }
+    },
+    {
+      "id": "club_champion",
+      "name": "Club Champion",
+      "description": "+20 Chips for each Club card played",
+      "rarity": "common",
+      "cost": 30,
+      "trigger": { "type": "on_play", "cardCondition": { "suit": "clubs" } },
+      "effect": { "type": "add_chips", "value": 20 }
+    },
+    {
+      "id": "spade_specialist",
+      "name": "Spade Specialist",
+      "description": "×1.5 Mult for each Spade card played",
+      "rarity": "uncommon",
+      "cost": 55,
+      "trigger": { "type": "on_play", "cardCondition": { "suit": "spades" } },
+      "effect": { "type": "multiply", "value": 1.5 }
+    },
+    {
+      "id": "royal_guard",
+      "name": "Royal Guard",
+      "description": "+30 Chips for each face card (J, Q, K) played",
+      "rarity": "common",
+      "cost": 40,
+      "trigger": { "type": "on_play", "cardCondition": { "minRank": 11 } },
+      "effect": { "type": "add_chips", "value": 30 }
+    },
+    {
+      "id": "low_roller",
+      "name": "Low Roller",
+      "description": "+5 Mult for each card 5 or below played",
+      "rarity": "common",
+      "cost": 35,
+      "trigger": { "type": "on_play", "cardCondition": { "maxRank": 5 } },
+      "effect": { "type": "add_mult", "value": 5 }
+    },
+    {
+      "id": "gold_digger",
+      "name": "Gold Digger",
+      "description": "Gold symbols appear 2x more often in slots",
+      "rarity": "uncommon",
+      "cost": 50,
+      "trigger": { "type": "on_slot" },
+      "effect": { "type": "modify_slot", "modification": { "symbolWeights": { "gold": 40 } } }
+    },
+    {
+      "id": "card_collector",
+      "name": "Card Collector",
+      "description": "Card symbols appear 2x more often in slots",
+      "rarity": "uncommon",
+      "cost": 50,
+      "trigger": { "type": "on_slot" },
+      "effect": { "type": "modify_slot", "modification": { "symbolWeights": { "card": 50 } } }
+    },
+    {
+      "id": "free_spinner",
+      "name": "Free Spinner",
+      "description": "+1 free roulette spin per round",
+      "rarity": "rare",
+      "cost": 95,
+      "trigger": { "type": "on_roulette" },
+      "effect": { "type": "modify_roulette", "modification": { "freeSpins": 1 } }
+    },
+    {
+      "id": "two_pair_bonus",
+      "name": "Double Trouble",
+      "description": "+40 Mult if played hand is Two Pair",
+      "rarity": "common",
+      "cost": 35,
+      "trigger": { "type": "on_score" },
+      "effect": { "type": "add_mult", "value": 40, "handCondition": "two_pair" }
+    },
+    {
+      "id": "three_amigos",
+      "name": "Three Amigos",
+      "description": "×1.8 Mult if played hand is Three of a Kind",
+      "rarity": "uncommon",
+      "cost": 50,
+      "trigger": { "type": "on_score" },
+      "effect": { "type": "multiply", "value": 1.8, "handCondition": "three_of_a_kind" }
+    },
+    {
+      "id": "royal_flush_master",
+      "name": "Royal Flush Master",
+      "description": "×10 Mult if played hand is Royal Flush",
+      "rarity": "legendary",
+      "cost": 180,
+      "trigger": { "type": "on_score" },
+      "effect": { "type": "multiply", "value": 10, "handCondition": "royal_flush" }
+    },
+    {
+      "id": "chip_magnet",
+      "name": "Chip Magnet",
+      "description": "Chip symbols appear 2x more often in slots",
+      "rarity": "uncommon",
+      "cost": 55,
+      "trigger": { "type": "on_slot" },
+      "effect": { "type": "modify_slot", "modification": { "symbolWeights": { "chip": 30 } } }
+    },
+    {
+      "id": "target_master",
+      "name": "Target Master",
+      "description": "Target symbols appear 2x more often in slots",
+      "rarity": "uncommon",
+      "cost": 55,
+      "trigger": { "type": "on_slot" },
+      "effect": { "type": "modify_slot", "modification": { "symbolWeights": { "target": 40 } } }
+    },
+    {
+      "id": "all_in",
+      "name": "All In",
+      "description": "×5 Mult but -20% safe zone on Roulette",
+      "rarity": "legendary",
+      "cost": 120,
+      "trigger": { "type": "on_score" },
+      "effect": { "type": "multiply", "value": 5, "penalty": { "safeZone": -20 } }
     }
   ]
 }
