@@ -96,6 +96,22 @@ export const translations = {
     royalQuintuple: "Royal Quintuple",
     pentagon: "Pentagon",
 
+    // Hand descriptions
+    highCardDesc: "No matching cards. Score is based on your highest card only.",
+    pairDesc: "Two cards of the same rank. Score is the sum of the pair multiplied by 2.",
+    twoPairDesc: "Two different pairs. Score is the sum of all four paired cards multiplied by 4.",
+    threeOfAKindDesc: "Three cards of the same rank. Score is the sum of the three cards multiplied by 6.",
+    straightDesc: "Five cards in sequence (e.g., 5-6-7-8-9). Ace can be high or low. Score is the sum of all cards multiplied by 8.",
+    flushDesc: "Five cards of the same suit. Score is the sum of all cards multiplied by 10.",
+    fullHouseDesc: "Three of a kind plus a pair. Score is the sum of all five cards multiplied by 13.",
+    straightFlushDesc: "Five cards in sequence, all of the same suit. Score is the sum of all cards multiplied by 16.",
+    fourOfAKindDesc: "Four cards of the same rank. Score is the sum of the four cards multiplied by 20.",
+    quintupleDesc: "Five cards of the same rank (requires wild cards). Score is the sum of all cards multiplied by 25.",
+    royalFlushDesc: "10, J, Q, K, A all of the same suit. The highest standard poker hand. Score is the sum of all cards multiplied by 30.",
+    royalQuintupleDesc: "Five cards of the same rank AND same suit (requires wild cards). Score is the sum of all cards multiplied by 30.",
+    pentagonDesc: "Five Ace of Spades (requires wild cards). The ultimate hand. Score is the sum of all cards multiplied by 100.",
+    exampleHand: "Example Hand",
+
     // Card effects
     wildEffect: "Wild: Can be any rank or suit",
     goldEffect: "Gold: Earn gold instead of score",
@@ -377,6 +393,22 @@ export const translations = {
     quintuple: "퀸튜플",
     royalQuintuple: "로열 퀸튜플",
     pentagon: "펜타곤",
+
+    // Hand descriptions
+    highCardDesc: "일치하는 카드가 없습니다. 가장 높은 카드만으로 점수가 계산됩니다.",
+    pairDesc: "같은 숫자 2장. 페어의 합 × 2로 점수가 계산됩니다.",
+    twoPairDesc: "서로 다른 페어 2개. 4장의 합 × 4로 점수가 계산됩니다.",
+    threeOfAKindDesc: "같은 숫자 3장. 3장의 합 × 6으로 점수가 계산됩니다.",
+    straightDesc: "5장이 연속된 숫자 (예: 5-6-7-8-9). A는 높거나 낮을 수 있습니다. 모든 카드 합 × 8로 계산됩니다.",
+    flushDesc: "같은 무늬 5장. 모든 카드 합 × 10으로 점수가 계산됩니다.",
+    fullHouseDesc: "트리플 + 페어. 5장 전체 합 × 13으로 점수가 계산됩니다.",
+    straightFlushDesc: "같은 무늬로 5장 연속. 모든 카드 합 × 16으로 점수가 계산됩니다.",
+    fourOfAKindDesc: "같은 숫자 4장. 4장의 합 × 20으로 점수가 계산됩니다.",
+    quintupleDesc: "같은 숫자 5장 (와일드 카드 필요). 모든 카드 합 × 25로 점수가 계산됩니다.",
+    royalFlushDesc: "같은 무늬로 10, J, Q, K, A. 가장 높은 기본 포커 핸드입니다. 모든 카드 합 × 30으로 계산됩니다.",
+    royalQuintupleDesc: "같은 숫자 AND 같은 무늬 5장 (와일드 카드 필요). 모든 카드 합 × 30으로 점수가 계산됩니다.",
+    pentagonDesc: "스페이드 A 5장 (와일드 카드 필요). 궁극의 핸드입니다. 모든 카드 합 × 100으로 점수가 계산됩니다.",
+    exampleHand: "예시 핸드",
 
     // Card effects
     wildEffect: "와일드: 어떤 랭크/무늬로도 사용 가능",
