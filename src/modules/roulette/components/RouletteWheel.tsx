@@ -3,11 +3,14 @@
  */
 
 import { useState, useCallback, useMemo } from 'react';
-import { motion } from 'framer-motion';
+import { motion, AnimatePresence } from 'framer-motion';
 import type { RouletteConfig, RouletteResult } from '@/types/interfaces';
 import { Segment } from './Segment';
 import { normalizeSegments } from '../probability';
 import { spin, calculateTargetAngle } from '../roulette';
+
+/** Probability threshold below which segments are hidden from the wheel visual */
+const HIDDEN_SEGMENT_THRESHOLD = 3;
 
 interface RouletteWheelProps {
   config: RouletteConfig;
@@ -44,6 +47,7 @@ export function RouletteWheel({
   const [pendingResult, setPendingResult] = useState<RouletteResult | null>(
     null
   );
+  const [showJackpot, setShowJackpot] = useState(false);
 
   // Preview segment ID from Fortune Teller joker
   const previewSegmentId = previewResult?.segment.id;
@@ -54,11 +58,20 @@ export function RouletteWheel({
     [config.segments]
   );
 
-  // Calculate segment angles
-  const segmentData = useMemo(() => {
+  // Filter segments for visual display (hide low probability segments)
+  const visibleSegments = useMemo(
+    () => normalizedSegments.filter((s) => s.probability > HIDDEN_SEGMENT_THRESHOLD),
+    [normalizedSegments]
+  );
+
+  // Renormalize visible segments so they add up to 100% for display purposes
+  const visualSegmentData = useMemo(() => {
+    const totalVisibleProb = visibleSegments.reduce((sum, s) => sum + s.probability, 0);
     let currentAngle = 0;
-    return normalizedSegments.map((segment) => {
-      const sweepAngle = (segment.probability / 100) * 360;
+    return visibleSegments.map((segment) => {
+      // Scale probability to fill the wheel
+      const scaledProb = (segment.probability / totalVisibleProb) * 100;
+      const sweepAngle = (scaledProb / 100) * 360;
       const data = {
         segment,
         startAngle: currentAngle,
@@ -67,7 +80,7 @@ export function RouletteWheel({
       currentAngle += sweepAngle;
       return data;
     });
-  }, [normalizedSegments]);
+  }, [visibleSegments]);
 
   // Handle spin
   const handleSpin = useCallback(() => {
@@ -95,8 +108,19 @@ export function RouletteWheel({
   const handleAnimationComplete = useCallback(() => {
     setIsSpinning(false);
     if (pendingResult) {
-      onSpinComplete(pendingResult);
-      setPendingResult(null);
+      // Check for jackpot (100x multiplier)
+      if (pendingResult.segment.multiplier >= 100) {
+        setShowJackpot(true);
+        // Delay the completion to show jackpot animation
+        setTimeout(() => {
+          setShowJackpot(false);
+          onSpinComplete(pendingResult);
+          setPendingResult(null);
+        }, 2500);
+      } else {
+        onSpinComplete(pendingResult);
+        setPendingResult(null);
+      }
     }
   }, [pendingResult, onSpinComplete]);
 
@@ -144,8 +168,8 @@ export function RouletteWheel({
             strokeWidth="8"
           />
 
-          {/* Segments */}
-          {segmentData.map(({ segment, startAngle, sweepAngle }) => (
+          {/* Segments (only visible ones) */}
+          {visualSegmentData.map(({ segment, startAngle, sweepAngle }) => (
             <Segment
               key={segment.id}
               segment={segment}
@@ -208,6 +232,120 @@ export function RouletteWheel({
           <span className="text-gray-400 font-medium">Disabled</span>
         </div>
       )}
+
+      {/* Jackpot (100x) celebration overlay */}
+      <AnimatePresence>
+        {showJackpot && (
+          <motion.div
+            className="fixed inset-0 z-50 flex items-center justify-center pointer-events-none"
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            exit={{ opacity: 0 }}
+          >
+            {/* Background flash */}
+            <motion.div
+              className="absolute inset-0 bg-yellow-400"
+              initial={{ opacity: 0 }}
+              animate={{ opacity: [0, 0.5, 0, 0.3, 0] }}
+              transition={{ duration: 0.5, times: [0, 0.1, 0.2, 0.3, 0.5] }}
+            />
+
+            {/* Radial burst effect */}
+            <motion.div
+              className="absolute w-[200vmax] h-[200vmax] rounded-full"
+              style={{
+                background: 'radial-gradient(circle, rgba(251,191,36,0.4) 0%, transparent 70%)',
+              }}
+              initial={{ scale: 0 }}
+              animate={{ scale: [0, 1.5, 2] }}
+              transition={{ duration: 1, ease: 'easeOut' }}
+            />
+
+            {/* Main jackpot text */}
+            <motion.div
+              className="relative flex flex-col items-center gap-4"
+              initial={{ scale: 0, rotate: -180 }}
+              animate={{ scale: [0, 1.3, 1], rotate: 0 }}
+              transition={{ duration: 0.6, ease: 'backOut' }}
+            >
+              {/* Crown icon */}
+              <motion.div
+                className="text-6xl sm:text-8xl"
+                animate={{
+                  scale: [1, 1.2, 1],
+                  rotate: [-5, 5, -5, 5, 0],
+                }}
+                transition={{ duration: 0.5, repeat: 3 }}
+              >
+                👑
+              </motion.div>
+
+              {/* JACKPOT text */}
+              <motion.h1
+                className="text-5xl sm:text-7xl font-black text-transparent bg-clip-text bg-gradient-to-r from-yellow-300 via-yellow-500 to-amber-500"
+                style={{
+                  textShadow: '0 0 40px rgba(251,191,36,0.8), 0 0 80px rgba(251,191,36,0.4)',
+                  WebkitTextStroke: '2px rgba(255,255,255,0.3)',
+                }}
+                animate={{
+                  scale: [1, 1.05, 1],
+                }}
+                transition={{ duration: 0.3, repeat: Infinity }}
+              >
+                JACKPOT!
+              </motion.h1>
+
+              {/* 100x text */}
+              <motion.div
+                className="text-4xl sm:text-6xl font-bold text-white"
+                initial={{ y: 20, opacity: 0 }}
+                animate={{ y: 0, opacity: 1 }}
+                transition={{ delay: 0.3 }}
+              >
+                ×100
+              </motion.div>
+
+              {/* Score display */}
+              {pendingResult && (
+                <motion.div
+                  className="text-2xl sm:text-3xl font-semibold text-yellow-300 mt-2"
+                  initial={{ y: 20, opacity: 0 }}
+                  animate={{ y: 0, opacity: 1 }}
+                  transition={{ delay: 0.5 }}
+                >
+                  {pendingResult.finalScore.toLocaleString()} pts!
+                </motion.div>
+              )}
+            </motion.div>
+
+            {/* Particle effects - coins/stars */}
+            {Array.from({ length: 20 }).map((_, i) => (
+              <motion.div
+                key={i}
+                className="absolute text-2xl sm:text-3xl"
+                style={{
+                  left: '50%',
+                  top: '50%',
+                }}
+                initial={{ x: 0, y: 0, opacity: 1 }}
+                animate={{
+                  x: (Math.random() - 0.5) * 400,
+                  y: (Math.random() - 0.5) * 400,
+                  opacity: [1, 1, 0],
+                  rotate: Math.random() * 720,
+                }}
+                transition={{
+                  duration: 1.5,
+                  delay: Math.random() * 0.3,
+                  ease: 'easeOut',
+                }}
+              >
+                {i % 2 === 0 ? '⭐' : '💰'}
+              </motion.div>
+            ))}
+          </motion.div>
+        )}
+      </AnimatePresence>
     </div>
   );
 }
