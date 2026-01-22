@@ -1179,6 +1179,7 @@ export const useGameStore = create<GameStore>((set, get) => ({
         chestRewards: [],
         chestPhase: 'closed',
         pendingCardRemoval: false,
+        pendingReroll: false,
       },
     });
   },
@@ -1392,17 +1393,24 @@ export const useGameStore = create<GameStore>((set, get) => ({
       roundRewardState: {
         ...state.roundRewardState,
         chestRewards: updatedRewards,
-        chestPhase: shouldReroll ? 'closed' : 'revealed',
+        chestPhase: 'revealed', // 항상 revealed로 유지 (보상 확인용)
         pendingCardRemoval,
+        pendingReroll: shouldReroll, // 리롤 대기 플래그
       },
     });
+  },
 
-    // Reroll인 경우 자동으로 다시 열기
-    if (shouldReroll) {
-      setTimeout(() => {
-        get().openTreasureChest();
-      }, 1500);
-    }
+  proceedToReroll: () => {
+    const state = get();
+    if (!state.roundRewardState || !state.roundRewardState.pendingReroll) return;
+
+    set({
+      roundRewardState: {
+        ...state.roundRewardState,
+        chestPhase: 'closed',
+        pendingReroll: false,
+      },
+    });
   },
 
   completeRoundReward: () => {

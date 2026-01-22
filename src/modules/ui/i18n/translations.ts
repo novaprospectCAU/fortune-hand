@@ -375,6 +375,8 @@ export const translations = {
     clickToOpenChest: "Click the chest to open!",
     applyReward: "Apply Reward",
     openingAgain: "Opening again",
+    rerollGranted: "Reroll granted!",
+    openAgain: "Open Again",
     previousRewards: "Previous rewards",
 
     // Chest Rewards
@@ -758,6 +760,8 @@ export const translations = {
     clickToOpenChest: "상자를 클릭해서 열어보세요!",
     applyReward: "보상 적용",
     openingAgain: "다시 여는 중",
+    rerollGranted: "리롤 획득!",
+    openAgain: "다시 열기",
     previousRewards: "이전 보상",
 
     // Chest Rewards

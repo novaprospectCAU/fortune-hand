@@ -29,6 +29,7 @@ function TreasureChest() {
   const roundRewardState = useGameStore((state) => state.roundRewardState);
   const openTreasureChest = useGameStore((state) => state.openTreasureChest);
   const applyChestReward = useGameStore((state) => state.applyChestReward);
+  const proceedToReroll = useGameStore((state) => state.proceedToReroll);
   const completeRoundReward = useGameStore((state) => state.completeRoundReward);
 
   const [isAnimating, setIsAnimating] = useState(false);
@@ -36,6 +37,7 @@ function TreasureChest() {
   const chestPhase = roundRewardState?.chestPhase ?? 'closed';
   const rewards = roundRewardState?.chestRewards ?? [];
   const currentReward = rewards[rewards.length - 1];
+  const pendingReroll = roundRewardState?.pendingReroll ?? false;
 
   const handleOpenChest = () => {
     if (chestPhase === 'closed' && !isAnimating) {
@@ -59,12 +61,15 @@ function TreasureChest() {
     applyChestReward();
   };
 
+  const handleProceedToReroll = () => {
+    proceedToReroll();
+  };
+
   const handleComplete = () => {
     completeRoundReward();
   };
 
   const isJackpot = currentReward?.type === 'jackpot';
-  const isReroll = currentReward?.type === 'reroll';
 
   return (
     <div className="flex flex-col items-center">
@@ -186,7 +191,8 @@ function TreasureChest() {
         </motion.button>
       )}
 
-      {chestPhase === 'revealed' && currentReward?.applied && !isReroll && (
+      {/* Normal reward - show continue button */}
+      {chestPhase === 'revealed' && currentReward?.applied && !pendingReroll && (
         <motion.button
           initial={{ opacity: 0 }}
           animate={{ opacity: 1 }}
@@ -197,13 +203,22 @@ function TreasureChest() {
         </motion.button>
       )}
 
-      {isReroll && currentReward?.applied && (
+      {/* Reroll reward - show "Open Again" button */}
+      {chestPhase === 'revealed' && currentReward?.applied && pendingReroll && (
         <motion.div
           initial={{ opacity: 0 }}
           animate={{ opacity: 1 }}
-          className="text-yellow-400 font-bold animate-pulse"
+          className="flex flex-col items-center gap-3"
         >
-          {t('openingAgain')}...
+          <p className="text-yellow-400 font-bold">🔄 {t('rerollGranted')}</p>
+          <motion.button
+            whileHover={{ scale: 1.05 }}
+            whileTap={{ scale: 0.95 }}
+            onClick={handleProceedToReroll}
+            className="px-6 py-3 bg-yellow-600 hover:bg-yellow-700 text-white font-bold rounded-lg transition-colors"
+          >
+            {t('openAgain')}
+          </motion.button>
         </motion.div>
       )}
     </div>

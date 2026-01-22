@@ -470,6 +470,7 @@ export interface RoundRewardState {
   chestRewards: TreasureChestReward[];
   chestPhase: 'closed' | 'opening' | 'revealed' | 'applying';
   pendingCardRemoval: boolean; // 카드 제거 대기 중
+  pendingReroll: boolean; // 리롤 대기 중 (보상 확인 후 다시 열기)
 }
 
 export interface RouletteProbabilityMods {
@@ -541,6 +542,7 @@ export interface GameActions {
   selectRoundReward(reward: 'quota' | 'chest' | 'gold'): void;
   openTreasureChest(): void;
   applyChestReward(): void;
+  proceedToReroll(): void;
   completeRoundReward(): void;
   clearRoundClearCelebration(): void;
 }
