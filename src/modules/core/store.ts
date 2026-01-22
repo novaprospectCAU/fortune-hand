@@ -1225,6 +1225,8 @@ export const useGameStore = create<GameStore>((set, get) => ({
     const roll = Math.random() * 100;
     let rewardType: TreasureChestRewardType;
 
+    console.log('[TreasureChest] Roll:', roll);
+
     if (roll < 10) {
       rewardType = 'hand_upgrades';
     } else if (roll < 30) {
@@ -1242,6 +1244,8 @@ export const useGameStore = create<GameStore>((set, get) => ({
     } else {
       rewardType = 'reroll';
     }
+
+    console.log('[TreasureChest] Reward type:', rewardType);
 
     const newReward: TreasureChestReward = {
       type: rewardType,
@@ -1382,16 +1386,25 @@ export const useGameStore = create<GameStore>((set, get) => ({
 
     details = applyReward(currentReward.type);
 
+    console.log('[TreasureChest] Applied reward:', currentReward.type);
+    console.log('[TreasureChest] Details:', details);
+    console.log('[TreasureChest] shouldReroll:', shouldReroll);
+
+    // 최신 상태 가져오기 (applyReward 내부에서 set()이 호출되었을 수 있음)
+    const freshState = get();
+
     // 보상 적용 완료 표시
-    const updatedRewards = state.roundRewardState.chestRewards.map((r, i) =>
-      i === state.roundRewardState!.chestRewards.length - 1
+    const updatedRewards = freshState.roundRewardState!.chestRewards.map((r, i) =>
+      i === freshState.roundRewardState!.chestRewards.length - 1
         ? { ...r, applied: true, details }
         : r
     );
 
+    console.log('[TreasureChest] Updated rewards:', updatedRewards);
+
     set({
       roundRewardState: {
-        ...state.roundRewardState,
+        ...freshState.roundRewardState!,
         chestRewards: updatedRewards,
         chestPhase: 'revealed', // 항상 revealed로 유지 (보상 확인용)
         pendingCardRemoval,

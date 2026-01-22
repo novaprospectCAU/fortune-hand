@@ -39,6 +39,10 @@ function TreasureChest() {
   const currentReward = rewards[rewards.length - 1];
   const pendingReroll = roundRewardState?.pendingReroll ?? false;
 
+  console.log('[TreasureChestUI] Phase:', chestPhase);
+  console.log('[TreasureChestUI] Current reward:', currentReward);
+  console.log('[TreasureChestUI] Pending reroll:', pendingReroll);
+
   const handleOpenChest = () => {
     if (chestPhase === 'closed' && !isAnimating) {
       setIsAnimating(true);
