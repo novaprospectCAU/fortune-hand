@@ -1,12 +1,13 @@
 /**
  * 점수 계산 모듈
  *
- * 핸드 결과와 보너스를 받아 최종 점수를 계산합니다.
- * 보너스 적용 순서: chips -> mult -> xmult
+ * 새로운 점수 시스템:
+ * 점수 = (관련 카드들의 합) × (핸드 배수 + 보너스 배수)
  */
 
-import type { AppliedBonus, Card, HandResult, ScoreCalculation } from '@/types/interfaces';
+import type { AppliedBonus, Card, HandResult, HandType, ScoreCalculation } from '@/types/interfaces';
 import { CARD_CHIP_VALUES } from './handRanks';
+import { HAND_MULTIPLIERS } from '@/data/constants';
 
 // 최대 retrigger 횟수 제한 (무한 루프 방지)
 const MAX_RETRIGGER_COUNT = 10;
@@ -52,15 +53,100 @@ function getCardTriggerCount(card: Card): number {
 }
 
 /**
+ * 핸드 타입에 따라 점수에 사용할 카드들의 합을 계산합니다.
+ */
+function getScoringCardSum(handType: HandType, scoringCards: Card[]): number {
+  // 모든 카드의 칩 값 합계
+  const allSum = scoringCards.reduce((sum, card) => sum + getCardChipValue(card), 0);
+
+  switch (handType) {
+    case 'high_card': {
+      // 가장 큰 카드 1장만
+      if (scoringCards.length === 0) return 0;
+      return Math.max(...scoringCards.map(c => getCardChipValue(c)));
+    }
+    case 'pair': {
+      // 페어인 2장만
+      const rankCounts = new Map<string, Card[]>();
+      for (const card of scoringCards) {
+        const existing = rankCounts.get(card.rank) || [];
+        existing.push(card);
+        rankCounts.set(card.rank, existing);
+      }
+      for (const [, cards] of rankCounts) {
+        if (cards.length >= 2) {
+          return cards.slice(0, 2).reduce((sum, c) => sum + getCardChipValue(c), 0);
+        }
+      }
+      return 0;
+    }
+    case 'two_pair': {
+      // 투페어 4장
+      const rankCounts = new Map<string, Card[]>();
+      for (const card of scoringCards) {
+        const existing = rankCounts.get(card.rank) || [];
+        existing.push(card);
+        rankCounts.set(card.rank, existing);
+      }
+      let sum = 0;
+      let pairsFound = 0;
+      for (const [, cards] of rankCounts) {
+        if (cards.length >= 2 && pairsFound < 2) {
+          sum += cards.slice(0, 2).reduce((s, c) => s + getCardChipValue(c), 0);
+          pairsFound++;
+        }
+      }
+      return sum;
+    }
+    case 'three_of_a_kind': {
+      // 트리플 3장
+      const rankCounts = new Map<string, Card[]>();
+      for (const card of scoringCards) {
+        const existing = rankCounts.get(card.rank) || [];
+        existing.push(card);
+        rankCounts.set(card.rank, existing);
+      }
+      for (const [, cards] of rankCounts) {
+        if (cards.length >= 3) {
+          return cards.slice(0, 3).reduce((sum, c) => sum + getCardChipValue(c), 0);
+        }
+      }
+      return 0;
+    }
+    case 'four_of_a_kind': {
+      // 포카드 4장
+      const rankCounts = new Map<string, Card[]>();
+      for (const card of scoringCards) {
+        const existing = rankCounts.get(card.rank) || [];
+        existing.push(card);
+        rankCounts.set(card.rank, existing);
+      }
+      for (const [, cards] of rankCounts) {
+        if (cards.length >= 4) {
+          return cards.slice(0, 4).reduce((sum, c) => sum + getCardChipValue(c), 0);
+        }
+      }
+      return 0;
+    }
+    // 나머지는 모든 카드 합계
+    case 'straight':
+    case 'flush':
+    case 'full_house':
+    case 'straight_flush':
+    case 'royal_flush':
+    case 'quintuple':
+    case 'royal_quintuple':
+    case 'pentagon':
+    default:
+      return allSum;
+  }
+}
+
+/**
  * 핸드 결과와 보너스를 받아 최종 점수를 계산합니다.
  *
- * 점수 계산 순서:
- * 1. 기본 chips = 핸드 타입 기본 칩 + 카드 칩 합계 (retrigger 적용)
- * 2. 기본 mult = 핸드 타입 기본 배수 + 카드 mult 강화 (retrigger 적용)
- * 3. chips 보너스 적용 (순서대로 더하기)
- * 4. mult 보너스 적용 (순서대로 더하기)
- * 5. xmult 보너스 적용 (순서대로 곱하기)
- * 6. 최종 점수 = chips * mult
+ * 새로운 점수 공식:
+ * 점수 = (관련 카드들의 합) × (핸드 배수 + 보너스 배수)
  *
  * @param handResult 핸드 판정 결과
  * @param bonuses 적용할 보너스 배열 (조커, 슬롯 등에서 제공)
@@ -70,22 +156,22 @@ export function calculateScore(
   handResult: HandResult,
   bonuses: AppliedBonus[] = []
 ): ScoreCalculation {
-  // 1. 기본 칩 계산: 핸드 타입 기본값 + 카드 칩 합계 (retrigger 적용)
-  let chipTotal = handResult.baseChips;
-  let totalCardChips = 0;
+  // 1. 관련 카드들의 합 계산 (retrigger 적용)
+  let chipTotal = 0;
 
-  // 각 카드의 칩 값을 retrigger 횟수만큼 계산
   for (const card of handResult.scoringCards) {
     const cardChipValue = getCardChipValue(card);
     const triggerCount = getCardTriggerCount(card);
-    totalCardChips += cardChipValue * triggerCount;
+    chipTotal += cardChipValue * triggerCount;
   }
 
-  chipTotal += totalCardChips;
+  // 핸드 타입에 따른 카드 합 계산
+  const cardSum = getScoringCardSum(handResult.handType, handResult.scoringCards);
 
-  // 2. 기본 배수 + 카드 강화 보너스 (mult 타입, retrigger 적용)
-  let multTotal = handResult.baseMult;
+  // 2. 기본 배수 (핸드 타입별 배수)
+  let multTotal = HAND_MULTIPLIERS[handResult.handType] ?? 1;
 
+  // 카드 강화 보너스 (mult 타입, retrigger 적용)
   for (const card of handResult.scoringCards) {
     if (card.enhancement?.type === 'mult') {
       const triggerCount = getCardTriggerCount(card);
@@ -93,34 +179,19 @@ export function calculateScore(
     }
   }
 
-  // 적용된 보너스 추적 (카드 칩은 별도로 추적)
+  // 적용된 보너스 추적
   const appliedBonuses: AppliedBonus[] = [];
 
-  // 카드 칩을 보너스로 기록 (투명성을 위해)
-  if (totalCardChips > 0) {
+  // 카드 합계 기록
+  if (cardSum > 0) {
     appliedBonuses.push({
-      source: 'Card chips',
+      source: 'Card sum',
       type: 'chips',
-      value: totalCardChips,
+      value: cardSum,
     });
   }
 
-  // 카드 강화 보너스 (chips 타입) 추적
-  for (const card of handResult.scoringCards) {
-    if (card.enhancement?.type === 'chips') {
-      const suitLetter = card.suit.charAt(0).toUpperCase();
-      const triggerCount = getCardTriggerCount(card);
-      const totalValue = card.enhancement.value * triggerCount;
-
-      appliedBonuses.push({
-        source: `Enhancement: ${card.rank}${suitLetter}${triggerCount > 1 ? ` (x${triggerCount})` : ''}`,
-        type: 'chips',
-        value: totalValue,
-      });
-    }
-  }
-
-  // 카드 강화 보너스 (mult 타입) 추적
+  // 카드 강화 보너스 추적
   for (const card of handResult.scoringCards) {
     if (card.enhancement?.type === 'mult') {
       const suitLetter = card.suit.charAt(0).toUpperCase();
@@ -135,46 +206,33 @@ export function calculateScore(
     }
   }
 
-  // Retrigger 자체를 보너스로 추적
-  for (const card of handResult.scoringCards) {
-    if (card.enhancement?.type === 'retrigger') {
-      const suitLetter = card.suit.charAt(0).toUpperCase();
-
-      appliedBonuses.push({
-        source: `Retrigger: ${card.rank}${suitLetter}`,
-        type: 'chips',
-        value: 0, // retrigger는 다른 효과를 배가하므로 직접적인 값은 0
-      });
-    }
-  }
-
-  // 3. chips 보너스 적용 (순서대로)
+  // 3. chips 보너스 적용 (카드 합에 추가)
   const chipBonuses = bonuses.filter(b => b.type === 'chips');
   for (const bonus of chipBonuses) {
     chipTotal += bonus.value;
     appliedBonuses.push(bonus);
   }
 
-  // 4. mult 보너스 적용 (순서대로)
+  // 4. mult 보너스 적용 (배수에 추가)
   const multBonuses = bonuses.filter(b => b.type === 'mult');
   for (const bonus of multBonuses) {
     multTotal += bonus.value;
     appliedBonuses.push(bonus);
   }
 
-  // 5. xmult 보너스 적용 (순서대로)
+  // 5. xmult 보너스 적용 (배수에 곱하기)
   const xmultBonuses = bonuses.filter(b => b.type === 'xmult');
   for (const bonus of xmultBonuses) {
     multTotal *= bonus.value;
     appliedBonuses.push(bonus);
   }
 
-  // 6. 최종 점수 계산
-  const finalScore = Math.floor(chipTotal * multTotal);
+  // 6. 최종 점수 계산: 카드 합 × 배수
+  const finalScore = Math.floor(cardSum * multTotal);
 
   return {
     handResult,
-    chipTotal,
+    chipTotal: cardSum,  // 표시용으로 카드 합
     multTotal,
     appliedBonuses,
     finalScore,

@@ -9,9 +9,10 @@
   },
   
   "scoring": {
-    "goldPerScore": 0.01,
-    "minGoldPerRound": 5,
-    "maxGoldPerRound": 50
+    "goldPerScore": 0.02,
+    "minGoldPerRound": 10,
+    "maxGoldPerRound": 100,
+    "roundBonusGold": [0, 5, 10, 15, 20, 25, 30, 40]
   },
   
   "slots": {

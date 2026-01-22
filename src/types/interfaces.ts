@@ -24,7 +24,7 @@ export type GamePhase =
   | 'SHOP_PHASE'
   | 'GAME_OVER';
 
-export type HandType = 
+export type HandType =
   | 'high_card'
   | 'pair'
   | 'two_pair'
@@ -34,7 +34,10 @@ export type HandType =
   | 'full_house'
   | 'four_of_a_kind'
   | 'straight_flush'
-  | 'royal_flush';
+  | 'royal_flush'
+  | 'quintuple'
+  | 'royal_quintuple'
+  | 'pentagon';
 
 // ============================================================
 // 카드 모듈 (cards)

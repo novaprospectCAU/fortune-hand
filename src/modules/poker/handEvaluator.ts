@@ -207,6 +207,50 @@ function getFlushCards(cards: Card[]): Card[] {
 // ============================================================
 
 /**
+ * 펜타곤 판정 (5장이 모두 스페이드 A)
+ */
+function detectPentagon(cards: Card[]): Card[] | null {
+  if (cards.length !== 5) return null;
+  const spadeAces = cards.filter(c => c.rank === 'A' && c.suit === 'spades');
+  if (spadeAces.length === 5) {
+    return spadeAces;
+  }
+  return null;
+}
+
+/**
+ * 로열 퀸튜플 판정 (5장이 모두 동일한 무늬의 동일한 수)
+ */
+function detectRoyalQuintuple(cards: Card[]): Card[] | null {
+  if (cards.length !== 5) return null;
+  const firstCard = cards[0];
+  if (!firstCard) return null;
+
+  const allSameRankAndSuit = cards.every(
+    c => c.rank === firstCard.rank && c.suit === firstCard.suit
+  );
+  if (allSameRankAndSuit) {
+    return cards;
+  }
+  return null;
+}
+
+/**
+ * 퀸튜플 판정 (5장이 모두 동일한 수)
+ */
+function detectQuintuple(cards: Card[]): Card[] | null {
+  if (cards.length !== 5) return null;
+  const firstCard = cards[0];
+  if (!firstCard) return null;
+
+  const allSameRank = cards.every(c => c.rank === firstCard.rank);
+  if (allSameRank) {
+    return cards;
+  }
+  return null;
+}
+
+/**
  * 로열 플러시 판정 (A-K-Q-J-10 같은 무늬)
  */
 function detectRoyalFlush(cards: Card[]): Card[] | null {
@@ -452,6 +496,15 @@ function calculateHandRank(handType: HandType, scoringCards: Card[]): number {
       return pairGroup ? rankToNumber(pairGroup.rank) : (values[0] ?? 0);
     }
 
+    case 'pentagon':
+      return 100000; // 최고 핸드
+
+    case 'royal_quintuple':
+      return 50000 + (values[0] ?? 0); // 같은 무늬 같은 수
+
+    case 'quintuple':
+      return 40000 + (values[0] ?? 0); // 5장 같은 수
+
     case 'high_card':
     default: {
       const v0 = values[0] ?? 0;
@@ -475,17 +528,20 @@ function evaluateNonWildCards(cards: Card[]): {
   handType: HandType;
   scoringCards: Card[];
 } {
-  // 높은 핸드부터 순서대로 체크
+  // 높은 핸드부터 순서대로 체크 (새로운 순서)
   const detectors: Array<[HandType, (cards: Card[]) => Card[] | null]> = [
-    ['royal_flush', detectRoyalFlush],
-    ['straight_flush', detectStraightFlush],
-    ['four_of_a_kind', detectFourOfAKind],
-    ['full_house', detectFullHouse],
-    ['flush', detectFlush],
-    ['straight', detectStraight],
-    ['three_of_a_kind', detectThreeOfAKind],
-    ['two_pair', detectTwoPair],
-    ['pair', detectPair],
+    ['pentagon', detectPentagon],           // 5장 스페이드 A
+    ['royal_quintuple', detectRoyalQuintuple], // 5장 같은 무늬 같은 수
+    ['quintuple', detectQuintuple],         // 5장 같은 수
+    ['royal_flush', detectRoyalFlush],      // 로열 플러시
+    ['four_of_a_kind', detectFourOfAKind],  // 포카드
+    ['straight_flush', detectStraightFlush], // 스트레이트 플러시
+    ['full_house', detectFullHouse],        // 풀하우스
+    ['flush', detectFlush],                 // 플러시
+    ['straight', detectStraight],           // 스트레이트
+    ['three_of_a_kind', detectThreeOfAKind], // 트리플
+    ['two_pair', detectTwoPair],            // 투페어
+    ['pair', detectPair],                   // 원페어
   ];
 
   for (const [handType, detector] of detectors) {

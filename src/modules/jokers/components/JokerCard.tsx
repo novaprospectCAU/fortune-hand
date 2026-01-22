@@ -8,6 +8,7 @@ import { motion } from 'framer-motion';
 import { clsx } from 'clsx';
 import type { Joker } from '@/types/interfaces';
 import { RARITY_COLORS } from '@/data/constants';
+import { useI18n, type TranslationKey } from '@/modules/ui';
 
 export interface JokerCardProps {
   /** The joker to display */
@@ -29,7 +30,17 @@ export function JokerCard({
   compact = false,
   className,
 }: JokerCardProps) {
+  const { t } = useI18n();
   const rarityColor = RARITY_COLORS[joker.rarity];
+
+  // Get translated name and description
+  const nameKey = `joker_${joker.id}` as TranslationKey;
+  const descKey = `joker_${joker.id}_desc` as TranslationKey;
+  const rarityKey = `rarity_${joker.rarity}` as TranslationKey;
+
+  const displayName = t(nameKey) !== nameKey ? t(nameKey) : joker.name;
+  const displayDesc = t(descKey) !== descKey ? t(descKey) : joker.description;
+  const displayRarity = t(rarityKey) !== rarityKey ? t(rarityKey) : joker.rarity.charAt(0).toUpperCase() + joker.rarity.slice(1);
 
   return (
     <motion.div
@@ -88,7 +99,7 @@ export function JokerCard({
         {!compact && (
           <div className="mt-1 text-center">
             <span className="text-xs font-medium text-white line-clamp-2">
-              {joker.name}
+              {displayName}
             </span>
           </div>
         )}
@@ -114,16 +125,16 @@ export function JokerCard({
           )}
         >
           <span className="text-xs font-bold text-white text-center">
-            {joker.name}
+            {displayName}
           </span>
           <span className="text-[10px] text-gray-300 text-center mt-1 leading-tight">
-            {joker.description}
+            {displayDesc}
           </span>
           <span
             className="text-[10px] font-medium text-center mt-1"
             style={{ color: rarityColor }}
           >
-            {joker.rarity.charAt(0).toUpperCase() + joker.rarity.slice(1)}
+            {displayRarity}
           </span>
         </div>
       )}

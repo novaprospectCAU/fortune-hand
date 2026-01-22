@@ -140,7 +140,7 @@
       "name": "Echo",
       "description": "All cards trigger twice",
       "rarity": "legendary",
-      "cost": 180,
+      "cost": 90,
       "trigger": { "type": "on_play" },
       "effect": { "type": "retrigger", "count": 1 }
     },
@@ -149,7 +149,7 @@
       "name": "Fortune Teller",
       "description": "See Roulette result",
       "rarity": "legendary",
-      "cost": 200,
+      "cost": 100,
       "trigger": { "type": "on_roulette" },
       "effect": { "type": "custom", "handler": "fortuneTeller" }
     },
@@ -158,7 +158,7 @@
       "name": "Royal Master",
       "description": "×20 for Royal Flush",
       "rarity": "legendary",
-      "cost": 150,
+      "cost": 80,
       "trigger": { "type": "on_score" },
       "effect": { "type": "multiply", "value": 20, "handCondition": "royal_flush" }
     },
@@ -167,7 +167,7 @@
       "name": "All In",
       "description": "×8 Mult, but ×0.5 more likely",
       "rarity": "legendary",
-      "cost": 120,
+      "cost": 65,
       "trigger": { "type": "on_score" },
       "effect": { "type": "multiply", "value": 8, "penalty": { "zeroZone": 15 } }
     },
@@ -257,7 +257,7 @@
       "name": "Double or Nothing",
       "description": "100x chance +1%",
       "rarity": "legendary",
-      "cost": 150,
+      "cost": 80,
       "trigger": { "type": "on_roulette" },
       "effect": { "type": "modify_roulette", "modification": { "jackpotBonus": 1 } }
     },
@@ -266,7 +266,7 @@
       "name": "Slot Lord",
       "description": "All good symbols +50%",
       "rarity": "legendary",
-      "cost": 180,
+      "cost": 90,
       "trigger": { "type": "on_slot" },
       "effect": { "type": "modify_slot", "modification": { "symbolWeights": { "star": 8, "gold": 30, "card": 38, "chip": 23, "wild": 8 } } }
     }

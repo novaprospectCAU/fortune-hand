@@ -9,6 +9,7 @@ import type { ShopState } from '@/types/interfaces';
 import { ShopItem, type ShopItemProps } from './ShopItem';
 import { RerollButton } from './RerollButton';
 import { calculateRerollCost, canAffordItem, canAffordReroll } from '../transactions';
+import { useI18n } from '@/modules/ui';
 
 export interface ShopProps {
   shopState: ShopState;
@@ -31,6 +32,7 @@ export function Shop({
   onLeave,
   getItemDetails,
 }: ShopProps): React.ReactElement {
+  const { t } = useI18n();
   const rerollCost = calculateRerollCost(shopState);
   const canReroll = canAffordReroll(shopState, playerGold);
 
@@ -38,7 +40,7 @@ export function Shop({
     <div className="flex flex-col min-h-full bg-gray-950 p-6">
       {/* Header */}
       <div className="flex justify-between items-center mb-6">
-        <h1 className="text-3xl font-bold text-white">Shop</h1>
+        <h1 className="text-3xl font-bold text-white">{t('shop')}</h1>
         <div className="flex items-center gap-4">
           {/* Player Gold */}
           <div className="flex items-center gap-2 bg-gray-800 px-4 py-2 rounded-lg">
@@ -64,7 +66,7 @@ export function Shop({
 
         {shopState.items.length === 0 && (
           <div className="flex items-center justify-center h-48 text-gray-500">
-            <p>No items available</p>
+            <p>{t('noItemsAvailable')}</p>
           </div>
         )}
       </div>
@@ -85,7 +87,7 @@ export function Shop({
             bg-gray-700 hover:bg-gray-600 text-white transition-colors
           "
         >
-          <span>Leave Shop</span>
+          <span>{t('leaveShop')}</span>
           <span className="text-xl">→</span>
         </button>
       </div>

@@ -51,16 +51,19 @@ export function rankToNumberLow(rank: Rank): number {
  * 핸드 타입 우선순위 배열 (판정 순서대로 - 높은 핸드부터)
  */
 export const HAND_TYPE_PRIORITY: HandType[] = [
-  'royal_flush',
-  'straight_flush',
-  'four_of_a_kind',
-  'full_house',
-  'flush',
-  'straight',
-  'three_of_a_kind',
-  'two_pair',
-  'pair',
-  'high_card',
+  'pentagon',           // 5장 스페이드 A (×100)
+  'royal_quintuple',    // 5장 같은 무늬 같은 수 (×30)
+  'quintuple',          // 5장 같은 수 (×25)
+  'royal_flush',        // 로열 플러시 (×30)
+  'four_of_a_kind',     // 포카드 (×20)
+  'straight_flush',     // 스트레이트 플러시 (×16)
+  'full_house',         // 풀하우스 (×13)
+  'flush',              // 플러시 (×10)
+  'straight',           // 스트레이트 (×8)
+  'three_of_a_kind',    // 트리플 (×6)
+  'two_pair',           // 투페어 (×4)
+  'pair',               // 원페어 (×2)
+  'high_card',          // 하이카드 (×1)
 ];
 
 /**

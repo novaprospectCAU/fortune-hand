@@ -11,7 +11,7 @@ import { AnimatePresence, motion } from 'framer-motion';
 import { useGameStore } from '@/modules/core';
 
 // UI module - layout and common components
-import { GameLayout, ScoreDisplay, DeckViewer, CardEffectTooltip, Modal, Button, RoundClearCelebration, useI18n } from '@/modules/ui';
+import { GameLayout, ScoreDisplay, DeckViewer, CardEffectTooltip, Modal, Button, RoundClearCelebration, useI18n, TranslationKey } from '@/modules/ui';
 
 // Game modules - components
 import { SlotMachine } from '@/modules/slots';
@@ -167,9 +167,12 @@ function App() {
         case 'joker': {
           const joker = getJokerById(itemId);
           if (joker) {
+            // Try to get translated name/description, fallback to original
+            const nameKey = `joker_${joker.id}` as TranslationKey;
+            const descKey = `joker_${joker.id}_desc` as TranslationKey;
             return {
-              name: joker.name,
-              description: joker.description,
+              name: t(nameKey) !== nameKey ? t(nameKey) : joker.name,
+              description: t(descKey) !== descKey ? t(descKey) : joker.description,
               rarity: joker.rarity,
             };
           }
@@ -183,34 +186,73 @@ function App() {
           break;
         }
         case 'pack': {
-          const packInfo = {
-            standard_pack: { name: 'Standard Pack', description: 'Contains 3 random cards', rarity: 'common' as const },
-            jumbo_pack: { name: 'Jumbo Pack', description: 'Contains 4 random cards', rarity: 'uncommon' as const },
-            mega_pack: { name: 'Mega Pack', description: 'Contains 5 random cards', rarity: 'rare' as const },
-          }[itemId];
-          if (packInfo) {
-            return packInfo;
+          const packNames: Record<string, TranslationKey> = {
+            standard_pack: 'pack_standard' as TranslationKey,
+            jumbo_pack: 'pack_jumbo' as TranslationKey,
+            mega_pack: 'pack_mega' as TranslationKey,
+          };
+          const packDescKeys: Record<string, TranslationKey> = {
+            standard_pack: 'pack_standard_desc' as TranslationKey,
+            jumbo_pack: 'pack_jumbo_desc' as TranslationKey,
+            mega_pack: 'pack_mega_desc' as TranslationKey,
+          };
+          const packRarity: Record<string, 'common' | 'uncommon' | 'rare'> = {
+            standard_pack: 'common',
+            jumbo_pack: 'uncommon',
+            mega_pack: 'rare',
+          };
+          const nameKey = packNames[itemId];
+          const descKey = packDescKeys[itemId];
+          if (nameKey && descKey) {
+            const fallbackName = itemId.replace(/_/g, ' ').replace(/\b\w/g, l => l.toUpperCase());
+            return {
+              name: t(nameKey) !== nameKey ? t(nameKey) : fallbackName,
+              description: t(descKey) !== descKey ? t(descKey) : `Contains random cards`,
+              rarity: packRarity[itemId] || 'common',
+            };
           }
           break;
         }
         case 'voucher': {
-          const voucherInfo = {
-            extra_hand: { name: 'Extra Hand', description: '+1 hand per round permanently', rarity: 'uncommon' as const },
-            extra_discard: { name: 'Extra Discard', description: '+1 discard per round permanently', rarity: 'uncommon' as const },
-            shop_discount: { name: 'Shop Discount', description: '10% off all shop items', rarity: 'rare' as const },
-            luck_boost: { name: 'Luck Boost', description: 'Better rarity chances in shop', rarity: 'rare' as const },
-          }[itemId];
-          if (voucherInfo) {
-            return voucherInfo;
+          const voucherNames: Record<string, TranslationKey> = {
+            extra_hand: 'voucher_extra_hand' as TranslationKey,
+            extra_discard: 'voucher_extra_discard' as TranslationKey,
+            shop_discount: 'voucher_shop_discount' as TranslationKey,
+            luck_boost: 'voucher_luck_boost' as TranslationKey,
+          };
+          const voucherDescKeys: Record<string, TranslationKey> = {
+            extra_hand: 'voucher_extra_hand_desc' as TranslationKey,
+            extra_discard: 'voucher_extra_discard_desc' as TranslationKey,
+            shop_discount: 'voucher_shop_discount_desc' as TranslationKey,
+            luck_boost: 'voucher_luck_boost_desc' as TranslationKey,
+          };
+          const voucherRarity: Record<string, 'uncommon' | 'rare'> = {
+            extra_hand: 'uncommon',
+            extra_discard: 'uncommon',
+            shop_discount: 'rare',
+            luck_boost: 'rare',
+          };
+          const nameKey = voucherNames[itemId];
+          const descKey = voucherDescKeys[itemId];
+          if (nameKey && descKey) {
+            const fallbackName = itemId.replace(/_/g, ' ').replace(/\b\w/g, l => l.toUpperCase());
+            return {
+              name: t(nameKey) !== nameKey ? t(nameKey) : fallbackName,
+              description: t(descKey) !== descKey ? t(descKey) : '',
+              rarity: voucherRarity[itemId] || 'uncommon',
+            };
           }
           break;
         }
         case 'consumable': {
           const consumable = getConsumableById(itemId);
           if (consumable) {
+            // Try to get translated name/description, fallback to original
+            const nameKey = `consumable_${consumable.id}` as TranslationKey;
+            const descKey = `consumable_${consumable.id}_desc` as TranslationKey;
             return {
-              name: consumable.name,
-              description: consumable.description,
+              name: t(nameKey) !== nameKey ? t(nameKey) : consumable.name,
+              description: t(descKey) !== descKey ? t(descKey) : consumable.description,
               rarity: consumable.rarity,
             };
           }
@@ -219,7 +261,7 @@ function App() {
       }
       return undefined;
     },
-    []
+    [t]
   );
 
   // Render main content based on phase

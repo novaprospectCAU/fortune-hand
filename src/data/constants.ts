@@ -17,6 +17,9 @@ export const HAND_TYPES = [
   'four_of_a_kind',
   'straight_flush',
   'royal_flush',
+  'quintuple',
+  'royal_quintuple',
+  'pentagon',
 ] as const;
 export type HandType = typeof HAND_TYPES[number];
 
@@ -28,22 +31,47 @@ export const HAND_RANKINGS: Record<HandType, number> = {
   straight: 4,
   flush: 5,
   full_house: 6,
-  four_of_a_kind: 7,
-  straight_flush: 8,
+  straight_flush: 7,
+  four_of_a_kind: 8,  // 포커
   royal_flush: 9,
+  quintuple: 10,
+  royal_quintuple: 11,
+  pentagon: 12,
 };
 
+// 새로운 점수 시스템: 관련 카드의 합 * 배수
+// chips는 더 이상 사용하지 않고, mult만 사용
+export const HAND_MULTIPLIERS: Record<HandType, number> = {
+  high_card: 1,         // 가장 큰 수 * 1
+  pair: 2,              // 페어 합 * 2
+  two_pair: 4,          // 4장 합 * 4
+  three_of_a_kind: 6,   // 트리플 합 * 6
+  straight: 8,          // 모든 카드 합 * 8
+  flush: 10,            // 모든 카드 합 * 10
+  full_house: 13,       // 모든 카드 합 * 13
+  straight_flush: 16,   // 모든 카드 합 * 16
+  four_of_a_kind: 20,   // 포커 4장 합 * 20
+  royal_flush: 30,      // 모든 카드 합 * 30
+  quintuple: 25,        // 모든 카드 합 * 25
+  royal_quintuple: 30,  // 모든 카드 합 * 30
+  pentagon: 100,        // 모든 카드 합 * 100 (5장 스페이드 A)
+};
+
+// 기존 호환성을 위해 유지 (나중에 제거 가능)
 export const BASE_HAND_VALUES: Record<HandType, { chips: number; mult: number }> = {
-  high_card: { chips: 5, mult: 1 },
-  pair: { chips: 10, mult: 2 },
-  two_pair: { chips: 20, mult: 2 },
-  three_of_a_kind: { chips: 30, mult: 3 },
-  straight: { chips: 30, mult: 4 },
-  flush: { chips: 35, mult: 4 },
-  full_house: { chips: 40, mult: 4 },
-  four_of_a_kind: { chips: 60, mult: 7 },
-  straight_flush: { chips: 100, mult: 8 },
-  royal_flush: { chips: 100, mult: 8 },
+  high_card: { chips: 0, mult: 1 },
+  pair: { chips: 0, mult: 2 },
+  two_pair: { chips: 0, mult: 4 },
+  three_of_a_kind: { chips: 0, mult: 6 },
+  straight: { chips: 0, mult: 8 },
+  flush: { chips: 0, mult: 10 },
+  full_house: { chips: 0, mult: 13 },
+  four_of_a_kind: { chips: 0, mult: 20 },
+  straight_flush: { chips: 0, mult: 16 },
+  royal_flush: { chips: 0, mult: 30 },
+  quintuple: { chips: 0, mult: 25 },
+  royal_quintuple: { chips: 0, mult: 30 },
+  pentagon: { chips: 0, mult: 100 },
 };
 
 export const CARD_CHIP_VALUES: Record<Rank, number> = {
@@ -114,15 +142,18 @@ export const DEFAULT_GAME_CONFIG = {
 
 // 점수 기반 골드 보상 설정
 export const SCORING_CONFIG = {
-  goldPerScore: 0.01,    // 점수당 골드 (1000점 = 10골드)
-  minGoldPerRound: 5,    // 라운드당 최소 골드
-  maxGoldPerRound: 50,   // 라운드당 최대 골드
+  goldPerScore: 0.02,    // 점수당 골드 (1000점 = 20골드)
+  minGoldPerRound: 10,   // 라운드당 최소 골드
+  maxGoldPerRound: 100,  // 라운드당 최대 골드
+  roundBonusGold: [0, 5, 10, 15, 20, 25, 30, 40], // 라운드별 추가 골드
 } as const;
 
 /**
  * 점수 기반 골드 보상 계산
  */
-export function calculateGoldReward(score: number): number {
+export function calculateGoldReward(score: number, round: number = 1): number {
   const rawGold = Math.floor(score * SCORING_CONFIG.goldPerScore);
-  return Math.min(SCORING_CONFIG.maxGoldPerRound, Math.max(SCORING_CONFIG.minGoldPerRound, rawGold));
+  const baseGold = Math.min(SCORING_CONFIG.maxGoldPerRound, Math.max(SCORING_CONFIG.minGoldPerRound, rawGold));
+  const roundBonus = SCORING_CONFIG.roundBonusGold[Math.min(round - 1, SCORING_CONFIG.roundBonusGold.length - 1)] ?? 0;
+  return baseGold + roundBonus;
 }
