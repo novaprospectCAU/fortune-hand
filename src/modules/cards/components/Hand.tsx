@@ -3,7 +3,7 @@
  * 여러 카드를 손패 형태로 배치하고 선택 관리
  */
 
-import { memo, useCallback } from 'react';
+import { memo, useCallback, useMemo } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import type { Card as CardType } from '@/types/interfaces';
 import { Card } from './Card';
@@ -41,7 +41,7 @@ function HandComponent({
   disabled = false,
   size = 'md',
 }: HandProps) {
-  const selectedSet = new Set(selectedIds);
+  const selectedSet = useMemo(() => new Set(selectedIds), [selectedIds]);
   const isMaxSelected = selectedIds.length >= maxSelect;
 
   const handleCardClick = useCallback(

@@ -110,7 +110,7 @@ export function TutorialOverlay({
                 content={currentStepData.content}
                 currentStep={currentStep + 1} // Convert to 1-indexed
                 totalSteps={totalSteps}
-                position={currentStepData.position as any}
+                position={currentStepData.position as 'top' | 'bottom' | 'left' | 'right' | 'center'}
                 isFirst={isFirstStep}
                 isLast={isLastStep}
                 onNext={handleNext}

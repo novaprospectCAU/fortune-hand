@@ -52,7 +52,7 @@ export function spin(
   random: RandomGenerator = defaultRandom
 ): SlotResult {
   // 1. 각 릴에서 심볼 선택
-  let symbols: [SlotSymbol, SlotSymbol, SlotSymbol] = [
+  const symbols: [SlotSymbol, SlotSymbol, SlotSymbol] = [
     selectSymbol(modifiers, random),
     selectSymbol(modifiers, random),
     selectSymbol(modifiers, random),

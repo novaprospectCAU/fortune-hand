@@ -62,6 +62,9 @@ function StarBurst() {
   );
 }
 
+/** Confetti color palette */
+const CONFETTI_COLORS = ['#fbbf24', '#f59e0b', '#22c55e', '#3b82f6', '#a855f7', '#ec4899'];
+
 export function RoundClearCelebration({
   isVisible,
   round,
@@ -71,15 +74,13 @@ export function RoundClearCelebration({
 }: RoundClearCelebrationProps) {
   const [confettiPieces, setConfettiPieces] = useState<{ id: number; delay: number; color: string }[]>([]);
 
-  const colors = ['#fbbf24', '#f59e0b', '#22c55e', '#3b82f6', '#a855f7', '#ec4899'];
-
   useEffect(() => {
     if (isVisible) {
       // Generate confetti pieces
       const pieces = Array.from({ length: 50 }, (_, i) => ({
         id: i,
         delay: Math.random() * 0.5,
-        color: colors[Math.floor(Math.random() * colors.length)]!,
+        color: CONFETTI_COLORS[Math.floor(Math.random() * CONFETTI_COLORS.length)]!,
       }));
       setConfettiPieces(pieces);
 
