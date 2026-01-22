@@ -23,6 +23,7 @@ export interface ShopItemProps {
       rank: Rank;
       isWild?: boolean;
       isGold?: boolean;
+      isGlass?: boolean;
       triggerSlot?: boolean;
       triggerRoulette?: boolean;
     };
@@ -58,6 +59,8 @@ function getItemTypeIcon(type: ShopItemType['type']): string {
       return '📦';
     case 'voucher':
       return '🎫';
+    case 'consumable':
+      return '🧪';
     default:
       return '❓';
   }
@@ -76,6 +79,8 @@ function getItemTypeName(type: ShopItemType['type']): string {
       return 'Pack';
     case 'voucher':
       return 'Voucher';
+    case 'consumable':
+      return 'Consumable';
     default:
       return 'Unknown';
   }
@@ -111,13 +116,17 @@ export function ShopItem({ item, canAfford, onBuy, itemDetails }: ShopItemProps)
           <span className="text-5xl sm:text-6xl">✕</span>
         ) : item.type === 'card' && itemDetails?.cardInfo ? (
           <div
-            className="w-20 h-28 sm:w-24 sm:h-32 rounded-lg bg-white border-2 flex flex-col items-center justify-between p-1 shadow-lg relative"
+            className={`w-20 h-28 sm:w-24 sm:h-32 rounded-lg border-2 flex flex-col items-center justify-between p-1 shadow-lg relative ${
+              itemDetails.cardInfo.isGlass ? 'bg-gradient-to-br from-white/80 via-cyan-100/60 to-white/80' : 'bg-white'
+            }`}
             style={{
-              borderColor: itemDetails.cardInfo.isWild ? '#a855f7' :
+              borderColor: itemDetails.cardInfo.isGlass ? '#06b6d4' :
+                          itemDetails.cardInfo.isWild ? '#a855f7' :
                           itemDetails.cardInfo.isGold ? '#f59e0b' :
                           itemDetails.cardInfo.triggerSlot ? '#22c55e' :
                           itemDetails.cardInfo.triggerRoulette ? '#3b82f6' : '#d1d5db',
-              boxShadow: itemDetails.cardInfo.isWild ? '0 0 12px rgba(168, 85, 247, 0.4)' :
+              boxShadow: itemDetails.cardInfo.isGlass ? '0 0 15px rgba(6, 182, 212, 0.5), inset 0 0 20px rgba(255, 255, 255, 0.3)' :
+                         itemDetails.cardInfo.isWild ? '0 0 12px rgba(168, 85, 247, 0.4)' :
                          itemDetails.cardInfo.isGold ? '0 0 12px rgba(245, 158, 11, 0.4)' :
                          itemDetails.cardInfo.triggerSlot ? '0 0 12px rgba(34, 197, 94, 0.4)' :
                          itemDetails.cardInfo.triggerRoulette ? '0 0 12px rgba(59, 130, 246, 0.4)' : undefined,
@@ -126,29 +135,30 @@ export function ShopItem({ item, canAfford, onBuy, itemDetails }: ShopItemProps)
             {/* Top left rank/suit */}
             <div
               className="self-start text-sm font-bold leading-tight"
-              style={{ color: SUIT_COLORS[itemDetails.cardInfo.suit] }}
+              style={{ color: itemDetails.cardInfo.isGlass ? '#0891b2' : SUIT_COLORS[itemDetails.cardInfo.suit] }}
             >
               <div>{itemDetails.cardInfo.rank}</div>
-              <div>{SUIT_SYMBOLS[itemDetails.cardInfo.suit]}</div>
+              <div>{itemDetails.cardInfo.isGlass ? '◇' : SUIT_SYMBOLS[itemDetails.cardInfo.suit]}</div>
             </div>
             {/* Center suit */}
             <div
               className="text-3xl sm:text-4xl"
-              style={{ color: SUIT_COLORS[itemDetails.cardInfo.suit] }}
+              style={{ color: itemDetails.cardInfo.isGlass ? '#0891b2' : SUIT_COLORS[itemDetails.cardInfo.suit] }}
             >
-              {SUIT_SYMBOLS[itemDetails.cardInfo.suit]}
+              {itemDetails.cardInfo.isGlass ? '◇' : SUIT_SYMBOLS[itemDetails.cardInfo.suit]}
             </div>
             {/* Bottom right rank/suit (rotated) */}
             <div
               className="self-end text-sm font-bold leading-tight rotate-180"
-              style={{ color: SUIT_COLORS[itemDetails.cardInfo.suit] }}
+              style={{ color: itemDetails.cardInfo.isGlass ? '#0891b2' : SUIT_COLORS[itemDetails.cardInfo.suit] }}
             >
               <div>{itemDetails.cardInfo.rank}</div>
-              <div>{SUIT_SYMBOLS[itemDetails.cardInfo.suit]}</div>
+              <div>{itemDetails.cardInfo.isGlass ? '◇' : SUIT_SYMBOLS[itemDetails.cardInfo.suit]}</div>
             </div>
             {/* Special card indicator */}
-            {(itemDetails.cardInfo.isWild || itemDetails.cardInfo.isGold || itemDetails.cardInfo.triggerSlot || itemDetails.cardInfo.triggerRoulette) && (
+            {(itemDetails.cardInfo.isWild || itemDetails.cardInfo.isGold || itemDetails.cardInfo.isGlass || itemDetails.cardInfo.triggerSlot || itemDetails.cardInfo.triggerRoulette) && (
               <div className="absolute top-1 right-1 text-xs">
+                {itemDetails.cardInfo.isGlass && <span title="Glass">💎</span>}
                 {itemDetails.cardInfo.isWild && <span title="Wild">🌟</span>}
                 {itemDetails.cardInfo.isGold && <span title="Gold">💰</span>}
                 {itemDetails.cardInfo.triggerSlot && <span title="Slot">🎰</span>}

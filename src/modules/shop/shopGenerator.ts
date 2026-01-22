@@ -13,6 +13,7 @@ import { getVouchersByRarity } from './vouchers';
 import balanceData from '@/data/balance.json';
 import jokersData from '@/data/jokers.json';
 import cardsData from '@/data/cards.json';
+import consumablesData from '@/data/consumables.json';
 
 /**
  * Shop configuration from balance.json
@@ -23,7 +24,7 @@ const RARITY_WEIGHTS = balanceData.rarityWeights;
 /**
  * Item type definition for shop generation
  */
-type ItemType = 'joker' | 'card' | 'pack' | 'voucher';
+type ItemType = 'joker' | 'card' | 'pack' | 'voucher' | 'consumable';
 
 /**
  * Generate a unique ID for a shop item
@@ -260,6 +261,48 @@ function generateVoucherItem(
 }
 
 /**
+ * Get available consumables filtered by rarity
+ */
+function getConsumablesByRarity(rarity: Rarity): typeof consumablesData.consumables {
+  return consumablesData.consumables.filter((c) => c.rarity === rarity);
+}
+
+/**
+ * Generate a consumable shop item
+ * Consumables allow card manipulation (remove, transform, duplicate)
+ *
+ * @param rarity - The rarity tier of the consumable
+ * @param round - Current game round
+ * @returns A shop item for a consumable, or null if none available
+ */
+function generateConsumableItem(rarity: Rarity, round: number): ShopItem | null {
+  const availableConsumables = getConsumablesByRarity(rarity);
+
+  if (availableConsumables.length === 0) {
+    // Fallback to any consumable if none of this rarity
+    if (consumablesData.consumables.length === 0) return null;
+    const consumable =
+      consumablesData.consumables[Math.floor(Math.random() * consumablesData.consumables.length)]!;
+    return {
+      id: generateItemId(),
+      type: 'consumable',
+      itemId: consumable.id,
+      cost: calculatePriceWithRoundScaling(consumable.cost, consumable.rarity as Rarity, round),
+      sold: false,
+    };
+  }
+
+  const consumable = availableConsumables[Math.floor(Math.random() * availableConsumables.length)]!;
+  return {
+    id: generateItemId(),
+    type: 'consumable',
+    itemId: consumable.id,
+    cost: calculatePriceWithRoundScaling(consumable.cost, rarity, round),
+    sold: false,
+  };
+}
+
+/**
  * Options for shop generation
  */
 export interface ShopGenerationOptions {
@@ -290,6 +333,8 @@ export function generateItem(
       return generatePackItem(rarity, round);
     case 'voucher':
       return generateVoucherItem(rarity, round, options.purchasedVoucherIds);
+    case 'consumable':
+      return generateConsumableItem(rarity, round);
     default:
       return null;
   }

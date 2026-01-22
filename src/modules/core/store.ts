@@ -15,6 +15,8 @@ import type {
   RouletteResult,
   ShopState,
   SlotResult,
+  Consumable,
+  Card,
 } from '@/types/interfaces';
 import { DEFAULT_GAME_CONFIG, calculateGoldReward } from '@/data/constants';
 import {
@@ -50,6 +52,7 @@ import {
   getVoucherById,
   calculateVoucherModifiers,
   calculateInterest,
+  getConsumableById,
 } from '@/modules/shop';
 
 /**
@@ -96,6 +99,7 @@ function createInitialState(): Omit<GameState, keyof GameActions> & {
     discardsRemaining: DEFAULT_GAME_CONFIG.startingDiscards,
     slotSpinsRemaining: DEFAULT_GAME_CONFIG.startingSlotSpins,
     openedPackCards: null,
+    consumableOverlay: null,
     config: mergeGameConfig(),
     shopState: null,
   };
@@ -820,6 +824,32 @@ export const useGameStore = create<GameStore>((set, get) => ({
           }
           break;
         }
+        case 'consumable': {
+          // Open consumable overlay for card selection
+          const consumable = getConsumableById(purchasedItem.itemId);
+          if (consumable) {
+            // Update shop first, then open overlay
+            set({
+              gold: transaction.newGold,
+              shopState: {
+                ...state.shopState!,
+                items: state.shopState!.items.map(item =>
+                  item.id === itemId ? { ...item, sold: true } : item
+                ),
+              },
+              consumableOverlay: {
+                isOpen: true,
+                consumable,
+                selectedCards: [],
+              },
+            });
+            // Return early since we handled the state update above
+            return;
+          } else {
+            console.warn('Consumable not found:', purchasedItem.itemId);
+          }
+          break;
+        }
       }
     }
 
@@ -937,6 +967,128 @@ export const useGameStore = create<GameStore>((set, get) => ({
 
   clearOpenedPackCards: () => {
     set({ openedPackCards: null });
+  },
+
+  // ============================================================
+  // Consumable Actions
+  // ============================================================
+
+  openConsumableOverlay: (consumable: Consumable) => {
+    set({
+      consumableOverlay: {
+        isOpen: true,
+        consumable,
+        selectedCards: [],
+      },
+    });
+  },
+
+  closeConsumableOverlay: () => {
+    set({ consumableOverlay: null });
+  },
+
+  applyConsumable: (selectedCardIds: string[]) => {
+    const state = get();
+    const overlay = state.consumableOverlay;
+    if (!overlay || !overlay.consumable) {
+      console.warn('No consumable overlay open');
+      return;
+    }
+
+    const consumable = overlay.consumable;
+    let newDeck = state.deck;
+
+    switch (consumable.type) {
+      case 'card_remover': {
+        // Remove selected cards from deck
+        if (selectedCardIds.length > 0) {
+          const newCards = newDeck.cards.filter(c => !selectedCardIds.includes(c.id));
+          const newDiscard = newDeck.discardPile.filter(c => !selectedCardIds.includes(c.id));
+          newDeck = { cards: newCards, discardPile: newDiscard };
+          console.log(`Removed ${selectedCardIds.length} card(s) from deck`);
+        }
+        break;
+      }
+
+      case 'card_transformer': {
+        // Transform selected cards into random cards with random effects
+        if (selectedCardIds.length > 0) {
+          const SUITS: Array<'hearts' | 'diamonds' | 'clubs' | 'spades'> = ['hearts', 'diamonds', 'clubs', 'spades'];
+          const RANKS: Array<Card['rank']> = ['A', '2', '3', '4', '5', '6', '7', '8', '9', '10', 'J', 'Q', 'K'];
+          const ENHANCEMENTS = ['mult', 'chips', 'gold', 'retrigger'] as const;
+
+          const transformCard = (): Card => {
+            const suit = SUITS[Math.floor(Math.random() * SUITS.length)]!;
+            const rank = RANKS[Math.floor(Math.random() * RANKS.length)]!;
+            const hasEnhancement = Math.random() > 0.5;
+            const hasSpecial = Math.random() > 0.6;
+            const specialRoll = Math.floor(Math.random() * 5);
+
+            const newCard: Card = {
+              id: `transformed_${Date.now()}_${Math.random().toString(36).substring(2, 9)}`,
+              suit,
+              rank,
+            };
+
+            if (hasEnhancement) {
+              const enhType = ENHANCEMENTS[Math.floor(Math.random() * ENHANCEMENTS.length)]!;
+              const value = enhType === 'retrigger' ? 1 : Math.floor(Math.random() * 5 + 2) * (enhType === 'chips' ? 10 : 1);
+              newCard.enhancement = { type: enhType, value };
+            }
+
+            if (hasSpecial) {
+              switch (specialRoll) {
+                case 0: newCard.isWild = true; break;
+                case 1: newCard.isGold = true; break;
+                case 2: newCard.isGlass = true; break;
+                case 3: newCard.triggerSlot = true; break;
+                case 4: newCard.triggerRoulette = true; break;
+              }
+            }
+
+            return newCard;
+          };
+
+          // Transform cards in deck
+          const newCards = newDeck.cards.map(c =>
+            selectedCardIds.includes(c.id) ? transformCard() : c
+          );
+          const newDiscard = newDeck.discardPile.map(c =>
+            selectedCardIds.includes(c.id) ? transformCard() : c
+          );
+          newDeck = { cards: shuffle(newCards), discardPile: newDiscard };
+          console.log(`Transformed ${selectedCardIds.length} card(s)`);
+        }
+        break;
+      }
+
+      case 'card_duplicator': {
+        // Duplicate selected cards
+        if (selectedCardIds.length > 0) {
+          const cardsToDuplicate = [
+            ...newDeck.cards.filter(c => selectedCardIds.includes(c.id)),
+            ...newDeck.discardPile.filter(c => selectedCardIds.includes(c.id)),
+          ];
+
+          const duplicatedCards = cardsToDuplicate.map(card => ({
+            ...card,
+            id: `${card.id}_dup_${Date.now()}_${Math.random().toString(36).substring(2, 9)}`,
+          }));
+
+          newDeck = {
+            cards: shuffle([...newDeck.cards, ...duplicatedCards]),
+            discardPile: newDeck.discardPile,
+          };
+          console.log(`Duplicated ${selectedCardIds.length} card(s)`);
+        }
+        break;
+      }
+    }
+
+    set({
+      deck: newDeck,
+      consumableOverlay: null,
+    });
   },
 }));
 

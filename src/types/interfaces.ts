@@ -44,13 +44,14 @@ export interface Card {
   id: string;
   suit: Suit;
   rank: Rank;
-  
+
   // 특수 카드 속성 (일반 카드는 모두 false/undefined)
   isWild?: boolean;        // 와일드 카드
   isGold?: boolean;        // 골드 카드 (점수 대신 골드)
+  isGlass?: boolean;       // 글래스 카드 (모든 문양으로 인정)
   triggerSlot?: boolean;   // 플레이 시 미니 슬롯
   triggerRoulette?: boolean; // 추가 룰렛 기회
-  
+
   // 강화 상태
   enhancement?: CardEnhancement;
 }
@@ -280,10 +281,32 @@ export interface JokerContext {
 
 export interface ShopItem {
   id: string;
-  type: 'joker' | 'card' | 'pack' | 'voucher';
+  type: 'joker' | 'card' | 'pack' | 'voucher' | 'consumable';
   itemId: string;         // 실제 아이템 참조
   cost: number;
   sold: boolean;
+}
+
+// ============================================================
+// 소모품 (Consumables)
+// ============================================================
+
+export type ConsumableType = 'card_remover' | 'card_transformer' | 'card_duplicator';
+
+export interface Consumable {
+  id: string;
+  name: string;
+  description: string;
+  type: ConsumableType;
+  rarity: 'common' | 'uncommon' | 'rare' | 'legendary';
+  cost: number;
+  selectLimit: number;  // 선택 가능한 카드 수
+}
+
+export interface ConsumableOverlayState {
+  isOpen: boolean;
+  consumable: Consumable | null;
+  selectedCards: Card[];
 }
 
 export interface ShopState {
@@ -391,6 +414,9 @@ export interface GameState {
 
   // 팩 오픈 결과 (오버레이 표시용)
   openedPackCards: Card[] | null;
+
+  // 소모품 오버레이 상태
+  consumableOverlay: ConsumableOverlayState | null;
 }
 
 export interface GameConfig {
@@ -437,6 +463,11 @@ export interface GameActions {
 
   // 팩 오픈 결과
   clearOpenedPackCards(): void;
+
+  // 소모품 관련
+  openConsumableOverlay(consumable: Consumable): void;
+  closeConsumableOverlay(): void;
+  applyConsumable(selectedCardIds: string[]): void;
 }
 
 // ============================================================

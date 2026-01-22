@@ -15,6 +15,7 @@ interface SpecialCardData {
   description: string;
   isWild?: boolean;
   isGold?: boolean;
+  isGlass?: boolean;
   triggerSlot?: boolean;
   triggerRoulette?: boolean;
   baseRank?: string;
@@ -48,6 +49,7 @@ function convertSpecialCardData(data: SpecialCardData): Card {
     rank: (data.baseRank as Rank) || 'A',
     isWild: data.isWild,
     isGold: data.isGold,
+    isGlass: data.isGlass,
     triggerSlot: data.triggerSlot,
     triggerRoulette: data.triggerRoulette,
   };
@@ -113,6 +115,7 @@ export function getSpecialCardDetails(
     rank: Rank;
     isWild?: boolean;
     isGold?: boolean;
+    isGlass?: boolean;
     triggerSlot?: boolean;
     triggerRoulette?: boolean;
   };
@@ -130,6 +133,7 @@ export function getSpecialCardDetails(
       rank: (data.baseRank as Rank) || 'A',
       isWild: data.isWild,
       isGold: data.isGold,
+      isGlass: data.isGlass,
       triggerSlot: data.triggerSlot,
       triggerRoulette: data.triggerRoulette,
     },
@@ -191,7 +195,7 @@ export function removeEnhancement(card: Card): Card {
  * @returns 특수 카드 여부
  */
 export function isSpecialCard(card: Card): boolean {
-  return !!(card.isWild || card.isGold || card.triggerSlot || card.triggerRoulette);
+  return !!(card.isWild || card.isGold || card.isGlass || card.triggerSlot || card.triggerRoulette);
 }
 
 /**

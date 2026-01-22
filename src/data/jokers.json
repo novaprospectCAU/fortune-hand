@@ -179,6 +179,96 @@
       "cost": 35,
       "trigger": { "type": "on_score" },
       "effect": { "type": "multiply", "value": 2, "handCondition": "pair" }
+    },
+    {
+      "id": "gold_digger",
+      "name": "Gold Digger",
+      "description": "Gold 💰 2x more often",
+      "rarity": "uncommon",
+      "cost": 55,
+      "trigger": { "type": "on_slot" },
+      "effect": { "type": "modify_slot", "modification": { "symbolWeights": { "gold": 40 } } }
+    },
+    {
+      "id": "card_collector",
+      "name": "Card Collector",
+      "description": "Card 🃏 2x more often",
+      "rarity": "uncommon",
+      "cost": 50,
+      "trigger": { "type": "on_slot" },
+      "effect": { "type": "modify_slot", "modification": { "symbolWeights": { "card": 50 } } }
+    },
+    {
+      "id": "chip_magnet",
+      "name": "Chip Magnet",
+      "description": "Chip 🎰 2x more often",
+      "rarity": "uncommon",
+      "cost": 50,
+      "trigger": { "type": "on_slot" },
+      "effect": { "type": "modify_slot", "modification": { "symbolWeights": { "chip": 30 } } }
+    },
+    {
+      "id": "wild_master",
+      "name": "Wild Master",
+      "description": "Wild 🌟 3x more often",
+      "rarity": "rare",
+      "cost": 80,
+      "trigger": { "type": "on_slot" },
+      "effect": { "type": "modify_slot", "modification": { "symbolWeights": { "wild": 15 } } }
+    },
+    {
+      "id": "target_seeker",
+      "name": "Target Seeker",
+      "description": "Target 🎯 2x more often",
+      "rarity": "uncommon",
+      "cost": 55,
+      "trigger": { "type": "on_slot" },
+      "effect": { "type": "modify_slot", "modification": { "symbolWeights": { "target": 40 } } }
+    },
+    {
+      "id": "lucky_gambler",
+      "name": "Lucky Gambler",
+      "description": "×0.5 zone -10%",
+      "rarity": "uncommon",
+      "cost": 65,
+      "trigger": { "type": "on_roulette" },
+      "effect": { "type": "modify_roulette", "modification": { "safeZoneBonus": 10 } }
+    },
+    {
+      "id": "risk_taker",
+      "name": "Risk Taker",
+      "description": "High mult more likely",
+      "rarity": "rare",
+      "cost": 90,
+      "trigger": { "type": "on_roulette" },
+      "effect": { "type": "modify_roulette", "modification": { "maxMultiplier": 1, "safeZoneBonus": -10 } }
+    },
+    {
+      "id": "free_spinner",
+      "name": "Free Spinner",
+      "description": "+1 free roulette spin",
+      "rarity": "rare",
+      "cost": 100,
+      "trigger": { "type": "on_roulette" },
+      "effect": { "type": "modify_roulette", "modification": { "freeSpins": 1 } }
+    },
+    {
+      "id": "double_or_nothing",
+      "name": "Double or Nothing",
+      "description": "100x chance +1%",
+      "rarity": "legendary",
+      "cost": 150,
+      "trigger": { "type": "on_roulette" },
+      "effect": { "type": "modify_roulette", "modification": { "jackpotBonus": 1 } }
+    },
+    {
+      "id": "slot_lord",
+      "name": "Slot Lord",
+      "description": "All good symbols +50%",
+      "rarity": "legendary",
+      "cost": 180,
+      "trigger": { "type": "on_slot" },
+      "effect": { "type": "modify_slot", "modification": { "symbolWeights": { "star": 8, "gold": 30, "card": 38, "chip": 23, "wild": 8 } } }
     }
   ]
 }

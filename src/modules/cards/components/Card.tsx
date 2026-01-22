@@ -35,6 +35,7 @@ const SUIT_COLORS: Record<string, string> = {
 const SPECIAL_BORDER_COLORS = {
   wild: '#a855f7', // 보라
   gold: '#f59e0b', // 골드
+  glass: '#06b6d4', // 시안
   slot: '#22c55e', // 초록
   roulette: '#3b82f6', // 파랑
 };
@@ -55,8 +56,17 @@ const ENHANCEMENT_GRADIENTS: Record<string, string> = {
 const SPECIAL_GLOW_SHADOWS: Record<string, string> = {
   wild: '0 0 12px rgba(168, 85, 247, 0.6), inset 0 0 8px rgba(168, 85, 247, 0.1)', // 보라 글로우
   gold: '0 0 12px rgba(245, 158, 11, 0.6), inset 0 0 8px rgba(245, 158, 11, 0.1)', // 골드 글로우
+  glass: '0 0 15px rgba(6, 182, 212, 0.6), inset 0 0 20px rgba(255, 255, 255, 0.3)', // 시안 글로우 + 투명 효과
   slot: '0 0 12px rgba(34, 197, 94, 0.6), inset 0 0 8px rgba(34, 197, 94, 0.1)', // 초록 글로우
   roulette: '0 0 12px rgba(59, 130, 246, 0.6), inset 0 0 8px rgba(59, 130, 246, 0.1)', // 파랑 글로우
+};
+
+/**
+ * 특수 카드 배경색
+ */
+const SPECIAL_BACKGROUNDS: Record<string, string> = {
+  glass: 'linear-gradient(135deg, rgba(255,255,255,0.8) 0%, rgba(6,182,212,0.2) 50%, rgba(255,255,255,0.8) 100%)',
+  gold: 'linear-gradient(135deg, #fff 0%, #fef3c7 50%, #fde68a 100%)',
 };
 
 export interface CardProps {
@@ -96,6 +106,7 @@ const SIZE_STYLES = {
  * 카드 특수 속성에 따른 테두리 색상 결정
  */
 function getSpecialBorderColor(card: CardType): string | undefined {
+  if (card.isGlass) return SPECIAL_BORDER_COLORS.glass;
   if (card.isWild) return SPECIAL_BORDER_COLORS.wild;
   if (card.isGold) return SPECIAL_BORDER_COLORS.gold;
   if (card.triggerSlot) return SPECIAL_BORDER_COLORS.slot;
@@ -107,10 +118,20 @@ function getSpecialBorderColor(card: CardType): string | undefined {
  * 특수 카드 글로우 효과 결정
  */
 function getSpecialGlow(card: CardType): string | undefined {
+  if (card.isGlass) return SPECIAL_GLOW_SHADOWS.glass;
   if (card.isWild) return SPECIAL_GLOW_SHADOWS.wild;
   if (card.isGold) return SPECIAL_GLOW_SHADOWS.gold;
   if (card.triggerSlot) return SPECIAL_GLOW_SHADOWS.slot;
   if (card.triggerRoulette) return SPECIAL_GLOW_SHADOWS.roulette;
+  return undefined;
+}
+
+/**
+ * 특수 카드 배경색 결정
+ */
+function getSpecialBackground(card: CardType): string | undefined {
+  if (card.isGlass) return SPECIAL_BACKGROUNDS.glass;
+  if (card.isGold) return SPECIAL_BACKGROUNDS.gold;
   return undefined;
 }
 
@@ -124,6 +145,9 @@ function getCardEffectDescriptions(
   const effects: string[] = [];
 
   // 특수 카드 효과
+  if (card.isGlass) {
+    effects.push(`💎 ${t('glassEffect')}`);
+  }
   if (card.isWild) {
     effects.push(`🌟 ${t('wildEffect')}`);
   }
@@ -175,14 +199,15 @@ function CardComponent({
   const [showTooltip, setShowTooltip] = useState(false);
 
   const sizeStyle = SIZE_STYLES[size];
-  const suitColor = SUIT_COLORS[card.suit];
-  const suitSymbol = SUIT_SYMBOLS[card.suit];
+  const suitColor = card.isGlass ? '#0891b2' : SUIT_COLORS[card.suit];
+  const suitSymbol = card.isGlass ? '◇' : SUIT_SYMBOLS[card.suit];
   const specialBorder = getSpecialBorderColor(card);
   const specialGlow = getSpecialGlow(card);
+  const specialBackground = getSpecialBackground(card);
   const enhancementGradient = card.enhancement
     ? ENHANCEMENT_GRADIENTS[card.enhancement.type]
     : undefined;
-  const hasSpecialEffect = specialBorder || enhancementGradient;
+  const hasSpecialEffect = specialBorder || enhancementGradient || specialBackground;
 
   // 카드 효과 설명 목록
   const effectDescriptions = getCardEffectDescriptions(card, t);
@@ -232,7 +257,7 @@ function CardComponent({
         borderWidth: `${borderWidth}px`,
         borderStyle: 'solid',
         borderColor: specialBorder || '#d1d5db',
-        background: enhancementGradient || 'white',
+        background: specialBackground || enhancementGradient || 'white',
       }}
       initial={false}
       animate={{
@@ -297,10 +322,11 @@ function CardComponent({
       {/* 특수 카드 표시 */}
       {isSpecialCard(card) && (
         <div className="absolute top-1 right-1 text-xs">
-          {card.isWild && <span title="Wild">W</span>}
-          {card.isGold && <span title="Gold">G</span>}
-          {card.triggerSlot && <span title="Slot">S</span>}
-          {card.triggerRoulette && <span title="Roulette">R</span>}
+          {card.isGlass && <span title="Glass">💎</span>}
+          {card.isWild && <span title="Wild">🌟</span>}
+          {card.isGold && <span title="Gold">💰</span>}
+          {card.triggerSlot && <span title="Slot">🎰</span>}
+          {card.triggerRoulette && <span title="Roulette">🎯</span>}
         </div>
       )}
 

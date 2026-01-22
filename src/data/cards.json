@@ -237,6 +237,75 @@
       "goldValue": 5,
       "rarity": "legendary",
       "shopCost": 65
+    },
+    {
+      "id": "glass_ace",
+      "name": "Glass Ace",
+      "description": "Transparent card - counts as any suit",
+      "baseRank": "A",
+      "baseSuit": "spades",
+      "isGlass": true,
+      "rarity": "uncommon",
+      "shopCost": 25
+    },
+    {
+      "id": "glass_king",
+      "name": "Glass King",
+      "description": "Transparent card - counts as any suit",
+      "baseRank": "K",
+      "baseSuit": "hearts",
+      "isGlass": true,
+      "rarity": "uncommon",
+      "shopCost": 22
+    },
+    {
+      "id": "glass_queen",
+      "name": "Glass Queen",
+      "description": "Transparent card - counts as any suit",
+      "baseRank": "Q",
+      "baseSuit": "diamonds",
+      "isGlass": true,
+      "rarity": "common",
+      "shopCost": 18
+    },
+    {
+      "id": "glass_jack",
+      "name": "Glass Jack",
+      "description": "Transparent card - counts as any suit",
+      "baseRank": "J",
+      "baseSuit": "clubs",
+      "isGlass": true,
+      "rarity": "common",
+      "shopCost": 15
+    },
+    {
+      "id": "glass_ten",
+      "name": "Glass Ten",
+      "description": "Transparent card - counts as any suit",
+      "baseRank": "10",
+      "baseSuit": "spades",
+      "isGlass": true,
+      "rarity": "common",
+      "shopCost": 12
+    },
+    {
+      "id": "glass_seven",
+      "name": "Glass Seven",
+      "description": "Transparent card - counts as any suit",
+      "baseRank": "7",
+      "baseSuit": "hearts",
+      "isGlass": true,
+      "rarity": "common",
+      "shopCost": 10
+    },
+    {
+      "id": "glass_wild",
+      "name": "Perfect Glass",
+      "description": "Transparent wild - any rank AND any suit",
+      "isGlass": true,
+      "isWild": true,
+      "rarity": "legendary",
+      "shopCost": 75
     }
   ],
 

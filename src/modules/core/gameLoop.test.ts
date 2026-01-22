@@ -70,6 +70,7 @@ describe('Game Loop', () => {
         discardsRemaining: 3,
         slotSpinsRemaining: 4,
         openedPackCards: null,
+        consumableOverlay: null,
         ...overrides,
       };
     }

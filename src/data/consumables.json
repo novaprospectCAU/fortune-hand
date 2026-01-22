@@ -1,0 +1,67 @@
+{
+  "consumables": [
+    {
+      "id": "card_remover_1",
+      "name": "Card Eraser",
+      "description": "Remove 1 card from deck",
+      "type": "card_remover",
+      "rarity": "common",
+      "cost": 25,
+      "selectLimit": 1
+    },
+    {
+      "id": "card_remover_2",
+      "name": "Deck Cleaner",
+      "description": "Remove up to 2 cards",
+      "type": "card_remover",
+      "rarity": "uncommon",
+      "cost": 45,
+      "selectLimit": 2
+    },
+    {
+      "id": "card_remover_3",
+      "name": "Mass Purge",
+      "description": "Remove up to 3 cards",
+      "type": "card_remover",
+      "rarity": "rare",
+      "cost": 70,
+      "selectLimit": 3
+    },
+    {
+      "id": "card_transformer_1",
+      "name": "Card Morpher",
+      "description": "Transform 1 card randomly",
+      "type": "card_transformer",
+      "rarity": "uncommon",
+      "cost": 40,
+      "selectLimit": 1
+    },
+    {
+      "id": "card_transformer_2",
+      "name": "Chaos Alchemist",
+      "description": "Transform up to 2 cards",
+      "type": "card_transformer",
+      "rarity": "rare",
+      "cost": 65,
+      "selectLimit": 2
+    },
+    {
+      "id": "card_duplicator_1",
+      "name": "Card Cloner",
+      "description": "Duplicate 1 card",
+      "type": "card_duplicator",
+      "rarity": "rare",
+      "cost": 60,
+      "selectLimit": 1
+    },
+    {
+      "id": "card_duplicator_2",
+      "name": "Mirror Master",
+      "description": "Duplicate up to 2 cards",
+      "type": "card_duplicator",
+      "rarity": "legendary",
+      "cost": 100,
+      "selectLimit": 2
+    }
+  ]
+}

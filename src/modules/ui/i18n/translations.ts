@@ -139,6 +139,27 @@ export const translations = {
     hands: "Hands",
     discards: "Discards",
 
+    // Consumables
+    selectCardsToRemove: "Select Cards to Remove",
+    selectCardsToTransform: "Select Cards to Transform",
+    selectCardsToDuplicate: "Select Cards to Duplicate",
+    selectCards: "Select Cards",
+    removeCardDesc: "Remove up to {n} cards from your deck",
+    transformCardDesc: "Transform up to {n} cards into random cards",
+    duplicateCardDesc: "Duplicate up to {n} cards (copy to deck)",
+    selectUpToN: "Select up to {n} cards",
+    selected: "Selected",
+    removeCards: "Remove {n} Card(s)",
+    transformCards: "Transform {n} Card(s)",
+    duplicateCards: "Duplicate {n} Card(s)",
+    skipRemoval: "Skip",
+    skipTransform: "Skip",
+    skipDuplicate: "Skip",
+    cardRemoved: "{n} card(s) removed from deck",
+    cardTransformed: "{n} card(s) transformed",
+    cardDuplicated: "{n} card(s) duplicated",
+    glassEffect: "Glass: Counts as any suit",
+
     // Settings
     language: "Language",
     english: "English",
@@ -278,6 +299,27 @@ export const translations = {
     // Resources
     hands: "핸드",
     discards: "버리기",
+
+    // Consumables
+    selectCardsToRemove: "제거할 카드 선택",
+    selectCardsToTransform: "변환할 카드 선택",
+    selectCardsToDuplicate: "복제할 카드 선택",
+    selectCards: "카드 선택",
+    removeCardDesc: "덱에서 최대 {n}장의 카드를 제거합니다",
+    transformCardDesc: "최대 {n}장의 카드를 랜덤 카드로 변환합니다",
+    duplicateCardDesc: "최대 {n}장의 카드를 복제합니다 (덱에 복사)",
+    selectUpToN: "최대 {n}장 선택",
+    selected: "선택됨",
+    removeCards: "{n}장 제거",
+    transformCards: "{n}장 변환",
+    duplicateCards: "{n}장 복제",
+    skipRemoval: "건너뛰기",
+    skipTransform: "건너뛰기",
+    skipDuplicate: "건너뛰기",
+    cardRemoved: "덱에서 {n}장의 카드가 제거되었습니다",
+    cardTransformed: "{n}장의 카드가 변환되었습니다",
+    cardDuplicated: "{n}장의 카드가 복제되었습니다",
+    glassEffect: "글래스: 모든 무늬로 인정",
 
     // Settings
     language: "언어",

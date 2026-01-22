@@ -39,7 +39,7 @@ describe('shopGenerator', () => {
 
   describe('selectItemType', () => {
     it('should return valid item types', () => {
-      const validTypes = ['joker', 'card', 'pack', 'voucher'];
+      const validTypes = ['joker', 'card', 'pack', 'voucher', 'consumable'];
 
       // Run multiple times to check randomness
       for (let i = 0; i < 10; i++) {
@@ -100,7 +100,7 @@ describe('shopGenerator', () => {
     });
 
     it('should generate items with valid types', () => {
-      const validTypes = ['joker', 'card', 'pack', 'voucher'];
+      const validTypes = ['joker', 'card', 'pack', 'voucher', 'consumable'];
       const shop = generateShop(1, 0);
 
       for (const item of shop.items) {

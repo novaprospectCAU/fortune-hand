@@ -57,10 +57,16 @@ export {
   calculateInterest,
   isVoucherPurchased,
 } from './vouchers';
+export {
+  getConsumableById,
+  getAllConsumables,
+  getConsumablesByRarity,
+  getConsumablesByType,
+} from './consumables';
 
 // Component exports
-export { Shop, ShopItem, RerollButton, PackDisplay, PackOpenOverlay } from './components';
-export type { ShopProps, ShopItemProps, RerollButtonProps, PackDisplayProps, PackOpenOverlayProps } from './components';
+export { Shop, ShopItem, RerollButton, PackDisplay, PackOpenOverlay, CardSelectionOverlay } from './components';
+export type { ShopProps, ShopItemProps, RerollButtonProps, PackDisplayProps, PackOpenOverlayProps, CardSelectionOverlayProps } from './components';
 
 // Re-export types from interfaces for convenience
 export type { ShopState, ShopItem as ShopItemType, Transaction } from '@/types/interfaces';

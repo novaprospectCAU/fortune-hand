@@ -467,7 +467,7 @@ describe('Shop Module Integration', () => {
     it('should generate items with valid types', () => {
       const shop = generateShop(1, 0);
       for (const item of shop.items) {
-        expect(['joker', 'card', 'pack', 'voucher']).toContain(item.type);
+        expect(['joker', 'card', 'pack', 'voucher', 'consumable']).toContain(item.type);
         expect(item.cost).toBeGreaterThan(0);
         expect(item.sold).toBe(false);
       }

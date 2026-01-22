@@ -92,10 +92,11 @@
     "rerollBaseCost": 5,
     "rerollCostIncrease": 2,
     "itemTypeWeights": {
-      "joker": 40,
-      "card": 30,
-      "pack": 20,
-      "voucher": 10
+      "joker": 35,
+      "card": 25,
+      "pack": 15,
+      "voucher": 10,
+      "consumable": 15
     }
   },
   
