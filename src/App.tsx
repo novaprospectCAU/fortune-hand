@@ -571,6 +571,14 @@ function App() {
         );
 
       case 'SHOP_PHASE':
+        // Don't show shop while round clear celebration or reward selection is active
+        if (showRoundClear || roundRewardState?.isOpen) {
+          return (
+            <div className="flex items-center justify-center h-full">
+              <p className="text-gray-400">{t('continue')}...</p>
+            </div>
+          );
+        }
         return (
           <div className="h-full">
             {shopState && (
