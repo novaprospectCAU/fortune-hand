@@ -16,7 +16,7 @@ import { GameLayout, ScoreDisplay, DeckViewer, CardEffectTooltip, Modal, Button,
 // Game modules - components
 import { SlotMachine } from '@/modules/slots';
 import { Hand, getSpecialCardDetails } from '@/modules/cards';
-import { RouletteWheel, getDefaultConfig, applyBonuses } from '@/modules/roulette';
+import { RouletteWheel, getDefaultConfig, applyBonuses, applyPermanentMods } from '@/modules/roulette';
 import { Shop, PackOpenOverlay, CardSelectionOverlay, getConsumableById } from '@/modules/shop';
 import { getJokerById } from '@/modules/jokers';
 
@@ -75,6 +75,7 @@ function App() {
     roundRewardState,
     openRoundReward,
     showRoundClearCelebration,
+    rouletteProbabilityMods,
   } = useGameStore();
 
   // Deck viewer state
@@ -98,10 +99,6 @@ function App() {
     target: showRoundClearCelebration.targetScore,
   } : null;
 
-  // Debug logging for round clear
-  useEffect(() => {
-    console.log('[RoundClear] showRoundClearCelebration changed:', showRoundClearCelebration);
-  }, [showRoundClearCelebration]);
 
   // Reset retry state when leaving roulette phase
   useEffect(() => {
@@ -155,20 +152,25 @@ function App() {
 
   // Round clear celebration complete handler
   const handleRoundClearComplete = useCallback(() => {
-    console.log('[RoundClear] Celebration complete, opening reward selection');
     // openRoundReward also clears the celebration flag
     openRoundReward();
-    console.log('[RoundClear] openRoundReward called');
   }, [openRoundReward]);
 
   // Get roulette config with bonuses applied
   const getRouletteConfig = useCallback(() => {
     let config = getDefaultConfig();
+
+    // Apply permanent probability modifications from treasure chests/jokers
+    if (rouletteProbabilityMods) {
+      config = applyPermanentMods(config, rouletteProbabilityMods);
+    }
+
+    // Apply slot bonuses for this turn
     if (slotResult?.effects.rouletteBonus) {
       config = applyBonuses(config, slotResult.effects.rouletteBonus);
     }
     return config;
-  }, [slotResult]);
+  }, [slotResult, rouletteProbabilityMods]);
 
   // Get item details for shop display
   const getItemDetails = useCallback(
@@ -757,16 +759,8 @@ function App() {
     />
 
     {/* Round reward selection */}
-    {(() => {
-      console.log('[App] Checking roundRewardState:', roundRewardState);
-      return null;
-    })()}
     {roundRewardState?.isOpen && (
-      <RoundRewardSelection
-        onComplete={() => {
-          console.log('[App] RoundRewardSelection onComplete called');
-        }}
-      />
+      <RoundRewardSelection />
     )}
 
     {/* Consumable card selection overlay */}

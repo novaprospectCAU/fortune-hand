@@ -10,6 +10,7 @@ import type {
   RouletteResult,
   RouletteSegment,
   SlotEffects,
+  RouletteProbabilityMods,
 } from '@/types/interfaces';
 import balanceData from '@/data/balance.json';
 import {
@@ -182,6 +183,106 @@ export function calculateTargetAngle(
   const targetAngle = extraRotations * 360 + (360 - centerAngle);
 
   return targetAngle;
+}
+
+/**
+ * Applies permanent probability modifications from treasure chests/jokers.
+ *
+ * Categories:
+ * - safe: 1x, 2x, 3x (safeBonus increases these)
+ * - risky: 0.5x, 4x, 6x, 100x (riskyBonus increases these, halfPenalty decreases 0.5x)
+ *
+ * @param config - The base roulette configuration
+ * @param mods - The permanent probability modifications
+ * @returns A new RouletteConfig with mods applied
+ */
+export function applyPermanentMods(
+  config: RouletteConfig,
+  mods: RouletteProbabilityMods
+): RouletteConfig {
+  // Deep clone segments to avoid mutation
+  const segments: RouletteSegment[] = config.segments.map((s) => ({ ...s }));
+
+  // Get total probability to redistribute
+  let totalRedistribute = 0;
+
+  // Apply halfPenalty: reduce 0.5x probability
+  if (mods.halfPenalty > 0) {
+    const halfSegment = segments.find((s) => s.multiplier === 0.5);
+    if (halfSegment && halfSegment.probability > 0) {
+      const reduction = Math.min(mods.halfPenalty, halfSegment.probability);
+      halfSegment.probability -= reduction;
+      totalRedistribute += reduction;
+    }
+  }
+
+  // Calculate safe segments (1x, 2x, 3x)
+  const safeSegments = segments.filter((s) =>
+    s.multiplier === 1 || s.multiplier === 2 || s.multiplier === 3
+  );
+
+  // Apply safeBonus: increase probability of safe segments
+  if (mods.safeBonus > 0 && safeSegments.length > 0) {
+    // Take from 0.5x segment if possible
+    const halfSegment = segments.find((s) => s.multiplier === 0.5);
+    let available = 0;
+    if (halfSegment && halfSegment.probability > 0) {
+      available = Math.min(mods.safeBonus, halfSegment.probability);
+      halfSegment.probability -= available;
+    }
+
+    // Distribute to safe segments evenly
+    if (available > 0) {
+      const perSegment = available / safeSegments.length;
+      safeSegments.forEach((s) => {
+        s.probability += perSegment;
+      });
+    }
+  }
+
+  // Apply riskyBonus: increase probability of risky segments (4x, 6x, 100x)
+  if (mods.riskyBonus > 0) {
+    const highRiskSegments = segments.filter((s) =>
+      s.multiplier === 4 || s.multiplier === 6 || s.multiplier === 100
+    );
+
+    if (highRiskSegments.length > 0) {
+      // Take from 1x segment if possible
+      const oneSegment = segments.find((s) => s.multiplier === 1);
+      let available = 0;
+      if (oneSegment && oneSegment.probability > 0) {
+        available = Math.min(mods.riskyBonus * highRiskSegments.length, oneSegment.probability);
+        oneSegment.probability -= available;
+      }
+
+      // Distribute to high risk segments evenly
+      if (available > 0) {
+        const perSegment = available / highRiskSegments.length;
+        highRiskSegments.forEach((s) => {
+          s.probability += perSegment;
+        });
+      }
+    }
+  }
+
+  // Redistribute any remaining probability from halfPenalty to safe segments
+  if (totalRedistribute > 0 && safeSegments.length > 0) {
+    const perSegment = totalRedistribute / safeSegments.length;
+    safeSegments.forEach((s) => {
+      s.probability += perSegment;
+    });
+  }
+
+  // Normalize to ensure probabilities sum to 100
+  const normalizedSegments = normalizeSegments(segments);
+
+  // Filter out segments with 0 probability for cleaner wheel
+  const activeSegments = normalizedSegments.filter((s) => s.probability > 0);
+
+  return {
+    segments: activeSegments.length > 0 ? activeSegments : normalizedSegments,
+    spinDuration: config.spinDuration,
+  };
 }
 
 /**

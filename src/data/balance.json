@@ -78,10 +78,13 @@
   
   "roulette": {
     "segments": [
-      { "id": "half", "multiplier": 0.5, "probability": 15, "color": "#ef4444" },
-      { "id": "one", "multiplier": 1, "probability": 70, "color": "#6b7280" },
-      { "id": "two", "multiplier": 2, "probability": 10, "color": "#22c55e" },
-      { "id": "three", "multiplier": 3, "probability": 5, "color": "#3b82f6" }
+      { "id": "half", "multiplier": 0.5, "probability": 15, "color": "#ef4444", "category": "risky" },
+      { "id": "one", "multiplier": 1, "probability": 60, "color": "#6b7280", "category": "safe" },
+      { "id": "two", "multiplier": 2, "probability": 15, "color": "#22c55e", "category": "safe" },
+      { "id": "three", "multiplier": 3, "probability": 10, "color": "#3b82f6", "category": "safe" },
+      { "id": "four", "multiplier": 4, "probability": 0, "color": "#8b5cf6", "category": "risky" },
+      { "id": "six", "multiplier": 6, "probability": 0, "color": "#f59e0b", "category": "risky" },
+      { "id": "hundred", "multiplier": 100, "probability": 0, "color": "#ec4899", "category": "risky" }
     ],
     "spinDuration": 3000
   },

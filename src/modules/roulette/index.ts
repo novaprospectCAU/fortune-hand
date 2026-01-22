@@ -10,6 +10,7 @@ export {
   skip,
   getDefaultConfig,
   applyBonuses,
+  applyPermanentMods,
   calculateTargetAngle,
   validateConfig,
 } from './roulette';

@@ -367,7 +367,6 @@ export const useGameStore = create<GameStore>((set, get) => ({
             });
 
             // Set round clear celebration flag (more reliable than phase transition detection)
-            console.log('[Store] Round cleared! Setting celebration flag');
             set({
               shopState,
               showRoundClearCelebration: {
@@ -1168,12 +1167,10 @@ export const useGameStore = create<GameStore>((set, get) => ({
   // ============================================================
 
   clearRoundClearCelebration: () => {
-    console.log('[Store] clearRoundClearCelebration called');
     set({ showRoundClearCelebration: null });
   },
 
   openRoundReward: () => {
-    console.log('[Store] openRoundReward called');
     set({
       showRoundClearCelebration: null, // Clear celebration flag
       roundRewardState: {
@@ -1184,7 +1181,6 @@ export const useGameStore = create<GameStore>((set, get) => ({
         pendingCardRemoval: false,
       },
     });
-    console.log('[Store] roundRewardState set to isOpen: true');
   },
 
   selectRoundReward: (reward: 'quota' | 'chest' | 'gold') => {
