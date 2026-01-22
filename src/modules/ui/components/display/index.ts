@@ -7,3 +7,4 @@ export { GoldDisplay, type GoldDisplayProps } from './GoldDisplay';
 export { RoundInfo, type RoundInfoProps } from './RoundInfo';
 export { PhaseIndicator, type PhaseIndicatorProps } from './PhaseIndicator';
 export { DeckViewer, type DeckViewerProps } from './DeckViewer';
+export { HandGuide, type HandGuideProps } from './HandGuide';

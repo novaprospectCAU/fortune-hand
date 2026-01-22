@@ -11,7 +11,7 @@ import { AnimatePresence, motion } from 'framer-motion';
 import { useGameStore } from '@/modules/core';
 
 // UI module - layout and common components
-import { GameLayout, ScoreDisplay, DeckViewer, CardEffectTooltip, Modal, Button, RoundClearCelebration, useI18n, TranslationKey } from '@/modules/ui';
+import { GameLayout, ScoreDisplay, DeckViewer, CardEffectTooltip, Modal, Button, RoundClearCelebration, useI18n, TranslationKey, HandGuide } from '@/modules/ui';
 
 // Game modules - components
 import { SlotMachine } from '@/modules/slots';
@@ -355,45 +355,53 @@ function App() {
 
       case 'PLAY_PHASE':
         return (
-          <div className="flex flex-col h-full">
-            {/* Slot Result Summary */}
-            {slotResult && (
-              <motion.div
-                initial={{ opacity: 0, y: -20 }}
-                animate={{ opacity: 1, y: 0 }}
-                className="bg-game-surface rounded-lg p-4 mb-4"
-              >
-                <div className="flex items-center justify-center gap-4">
-                  <span className="text-2xl">
-                    {slotResult.symbols.map((s, i) => {
-                      const emoji = getSymbolEmoji(s);
-                      return <span key={i}>{emoji}</span>;
-                    })}
-                  </span>
-                  {slotResult.isJackpot && (
-                    <span className="text-yellow-400 font-bold">{t('jackpot')}</span>
-                  )}
-                </div>
-                {/* Slot Effects Description */}
-                <div className="text-center mt-2 text-sm">
-                  {formatSlotEffects(slotResult.effects, t)}
-                </div>
-              </motion.div>
-            )}
+          <div className="flex h-full gap-4">
+            {/* Hand Guide - Left Side */}
+            <div className="hidden md:block w-48 shrink-0">
+              <HandGuide className="sticky top-4" />
+            </div>
 
-            {/* Hand */}
-            <div className="flex-1 flex flex-col justify-end">
-              <div className="text-center mb-2 text-gray-400">
-                {t('selectUpTo5')}
+            {/* Main Content */}
+            <div className="flex-1 flex flex-col min-w-0">
+              {/* Slot Result Summary */}
+              {slotResult && (
+                <motion.div
+                  initial={{ opacity: 0, y: -20 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  className="bg-game-surface rounded-lg p-4 mb-4"
+                >
+                  <div className="flex items-center justify-center gap-4">
+                    <span className="text-2xl">
+                      {slotResult.symbols.map((s, i) => {
+                        const emoji = getSymbolEmoji(s);
+                        return <span key={i}>{emoji}</span>;
+                      })}
+                    </span>
+                    {slotResult.isJackpot && (
+                      <span className="text-yellow-400 font-bold">{t('jackpot')}</span>
+                    )}
+                  </div>
+                  {/* Slot Effects Description */}
+                  <div className="text-center mt-2 text-sm">
+                    {formatSlotEffects(slotResult.effects, t)}
+                  </div>
+                </motion.div>
+              )}
+
+              {/* Hand */}
+              <div className="flex-1 flex flex-col justify-end">
+                <div className="text-center mb-2 text-gray-400">
+                  {t('selectUpTo5')}
+                </div>
+                <Hand
+                  cards={hand}
+                  selectedIds={selectedCards.map((c) => c.id)}
+                  onCardClick={handleCardClick}
+                  onCardHover={setHoveredCard}
+                  maxSelect={5}
+                  disabled={false}
+                />
               </div>
-              <Hand
-                cards={hand}
-                selectedIds={selectedCards.map((c) => c.id)}
-                onCardClick={handleCardClick}
-                onCardHover={setHoveredCard}
-                maxSelect={5}
-                disabled={false}
-              />
             </div>
           </div>
         );

@@ -53,6 +53,8 @@ export {
   type PhaseIndicatorProps,
   DeckViewer,
   type DeckViewerProps,
+  HandGuide,
+  type HandGuideProps,
 } from './components/display';
 
 // Feedback Components

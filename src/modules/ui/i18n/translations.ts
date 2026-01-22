@@ -281,6 +281,10 @@ export const translations = {
     rarity_uncommon: "Uncommon",
     rarity_rare: "Rare",
     rarity_legendary: "Legendary",
+
+    // Hand guide
+    handGuide: "Hand Guide",
+    multiplier: "Multiplier",
   },
 
   ko: {
@@ -559,6 +563,10 @@ export const translations = {
     rarity_uncommon: "고급",
     rarity_rare: "희귀",
     rarity_legendary: "전설",
+
+    // Hand guide
+    handGuide: "족보 안내",
+    multiplier: "배수",
   },
 } as const;
 
