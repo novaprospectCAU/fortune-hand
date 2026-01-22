@@ -217,17 +217,26 @@ function generatePackItem(rarity: Rarity, round: number): ShopItem | null {
  *
  * @param rarity - The rarity tier of the voucher
  * @param round - Current game round
+ * @param purchasedVoucherIds - IDs of vouchers already purchased (to exclude)
  * @returns A shop item for a voucher, or null if none available
  */
-function generateVoucherItem(rarity: Rarity, round: number): ShopItem | null {
-  const availableVouchers = getVouchersByRarity(rarity);
+function generateVoucherItem(
+  rarity: Rarity,
+  round: number,
+  purchasedVoucherIds: string[] = []
+): ShopItem | null {
+  // Filter out already purchased vouchers
+  const availableVouchers = getVouchersByRarity(rarity).filter(
+    (v) => !purchasedVoucherIds.includes(v.id)
+  );
 
   if (availableVouchers.length === 0) {
-    // Fallback to any voucher if none of this rarity
+    // Fallback to any unpurchased voucher if none of this rarity
     const allVouchers = getVouchersByRarity('common')
       .concat(getVouchersByRarity('uncommon'))
       .concat(getVouchersByRarity('rare'))
-      .concat(getVouchersByRarity('legendary'));
+      .concat(getVouchersByRarity('legendary'))
+      .filter((v) => !purchasedVoucherIds.includes(v.id));
 
     if (allVouchers.length === 0) return null;
     const voucher = allVouchers[Math.floor(Math.random() * allVouchers.length)]!;
@@ -251,17 +260,26 @@ function generateVoucherItem(rarity: Rarity, round: number): ShopItem | null {
 }
 
 /**
+ * Options for shop generation
+ */
+export interface ShopGenerationOptions {
+  purchasedVoucherIds?: string[];
+}
+
+/**
  * Generate a single shop item based on type and rarity
  *
  * @param type - The type of item to generate
  * @param rarity - The rarity of the item
  * @param round - Current game round
+ * @param options - Additional options for generation
  * @returns A generated shop item
  */
 export function generateItem(
   type: ItemType,
   rarity: Rarity,
-  round: number
+  round: number,
+  options: ShopGenerationOptions = {}
 ): ShopItem | null {
   switch (type) {
     case 'joker':
@@ -271,7 +289,7 @@ export function generateItem(
     case 'pack':
       return generatePackItem(rarity, round);
     case 'voucher':
-      return generateVoucherItem(rarity, round);
+      return generateVoucherItem(rarity, round, options.purchasedVoucherIds);
     default:
       return null;
   }
@@ -282,23 +300,28 @@ export function generateItem(
  *
  * @param round - Current game round (affects prices and available items)
  * @param luck - Player's luck stat (affects rarity distribution)
+ * @param options - Additional options for generation (e.g., purchasedVoucherIds)
  * @returns A new ShopState with generated items
  */
-export function generateShop(round: number = 1, luck: number = 0): ShopState {
+export function generateShop(
+  round: number = 1,
+  luck: number = 0,
+  options: ShopGenerationOptions = {}
+): ShopState {
   const items: ShopItem[] = [];
   const itemCount = SHOP_CONFIG.itemCount;
 
   for (let i = 0; i < itemCount; i++) {
     const type = selectItemType();
     const rarity = selectRarity(luck);
-    const item = generateItem(type, rarity, round);
+    const item = generateItem(type, rarity, round, options);
 
     if (item) {
       items.push(item);
     } else {
       // If item generation failed, try again with a different type
       const fallbackType = type === 'joker' ? 'pack' : 'joker';
-      const fallbackItem = generateItem(fallbackType, rarity, round);
+      const fallbackItem = generateItem(fallbackType, rarity, round, options);
       if (fallbackItem) {
         items.push(fallbackItem);
       }
@@ -318,14 +341,16 @@ export function generateShop(round: number = 1, luck: number = 0): ShopState {
  * @param round - Current game round
  * @param luck - Player's luck stat
  * @param seed - Random seed for deterministic generation
+ * @param options - Additional options for generation
  * @returns A new ShopState with generated items
  */
 export function generateShopWithSeed(
   round: number = 1,
   luck: number = 0,
-  _seed: number = 0
+  _seed: number = 0,
+  options: ShopGenerationOptions = {}
 ): ShopState {
   // For testing purposes, we use the standard generator
   // A proper seeded random implementation would be needed for full determinism
-  return generateShop(round, luck);
+  return generateShop(round, luck, options);
 }

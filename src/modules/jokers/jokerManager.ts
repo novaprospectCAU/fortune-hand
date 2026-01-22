@@ -253,3 +253,14 @@ function mergeRouletteModifiers(
 
   return result;
 }
+
+/**
+ * Check if the player has the Fortune Teller joker
+ * Fortune Teller allows seeing roulette result before spinning
+ *
+ * @param jokers - Array of jokers the player owns
+ * @returns true if player has Fortune Teller joker
+ */
+export function hasFortuneTeller(jokers: Joker[]): boolean {
+  return jokers.some((joker) => joker.id === 'fortune_teller');
+}

@@ -10,6 +10,7 @@ import {
   getRouletteModifiersFromJokers,
   getRetriggerCountFromJokers,
   getTriggeredJokers,
+  hasFortuneTeller,
 } from './jokerManager';
 import type { Joker, JokerContext, Card } from '@/types/interfaces';
 
@@ -334,6 +335,38 @@ describe('jokerManager', () => {
       const triggered = getTriggeredJokers(jokers, context);
 
       expect(triggered).toHaveLength(0);
+    });
+  });
+
+  describe('hasFortuneTeller', () => {
+    it('should return true when player has fortune_teller joker', () => {
+      const jokers = [
+        createJoker('some_joker', { type: 'on_score' }, { type: 'add_mult', value: 10 }),
+        {
+          id: 'fortune_teller',
+          name: 'Fortune Teller',
+          description: 'See Roulette result before spinning',
+          rarity: 'legendary' as const,
+          cost: 200,
+          trigger: { type: 'on_roulette' as const },
+          effect: { type: 'custom' as const, handler: 'fortuneTeller' },
+        },
+      ];
+
+      expect(hasFortuneTeller(jokers)).toBe(true);
+    });
+
+    it('should return false when player does not have fortune_teller joker', () => {
+      const jokers = [
+        createJoker('j1', { type: 'on_score' }, { type: 'add_mult', value: 10 }),
+        createJoker('j2', { type: 'on_roulette' }, { type: 'add_chips', value: 50 }),
+      ];
+
+      expect(hasFortuneTeller(jokers)).toBe(false);
+    });
+
+    it('should return false when jokers array is empty', () => {
+      expect(hasFortuneTeller([])).toBe(false);
     });
   });
 });

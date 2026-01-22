@@ -12,6 +12,8 @@ interface SegmentProps {
   centerX: number;
   centerY: number;
   isHighlighted?: boolean;
+  /** Preview highlight from Fortune Teller joker */
+  isPreview?: boolean;
 }
 
 /**
@@ -97,6 +99,7 @@ export function Segment({
   centerX,
   centerY,
   isHighlighted = false,
+  isPreview = false,
 }: SegmentProps) {
   const path = describeArc(
     centerX,
@@ -125,20 +128,55 @@ export function Segment({
   // Calculate font size based on segment size
   const fontSize = Math.max(10, Math.min(20, sweepAngle / 3));
 
+  // Determine stroke and filter based on state
+  const getStroke = () => {
+    if (isPreview) return '#a855f7'; // Purple for Fortune Teller preview
+    if (isHighlighted) return '#ffffff';
+    return '#1f2937';
+  };
+
+  const getStrokeWidth = () => {
+    if (isPreview) return 4;
+    if (isHighlighted) return 3;
+    return 1;
+  };
+
+  const getFilter = () => {
+    if (isPreview) {
+      return 'brightness(1.1) drop-shadow(0 0 12px rgba(168, 85, 247, 0.8))';
+    }
+    if (isHighlighted) {
+      return 'brightness(1.2) drop-shadow(0 0 8px rgba(255,255,255,0.5))';
+    }
+    return 'none';
+  };
+
   return (
     <g className="roulette-segment">
       <path
         d={path}
         fill={segment.color}
-        stroke={isHighlighted ? '#ffffff' : '#1f2937'}
-        strokeWidth={isHighlighted ? 3 : 1}
+        stroke={getStroke()}
+        strokeWidth={getStrokeWidth()}
         className="transition-all duration-200"
         style={{
-          filter: isHighlighted
-            ? 'brightness(1.2) drop-shadow(0 0 8px rgba(255,255,255,0.5))'
-            : 'none',
+          filter: getFilter(),
         }}
       />
+      {/* Fortune Teller preview indicator - eye icon */}
+      {isPreview && (
+        <text
+          x={labelPos.x}
+          y={labelPos.y - fontSize * 0.8}
+          fill="#a855f7"
+          fontSize={fontSize * 0.6}
+          textAnchor="middle"
+          dominantBaseline="middle"
+          transform={`rotate(${labelPos.rotation}, ${labelPos.x}, ${labelPos.y - fontSize * 0.8})`}
+        >
+          👁️
+        </text>
+      )}
       <text
         x={labelPos.x}
         y={labelPos.y}

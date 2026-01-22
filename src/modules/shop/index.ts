@@ -12,7 +12,13 @@
  */
 
 // Logic exports
-export { generateShop, generateShopWithSeed, selectItemType, selectRarity } from './shopGenerator';
+export {
+  generateShop,
+  generateShopWithSeed,
+  selectItemType,
+  selectRarity,
+  type ShopGenerationOptions,
+} from './shopGenerator';
 export {
   buyItem,
   reroll,

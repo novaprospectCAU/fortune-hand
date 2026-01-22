@@ -208,4 +208,41 @@ describe('shopGenerator', () => {
       expect(commonCount).toBeGreaterThan(iterations * 0.4);
     });
   });
+
+  describe('voucher filtering', () => {
+    it('should exclude purchased vouchers from shop generation', () => {
+      // Generate many shops with some vouchers already purchased
+      const purchasedVoucherIds = ['extra_hand', 'seed_money', 'max_jokers'];
+      const iterations = 100;
+      let voucherItems: string[] = [];
+
+      for (let i = 0; i < iterations; i++) {
+        const shop = generateShop(1, 0, { purchasedVoucherIds });
+        const vouchers = shop.items.filter((item) => item.type === 'voucher');
+        voucherItems = voucherItems.concat(vouchers.map((v) => v.itemId));
+      }
+
+      // None of the purchased vouchers should appear in any shop
+      for (const purchasedId of purchasedVoucherIds) {
+        expect(voucherItems).not.toContain(purchasedId);
+      }
+    });
+
+    it('should still generate vouchers when some are purchased', () => {
+      // With only a few vouchers purchased, we should still see vouchers in shops
+      const purchasedVoucherIds = ['extra_hand'];
+      let foundVoucher = false;
+
+      // Generate shops until we find a voucher (or give up after many tries)
+      for (let i = 0; i < 200 && !foundVoucher; i++) {
+        const shop = generateShop(1, 0, { purchasedVoucherIds });
+        if (shop.items.some((item) => item.type === 'voucher')) {
+          foundVoucher = true;
+        }
+      }
+
+      // We should find at least one voucher in 200 shops
+      expect(foundVoucher).toBe(true);
+    });
+  });
 });

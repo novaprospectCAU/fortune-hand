@@ -339,7 +339,11 @@ export const useGameStore = create<GameStore>((set, get) => ({
             }
 
             // Generate shop with luck bonus from vouchers
-            const shopState = generateShop(state.round, voucherMods.luckBonus);
+            // Exclude already purchased vouchers from appearing in shop
+            const purchasedVoucherIds = state.purchasedVouchers.map((v) => v.id);
+            const shopState = generateShop(state.round, voucherMods.luckBonus, {
+              purchasedVoucherIds,
+            });
             set({ shopState });
             get()._setPhase('SHOP_PHASE');
           } else {
@@ -364,7 +368,10 @@ export const useGameStore = create<GameStore>((set, get) => ({
         if (!get().shopState) {
           const state = get();
           const voucherMods = calculateVoucherModifiers(state.purchasedVouchers);
-          const shopState = generateShop(state.round, voucherMods.luckBonus);
+          const purchasedVoucherIds = state.purchasedVouchers.map((v) => v.id);
+          const shopState = generateShop(state.round, voucherMods.luckBonus, {
+            purchasedVoucherIds,
+          });
           set({ shopState });
         }
         break;

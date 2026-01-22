@@ -49,6 +49,7 @@ export {
   getRouletteModifiersFromJokers,
   getRetriggerCountFromJokers,
   getTriggeredJokers,
+  hasFortuneTeller,
 } from './jokerManager';
 export type { JokerEvaluationResult } from './jokerManager';
 

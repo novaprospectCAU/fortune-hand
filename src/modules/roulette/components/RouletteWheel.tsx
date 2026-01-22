@@ -14,6 +14,8 @@ interface RouletteWheelProps {
   onSpinComplete: (result: RouletteResult) => void;
   baseScore: number;
   disabled?: boolean;
+  /** Preview result from Fortune Teller joker - shows which segment will be selected */
+  previewResult?: RouletteResult | null;
 }
 
 // Mobile-responsive wheel size
@@ -35,12 +37,16 @@ export function RouletteWheel({
   onSpinComplete,
   baseScore,
   disabled = false,
+  previewResult = null,
 }: RouletteWheelProps) {
   const [isSpinning, setIsSpinning] = useState(false);
   const [rotation, setRotation] = useState(0);
   const [pendingResult, setPendingResult] = useState<RouletteResult | null>(
     null
   );
+
+  // Preview segment ID from Fortune Teller joker
+  const previewSegmentId = previewResult?.segment.id;
 
   // Normalize segments for consistent rendering
   const normalizedSegments = useMemo(
@@ -69,8 +75,8 @@ export function RouletteWheel({
 
     setIsSpinning(true);
 
-    // Determine the result first
-    const result = spin({ baseScore, config });
+    // Use preview result from Fortune Teller if available, otherwise spin normally
+    const result = previewResult ?? spin({ baseScore, config });
     setPendingResult(result);
 
     // Calculate target angle to land on the selected segment
@@ -83,7 +89,7 @@ export function RouletteWheel({
 
     // Set the new rotation (cumulative to prevent snapping)
     setRotation((prev) => prev + targetAngle);
-  }, [isSpinning, disabled, baseScore, config]);
+  }, [isSpinning, disabled, baseScore, config, previewResult]);
 
   // Handle animation complete
   const handleAnimationComplete = useCallback(() => {
@@ -151,6 +157,7 @@ export function RouletteWheel({
               isHighlighted={
                 !isSpinning && highlightedSegmentId === segment.id
               }
+              isPreview={!isSpinning && previewSegmentId === segment.id}
             />
           ))}
 
