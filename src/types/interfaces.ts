@@ -437,6 +437,14 @@ export interface GameState {
 
   // 다음 라운드 시작 점수 비율 (0-1)
   nextRoundStartScoreRatio: number;
+
+  // 라운드 클리어 축하 상태 (React 상태 배칭 문제 해결용)
+  showRoundClearCelebration: {
+    show: boolean;
+    round: number;
+    score: number;
+    targetScore: number;
+  } | null;
 }
 
 // 보물 상자 보상 타입
@@ -534,6 +542,7 @@ export interface GameActions {
   openTreasureChest(): void;
   applyChestReward(): void;
   completeRoundReward(): void;
+  clearRoundClearCelebration(): void;
 }
 
 // ============================================================

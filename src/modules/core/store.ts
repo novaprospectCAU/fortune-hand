@@ -115,6 +115,7 @@ function createInitialState(): Omit<GameState, keyof GameActions> & {
       symbolWeightBonuses: {},
     },
     nextRoundStartScoreRatio: 0,
+    showRoundClearCelebration: null,
     config: mergeGameConfig(),
     shopState: null,
   };
@@ -364,7 +365,18 @@ export const useGameStore = create<GameStore>((set, get) => ({
             const shopState = generateShop(state.round, voucherMods.luckBonus, {
               purchasedVoucherIds: state.purchasedVouchers,
             });
-            set({ shopState });
+
+            // Set round clear celebration flag (more reliable than phase transition detection)
+            console.log('[Store] Round cleared! Setting celebration flag');
+            set({
+              shopState,
+              showRoundClearCelebration: {
+                show: true,
+                round: state.round,
+                score: state.currentScore,
+                targetScore: state.targetScore,
+              },
+            });
             get()._setPhase('SHOP_PHASE');
           } else {
             get()._setPhase('GAME_OVER');
@@ -1155,9 +1167,15 @@ export const useGameStore = create<GameStore>((set, get) => ({
   // Round Reward Actions
   // ============================================================
 
+  clearRoundClearCelebration: () => {
+    console.log('[Store] clearRoundClearCelebration called');
+    set({ showRoundClearCelebration: null });
+  },
+
   openRoundReward: () => {
     console.log('[Store] openRoundReward called');
     set({
+      showRoundClearCelebration: null, // Clear celebration flag
       roundRewardState: {
         isOpen: true,
         selectedReward: null,

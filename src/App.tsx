@@ -74,6 +74,7 @@ function App() {
     applyConsumable,
     roundRewardState,
     openRoundReward,
+    showRoundClearCelebration,
   } = useGameStore();
 
   // Deck viewer state
@@ -88,22 +89,19 @@ function App() {
   // Joker removal confirmation
   const [jokerToRemove, setJokerToRemove] = useState<Joker | null>(null);
 
-  // Round clear celebration state
-  const [showRoundClear, setShowRoundClear] = useState(false);
-  const [clearedRoundInfo, setClearedRoundInfo] = useState<{ round: number; score: number; target: number } | null>(null);
-  const [previousPhase, setPreviousPhase] = useState<string | null>(null);
+  // Round clear celebration is now tracked in the store directly
+  // This is more reliable than detecting phase transitions which can be batched by React
+  const showRoundClear = showRoundClearCelebration?.show ?? false;
+  const clearedRoundInfo = showRoundClearCelebration ? {
+    round: showRoundClearCelebration.round,
+    score: showRoundClearCelebration.score,
+    target: showRoundClearCelebration.targetScore,
+  } : null;
 
-  // Detect round clear (REWARD_PHASE -> SHOP_PHASE with success)
+  // Debug logging for round clear
   useEffect(() => {
-    console.log('[RoundClear] Phase change detected:', { previousPhase, phase });
-    if (previousPhase === 'REWARD_PHASE' && phase === 'SHOP_PHASE') {
-      // Round was cleared successfully (went to shop instead of game over)
-      console.log('[RoundClear] Round cleared! Showing celebration');
-      setClearedRoundInfo({ round, score: currentScore, target: targetScore });
-      setShowRoundClear(true);
-    }
-    setPreviousPhase(phase);
-  }, [phase, previousPhase, round, currentScore, targetScore]);
+    console.log('[RoundClear] showRoundClearCelebration changed:', showRoundClearCelebration);
+  }, [showRoundClearCelebration]);
 
   // Reset retry state when leaving roulette phase
   useEffect(() => {
@@ -158,8 +156,7 @@ function App() {
   // Round clear celebration complete handler
   const handleRoundClearComplete = useCallback(() => {
     console.log('[RoundClear] Celebration complete, opening reward selection');
-    setShowRoundClear(false);
-    // Open round reward selection after celebration
+    // openRoundReward also clears the celebration flag
     openRoundReward();
     console.log('[RoundClear] openRoundReward called');
   }, [openRoundReward]);
@@ -768,7 +765,6 @@ function App() {
       <RoundRewardSelection
         onComplete={() => {
           console.log('[App] RoundRewardSelection onComplete called');
-          setClearedRoundInfo(null);
         }}
       />
     )}

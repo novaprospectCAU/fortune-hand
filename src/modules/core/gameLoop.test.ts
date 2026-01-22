@@ -76,6 +76,7 @@ describe('Game Loop', () => {
         rouletteProbabilityMods: { safeBonus: 0, riskyBonus: 0, halfPenalty: 0 },
         permanentSlotBuffs: { symbolWeightBonuses: {} },
         nextRoundStartScoreRatio: 0,
+        showRoundClearCelebration: null,
         ...overrides,
       };
     }
