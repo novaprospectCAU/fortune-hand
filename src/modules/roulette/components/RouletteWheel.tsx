@@ -58,9 +58,11 @@ export function RouletteWheel({
     [config.segments]
   );
 
-  // Filter segments for visual display (hide low probability segments)
+  // Filter segments for visual display (hide low probability segments, but always show jackpot)
   const visibleSegments = useMemo(
-    () => normalizedSegments.filter((s) => s.probability > HIDDEN_SEGMENT_THRESHOLD),
+    () => normalizedSegments.filter((s) =>
+      s.probability > HIDDEN_SEGMENT_THRESHOLD || s.multiplier >= 100
+    ),
     [normalizedSegments]
   );
 
