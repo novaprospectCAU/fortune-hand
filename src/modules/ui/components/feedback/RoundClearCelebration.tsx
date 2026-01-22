@@ -75,6 +75,7 @@ export function RoundClearCelebration({
   const [confettiPieces, setConfettiPieces] = useState<{ id: number; delay: number; color: string }[]>([]);
 
   useEffect(() => {
+    console.log('[RoundClearCelebration] useEffect triggered, isVisible:', isVisible);
     if (isVisible) {
       // Generate confetti pieces
       const pieces = Array.from({ length: 50 }, (_, i) => ({
@@ -85,11 +86,16 @@ export function RoundClearCelebration({
       setConfettiPieces(pieces);
 
       // Auto-complete after animation
+      console.log('[RoundClearCelebration] Setting 3.5s timer for onComplete');
       const timer = setTimeout(() => {
+        console.log('[RoundClearCelebration] Timer fired, calling onComplete');
         onComplete?.();
       }, 3500);
 
-      return () => clearTimeout(timer);
+      return () => {
+        console.log('[RoundClearCelebration] Cleanup called, clearing timer');
+        clearTimeout(timer);
+      };
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [isVisible]); // Only depend on isVisible to prevent re-running on callback change

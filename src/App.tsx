@@ -95,8 +95,10 @@ function App() {
 
   // Detect round clear (REWARD_PHASE -> SHOP_PHASE with success)
   useEffect(() => {
+    console.log('[RoundClear] Phase change detected:', { previousPhase, phase });
     if (previousPhase === 'REWARD_PHASE' && phase === 'SHOP_PHASE') {
       // Round was cleared successfully (went to shop instead of game over)
+      console.log('[RoundClear] Round cleared! Showing celebration');
       setClearedRoundInfo({ round, score: currentScore, target: targetScore });
       setShowRoundClear(true);
     }
@@ -155,9 +157,11 @@ function App() {
 
   // Round clear celebration complete handler
   const handleRoundClearComplete = useCallback(() => {
+    console.log('[RoundClear] Celebration complete, opening reward selection');
     setShowRoundClear(false);
     // Open round reward selection after celebration
     openRoundReward();
+    console.log('[RoundClear] openRoundReward called');
   }, [openRoundReward]);
 
   // Get roulette config with bonuses applied
@@ -756,9 +760,14 @@ function App() {
     />
 
     {/* Round reward selection */}
+    {(() => {
+      console.log('[App] Checking roundRewardState:', roundRewardState);
+      return null;
+    })()}
     {roundRewardState?.isOpen && (
       <RoundRewardSelection
         onComplete={() => {
+          console.log('[App] RoundRewardSelection onComplete called');
           setClearedRoundInfo(null);
         }}
       />

@@ -1156,6 +1156,7 @@ export const useGameStore = create<GameStore>((set, get) => ({
   // ============================================================
 
   openRoundReward: () => {
+    console.log('[Store] openRoundReward called');
     set({
       roundRewardState: {
         isOpen: true,
@@ -1165,6 +1166,7 @@ export const useGameStore = create<GameStore>((set, get) => ({
         pendingCardRemoval: false,
       },
     });
+    console.log('[Store] roundRewardState set to isOpen: true');
   },
 
   selectRoundReward: (reward: 'quota' | 'chest' | 'gold') => {
