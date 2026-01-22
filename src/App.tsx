@@ -17,7 +17,7 @@ import { GameLayout, ScoreDisplay, DeckViewer, CardEffectTooltip, Modal, Button,
 import { SlotMachine } from '@/modules/slots';
 import { Hand, getSpecialCardDetails } from '@/modules/cards';
 import { RouletteWheel, getDefaultConfig, applyBonuses } from '@/modules/roulette';
-import { Shop, PackOpenOverlay } from '@/modules/shop';
+import { Shop, PackOpenOverlay, CardSelectionOverlay, getConsumableById } from '@/modules/shop';
 import { getJokerById } from '@/modules/jokers';
 
 // Types
@@ -69,6 +69,9 @@ function App() {
     leaveShop,
     openedPackCards,
     clearOpenedPackCards,
+    consumableOverlay,
+    closeConsumableOverlay,
+    applyConsumable,
   } = useGameStore();
 
   // Deck viewer state
@@ -199,6 +202,17 @@ function App() {
           }[itemId];
           if (voucherInfo) {
             return voucherInfo;
+          }
+          break;
+        }
+        case 'consumable': {
+          const consumable = getConsumableById(itemId);
+          if (consumable) {
+            return {
+              name: consumable.name,
+              description: consumable.description,
+              rarity: consumable.rarity,
+            };
           }
           break;
         }
@@ -668,6 +682,16 @@ function App() {
         setClearedRoundInfo(null);
       }}
     />
+
+    {/* Consumable card selection overlay */}
+    {consumableOverlay?.isOpen && consumableOverlay.consumable && (
+      <CardSelectionOverlay
+        consumable={consumableOverlay.consumable}
+        deckCards={deck.cards}
+        onConfirm={applyConsumable}
+        onCancel={closeConsumableOverlay}
+      />
+    )}
   </>
   );
 }
