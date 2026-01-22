@@ -339,6 +339,27 @@ export const translations = {
     // Hand guide
     handGuide: "Hand Guide",
     multiplier: "Multiplier",
+
+    // Slot guide
+    slotGuide: "Slot Guide",
+    singleSymbol: "Single",
+    tripleSymbol: "Triple",
+    activeJokerBuffs: "Active Joker Buffs",
+    jokerBuffsActive: "joker buffs active",
+    slotSymbol_card: "Card",
+    slotSymbol_card_desc: "Draw extra cards. More cards = more hand options!",
+    slotSymbol_target: "Target",
+    slotSymbol_target_desc: "Boost roulette safe zone and max multiplier.",
+    slotSymbol_gold: "Gold",
+    slotSymbol_gold_desc: "Get instant gold to spend in the shop.",
+    slotSymbol_chip: "Chip",
+    slotSymbol_chip_desc: "Get instant chip bonus added to your score.",
+    slotSymbol_star: "Star",
+    slotSymbol_star_desc: "The jackpot symbol! Three stars = massive bonus!",
+    slotSymbol_wild: "Wild",
+    slotSymbol_wild_desc: "Matches any symbol for combinations.",
+    slotSymbol_skull: "Skull",
+    slotSymbol_skull_desc: "Penalty! Discard cards or skip roulette.",
   },
 
   ko: {
@@ -675,6 +696,27 @@ export const translations = {
     // Hand guide
     handGuide: "족보 안내",
     multiplier: "배수",
+
+    // Slot guide
+    slotGuide: "슬롯 안내",
+    singleSymbol: "1개",
+    tripleSymbol: "3개",
+    activeJokerBuffs: "활성 조커 버프",
+    jokerBuffsActive: "개 조커 버프 활성",
+    slotSymbol_card: "카드",
+    slotSymbol_card_desc: "추가 카드를 드로우합니다. 더 많은 카드 = 더 많은 선택지!",
+    slotSymbol_target: "타겟",
+    slotSymbol_target_desc: "룰렛 안전 구간과 최대 배수를 증가시킵니다.",
+    slotSymbol_gold: "골드",
+    slotSymbol_gold_desc: "상점에서 사용할 즉시 골드를 획득합니다.",
+    slotSymbol_chip: "칩",
+    slotSymbol_chip_desc: "점수에 추가되는 즉시 칩 보너스를 획득합니다.",
+    slotSymbol_star: "스타",
+    slotSymbol_star_desc: "잭팟 심볼! 스타 3개 = 엄청난 보너스!",
+    slotSymbol_wild: "와일드",
+    slotSymbol_wild_desc: "조합에서 어떤 심볼과도 매칭됩니다.",
+    slotSymbol_skull: "해골",
+    slotSymbol_skull_desc: "페널티! 카드 버리기 또는 룰렛 스킵.",
   },
 } as const;
 

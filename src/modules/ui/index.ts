@@ -55,6 +55,8 @@ export {
   type DeckViewerProps,
   HandGuide,
   type HandGuideProps,
+  SlotGuide,
+  type SlotGuideProps,
 } from './components/display';
 
 // Feedback Components

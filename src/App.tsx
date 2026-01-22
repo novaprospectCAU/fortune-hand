@@ -11,7 +11,7 @@ import { AnimatePresence, motion } from 'framer-motion';
 import { useGameStore } from '@/modules/core';
 
 // UI module - layout and common components
-import { GameLayout, ScoreDisplay, DeckViewer, CardEffectTooltip, Modal, Button, RoundClearCelebration, useI18n, TranslationKey, HandGuide } from '@/modules/ui';
+import { GameLayout, ScoreDisplay, DeckViewer, CardEffectTooltip, Modal, Button, RoundClearCelebration, useI18n, TranslationKey, HandGuide, SlotGuide } from '@/modules/ui';
 
 // Game modules - components
 import { SlotMachine } from '@/modules/slots';
@@ -301,41 +301,49 @@ function App() {
 
       case 'SLOT_PHASE':
         return (
-          <div className="flex flex-col items-center justify-center h-full py-2 sm:py-4">
-            <motion.div
-              initial={{ opacity: 0, scale: 0.9 }}
-              animate={{ opacity: 1, scale: 1 }}
-              className="text-center mb-6"
-            >
-              <h2 className="text-2xl font-bold text-white mb-2">
-                {t('roundTurn', { round, turn })}
-              </h2>
-              {!slotResult && (
-                <p className="text-gray-400">{t('spinToBegin')}</p>
-              )}
-            </motion.div>
-            <SlotMachine
-              onSpinComplete={handleSlotSpinComplete}
-              disabled={!!slotResult}
-            />
-            {/* Show slot effects after spinning */}
-            {slotResult && (
+          <div className="flex h-full gap-4">
+            {/* Slot Guide - Left Side */}
+            <div className="hidden md:block w-48 shrink-0">
+              <SlotGuide className="sticky top-4" />
+            </div>
+
+            {/* Main Content */}
+            <div className="flex-1 flex flex-col items-center justify-center py-2 sm:py-4">
               <motion.div
-                initial={{ opacity: 0, y: 20 }}
-                animate={{ opacity: 1, y: 0 }}
-                className="mt-6 bg-game-surface rounded-lg p-4 max-w-md"
+                initial={{ opacity: 0, scale: 0.9 }}
+                animate={{ opacity: 1, scale: 1 }}
+                className="text-center mb-6"
               >
-                <h3 className="text-lg font-bold text-white text-center mb-2">
-                  {slotResult.isJackpot ? `🎉 ${t('jackpot')} 🎉` : t('slotResult')}
-                </h3>
-                <div className="text-center text-sm">
-                  {formatSlotEffects(slotResult.effects, t)}
-                </div>
-                <p className="text-gray-400 text-center text-sm mt-3">
-                  {t('clickContinueToDraw')}
-                </p>
+                <h2 className="text-2xl font-bold text-white mb-2">
+                  {t('roundTurn', { round, turn })}
+                </h2>
+                {!slotResult && (
+                  <p className="text-gray-400">{t('spinToBegin')}</p>
+                )}
               </motion.div>
-            )}
+              <SlotMachine
+                onSpinComplete={handleSlotSpinComplete}
+                disabled={!!slotResult}
+              />
+              {/* Show slot effects after spinning */}
+              {slotResult && (
+                <motion.div
+                  initial={{ opacity: 0, y: 20 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  className="mt-6 bg-game-surface rounded-lg p-4 max-w-md"
+                >
+                  <h3 className="text-lg font-bold text-white text-center mb-2">
+                    {slotResult.isJackpot ? `🎉 ${t('jackpot')} 🎉` : t('slotResult')}
+                  </h3>
+                  <div className="text-center text-sm">
+                    {formatSlotEffects(slotResult.effects, t)}
+                  </div>
+                  <p className="text-gray-400 text-center text-sm mt-3">
+                    {t('clickContinueToDraw')}
+                  </p>
+                </motion.div>
+              )}
+            </div>
           </div>
         );
 
