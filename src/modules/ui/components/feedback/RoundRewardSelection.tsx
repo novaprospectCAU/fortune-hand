@@ -5,7 +5,7 @@
  * Includes treasure chest opening animation
  */
 
-import React, { useState } from 'react';
+import React, { useState, useMemo } from 'react';
 import { motion } from 'framer-motion';
 import { useI18n } from '../../i18n';
 import { useGameStore } from '@/modules/core/store';
@@ -14,7 +14,7 @@ import type { TreasureChestRewardType } from '@/types/interfaces';
 // Reward type display info
 const REWARD_TYPE_INFO: Record<TreasureChestRewardType, { emoji: string; nameKey: string }> = {
   hand_upgrades: { emoji: '🃏', nameKey: 'chestReward_handUpgrades' },
-  high_rarity_item: { emoji: '💎', nameKey: 'chestReward_highRarity' },
+  high_rarity_item: { emoji: '💰', nameKey: 'chestReward_highRarity' },
   remove_cards: { emoji: '🗑️', nameKey: 'chestReward_removeCards' },
   roulette_safe: { emoji: '🎯', nameKey: 'chestReward_rouletteSafe' },
   roulette_risky: { emoji: '🎰', nameKey: 'chestReward_rouletteRisky' },
@@ -31,17 +31,23 @@ function TreasureChest() {
   const applyChestReward = useGameStore((state) => state.applyChestReward);
   const proceedToReroll = useGameStore((state) => state.proceedToReroll);
   const completeRoundReward = useGameStore((state) => state.completeRoundReward);
+  const removeCardsFromDeck = useGameStore((state) => state.removeCardsFromDeck);
+  const deck = useGameStore((state) => state.deck);
 
   const [isAnimating, setIsAnimating] = useState(false);
+  const [selectedCardIds, setSelectedCardIds] = useState<string[]>([]);
 
   const chestPhase = roundRewardState?.chestPhase ?? 'closed';
   const rewards = roundRewardState?.chestRewards ?? [];
   const currentReward = rewards[rewards.length - 1];
   const pendingReroll = roundRewardState?.pendingReroll ?? false;
+  const pendingCardRemoval = roundRewardState?.pendingCardRemoval ?? false;
 
-  console.log('[TreasureChestUI] Phase:', chestPhase);
-  console.log('[TreasureChestUI] Current reward:', currentReward);
-  console.log('[TreasureChestUI] Pending reroll:', pendingReroll);
+  // All cards available for removal (deck + discardPile)
+  const allDeckCards = useMemo(() => {
+    return [...deck.cards, ...deck.discardPile];
+  }, [deck]);
+
 
   const handleOpenChest = () => {
     if (chestPhase === 'closed' && !isAnimating) {
@@ -195,8 +201,80 @@ function TreasureChest() {
         </motion.button>
       )}
 
+      {/* Card removal UI */}
+      {chestPhase === 'revealed' && currentReward?.applied && pendingCardRemoval && (
+        <motion.div
+          initial={{ opacity: 0, y: 10 }}
+          animate={{ opacity: 1, y: 0 }}
+          className="flex flex-col items-center gap-3 w-full max-w-lg"
+        >
+          <p className="text-yellow-400 font-bold">{t('selectCardsToRemove')}</p>
+          <p className="text-gray-400 text-sm">{selectedCardIds.length}/3 {t('selected')}</p>
+          <div className="grid grid-cols-6 sm:grid-cols-8 gap-1 max-h-48 overflow-y-auto w-full p-2 bg-gray-700/50 rounded-lg">
+            {allDeckCards.map((card) => {
+              const isCardSelected = selectedCardIds.includes(card.id);
+              const suitColor = card.suit === 'hearts' || card.suit === 'diamonds' ? '#ef4444' : '#1f2937';
+              const suitSymbol = card.suit === 'hearts' ? '\u2665' : card.suit === 'diamonds' ? '\u2666' : card.suit === 'clubs' ? '\u2663' : '\u2660';
+              return (
+                <button
+                  key={card.id}
+                  onClick={() => {
+                    if (isCardSelected) {
+                      setSelectedCardIds(prev => prev.filter(id => id !== card.id));
+                    } else if (selectedCardIds.length < 3) {
+                      setSelectedCardIds(prev => [...prev, card.id]);
+                    }
+                  }}
+                  className={`
+                    p-1 rounded text-xs font-bold text-center transition-all
+                    ${isCardSelected
+                      ? 'bg-red-500/30 border-2 border-red-400 scale-95'
+                      : 'bg-white border border-gray-300 hover:border-yellow-400'
+                    }
+                    ${!isCardSelected && selectedCardIds.length >= 3 ? 'opacity-40 cursor-not-allowed' : 'cursor-pointer'}
+                  `}
+                  disabled={!isCardSelected && selectedCardIds.length >= 3}
+                >
+                  <div style={{ color: suitColor }}>{card.rank}</div>
+                  <div style={{ color: suitColor }}>{suitSymbol}</div>
+                </button>
+              );
+            })}
+          </div>
+          <div className="flex gap-3">
+            <motion.button
+              whileTap={{ scale: 0.95 }}
+              onClick={() => {
+                if (selectedCardIds.length > 0) {
+                  removeCardsFromDeck(selectedCardIds);
+                  setSelectedCardIds([]);
+                }
+              }}
+              disabled={selectedCardIds.length === 0}
+              className={`px-6 py-2 font-bold rounded-lg transition-colors ${
+                selectedCardIds.length > 0
+                  ? 'bg-red-600 hover:bg-red-700 text-white'
+                  : 'bg-gray-600 text-gray-400 cursor-not-allowed'
+              }`}
+            >
+              {t('removeSelected')}
+            </motion.button>
+            <motion.button
+              whileTap={{ scale: 0.95 }}
+              onClick={() => {
+                // Skip card removal
+                removeCardsFromDeck([]);
+              }}
+              className="px-6 py-2 bg-gray-600 hover:bg-gray-700 text-white font-bold rounded-lg transition-colors"
+            >
+              {t('skip')}
+            </motion.button>
+          </div>
+        </motion.div>
+      )}
+
       {/* Normal reward - show continue button */}
-      {chestPhase === 'revealed' && currentReward?.applied && !pendingReroll && (
+      {chestPhase === 'revealed' && currentReward?.applied && !pendingReroll && !pendingCardRemoval && (
         <motion.button
           initial={{ opacity: 0 }}
           animate={{ opacity: 1 }}
@@ -239,11 +317,19 @@ export function RoundRewardSelection({ onComplete }: RoundRewardSelectionProps):
   const selectRoundReward = useGameStore((state) => state.selectRoundReward);
   const completeRoundReward = useGameStore((state) => state.completeRoundReward);
   const round = useGameStore((state) => state.round);
+  const [previewReward, setPreviewReward] = useState<'quota' | 'chest' | 'gold' | null>(null);
 
   if (!roundRewardState?.isOpen) return null;
 
-  const handleSelectReward = (reward: 'quota' | 'chest' | 'gold') => {
-    selectRoundReward(reward);
+  const handlePreviewReward = (reward: 'quota' | 'chest' | 'gold') => {
+    setPreviewReward(prev => prev === reward ? null : reward);
+  };
+
+  const handleConfirmReward = () => {
+    if (previewReward) {
+      selectRoundReward(previewReward);
+      setPreviewReward(null);
+    }
   };
 
   const handleComplete = () => {
@@ -280,42 +366,69 @@ export function RoundRewardSelection({ onComplete }: RoundRewardSelectionProps):
 
         {/* Reward Selection */}
         {!selectedReward && (
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mb-6">
-            {/* Quota Option */}
-            <motion.button
-              whileHover={{ scale: 1.05 }}
-              whileTap={{ scale: 0.95 }}
-              onClick={() => handleSelectReward('quota')}
-              className="bg-blue-900/50 hover:bg-blue-800/50 border-2 border-blue-500 rounded-xl p-6 text-center transition-colors"
-            >
-              <div className="text-5xl mb-3">📊</div>
-              <h3 className="text-xl font-bold text-blue-400 mb-2">{t('rewardQuota')}</h3>
-              <p className="text-gray-300 text-sm">{t('rewardQuotaDesc')}</p>
-            </motion.button>
+          <div className="flex flex-col items-center">
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mb-6 w-full">
+              {/* Quota Option */}
+              <motion.button
+                whileHover={{ scale: 1.03 }}
+                whileTap={{ scale: 0.97 }}
+                onClick={() => handlePreviewReward('quota')}
+                className={`rounded-xl p-6 text-center transition-all border-2 ${
+                  previewReward === 'quota'
+                    ? 'bg-blue-800/60 border-blue-300 scale-105'
+                    : 'bg-blue-900/50 hover:bg-blue-800/50 border-blue-500'
+                }`}
+              >
+                <div className="text-5xl mb-3">📊</div>
+                <h3 className="text-xl font-bold text-blue-400 mb-2">{t('rewardQuota')}</h3>
+                <p className="text-gray-300 text-sm">{t('rewardQuotaDesc')}</p>
+              </motion.button>
 
-            {/* Chest Option */}
-            <motion.button
-              whileHover={{ scale: 1.05 }}
-              whileTap={{ scale: 0.95 }}
-              onClick={() => handleSelectReward('chest')}
-              className="bg-yellow-900/50 hover:bg-yellow-800/50 border-2 border-yellow-500 rounded-xl p-6 text-center transition-colors"
-            >
-              <div className="text-5xl mb-3">📦</div>
-              <h3 className="text-xl font-bold text-yellow-400 mb-2">{t('rewardChest')}</h3>
-              <p className="text-gray-300 text-sm">{t('rewardChestDesc')}</p>
-            </motion.button>
+              {/* Chest Option */}
+              <motion.button
+                whileHover={{ scale: 1.03 }}
+                whileTap={{ scale: 0.97 }}
+                onClick={() => handlePreviewReward('chest')}
+                className={`rounded-xl p-6 text-center transition-all border-2 ${
+                  previewReward === 'chest'
+                    ? 'bg-yellow-800/60 border-yellow-300 scale-105'
+                    : 'bg-yellow-900/50 hover:bg-yellow-800/50 border-yellow-500'
+                }`}
+              >
+                <div className="text-5xl mb-3">📦</div>
+                <h3 className="text-xl font-bold text-yellow-400 mb-2">{t('rewardChest')}</h3>
+                <p className="text-gray-300 text-sm">{t('rewardChestDesc')}</p>
+              </motion.button>
 
-            {/* Gold Option */}
-            <motion.button
-              whileHover={{ scale: 1.05 }}
-              whileTap={{ scale: 0.95 }}
-              onClick={() => handleSelectReward('gold')}
-              className="bg-green-900/50 hover:bg-green-800/50 border-2 border-green-500 rounded-xl p-6 text-center transition-colors"
-            >
-              <div className="text-5xl mb-3">💰</div>
-              <h3 className="text-xl font-bold text-green-400 mb-2">{t('rewardGold')}</h3>
-              <p className="text-gray-300 text-sm">{t('rewardGoldDesc')}</p>
-            </motion.button>
+              {/* Gold Option */}
+              <motion.button
+                whileHover={{ scale: 1.03 }}
+                whileTap={{ scale: 0.97 }}
+                onClick={() => handlePreviewReward('gold')}
+                className={`rounded-xl p-6 text-center transition-all border-2 ${
+                  previewReward === 'gold'
+                    ? 'bg-green-800/60 border-green-300 scale-105'
+                    : 'bg-green-900/50 hover:bg-green-800/50 border-green-500'
+                }`}
+              >
+                <div className="text-5xl mb-3">💰</div>
+                <h3 className="text-xl font-bold text-green-400 mb-2">{t('rewardGold')}</h3>
+                <p className="text-gray-300 text-sm">{t('rewardGoldDesc')}</p>
+              </motion.button>
+            </div>
+
+            {/* Confirm Button */}
+            {previewReward && (
+              <motion.button
+                initial={{ opacity: 0, y: 10 }}
+                animate={{ opacity: 1, y: 0 }}
+                whileTap={{ scale: 0.95 }}
+                onClick={handleConfirmReward}
+                className="px-8 py-3 bg-yellow-500 hover:bg-yellow-600 text-gray-900 font-bold rounded-lg transition-colors text-lg"
+              >
+                {t('confirmReward')}
+              </motion.button>
+            )}
           </div>
         )}
 

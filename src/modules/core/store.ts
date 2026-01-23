@@ -774,6 +774,13 @@ export const useGameStore = create<GameStore>((set, get) => ({
       return;
     }
 
+    // Check joker capacity before purchase
+    const itemToBuy = state.shopState.items.find(i => i.id === itemId);
+    if (itemToBuy?.type === 'joker' && state.jokers.length >= state.maxJokers) {
+      console.warn('Cannot buy joker: max capacity reached');
+      return;
+    }
+
     const transaction = shopBuyItem(state.shopState, itemId, state.gold);
 
     if (!transaction.success) {
@@ -1225,8 +1232,6 @@ export const useGameStore = create<GameStore>((set, get) => ({
     const roll = Math.random() * 100;
     let rewardType: TreasureChestRewardType;
 
-    console.log('[TreasureChest] Roll:', roll);
-
     if (roll < 10) {
       rewardType = 'hand_upgrades';
     } else if (roll < 30) {
@@ -1244,8 +1249,6 @@ export const useGameStore = create<GameStore>((set, get) => ({
     } else {
       rewardType = 'reroll';
     }
-
-    console.log('[TreasureChest] Reward type:', rewardType);
 
     const newReward: TreasureChestReward = {
       type: rewardType,
@@ -1386,10 +1389,6 @@ export const useGameStore = create<GameStore>((set, get) => ({
 
     details = applyReward(currentReward.type);
 
-    console.log('[TreasureChest] Applied reward:', currentReward.type);
-    console.log('[TreasureChest] Details:', details);
-    console.log('[TreasureChest] shouldReroll:', shouldReroll);
-
     // 최신 상태 가져오기 (applyReward 내부에서 set()이 호출되었을 수 있음)
     const freshState = get();
 
@@ -1399,8 +1398,6 @@ export const useGameStore = create<GameStore>((set, get) => ({
         ? { ...r, applied: true, details }
         : r
     );
-
-    console.log('[TreasureChest] Updated rewards:', updatedRewards);
 
     set({
       roundRewardState: {
@@ -1422,6 +1419,25 @@ export const useGameStore = create<GameStore>((set, get) => ({
         ...state.roundRewardState,
         chestPhase: 'closed',
         pendingReroll: false,
+      },
+    });
+  },
+
+  removeCardsFromDeck: (cardIds: string[]) => {
+    const state = get();
+    if (!state.roundRewardState?.pendingCardRemoval) return;
+
+    // Remove cards from deck (both cards and discardPile)
+    const newDeck = {
+      cards: state.deck.cards.filter(c => !cardIds.includes(c.id)),
+      discardPile: state.deck.discardPile.filter(c => !cardIds.includes(c.id)),
+    };
+
+    set({
+      deck: newDeck,
+      roundRewardState: {
+        ...state.roundRewardState,
+        pendingCardRemoval: false,
       },
     });
   },

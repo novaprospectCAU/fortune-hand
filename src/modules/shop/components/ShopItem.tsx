@@ -12,6 +12,8 @@ export interface ShopItemProps {
   item: ShopItemType;
   canAfford: boolean;
   onBuy: () => void;
+  /** Reason why purchase is disabled (shown below button) */
+  disabledReason?: string;
   /** Optional item details to display */
   itemDetails?: {
     name: string;
@@ -86,7 +88,7 @@ function getItemTypeName(type: ShopItemType['type']): string {
   }
 }
 
-export function ShopItem({ item, canAfford, onBuy, itemDetails }: ShopItemProps): React.ReactElement {
+export function ShopItem({ item, canAfford, onBuy, itemDetails, disabledReason }: ShopItemProps): React.ReactElement {
   const isSold = item.sold;
   const isDisabled = isSold || !canAfford;
 
@@ -215,7 +217,9 @@ export function ShopItem({ item, canAfford, onBuy, itemDetails }: ShopItemProps)
           )}
         </button>
         {!isSold && !canAfford && (
-          <p className="text-xs text-red-400 text-center mt-1">Not enough gold</p>
+          <p className="text-xs text-red-400 text-center mt-1">
+            {disabledReason || 'Not enough gold'}
+          </p>
         )}
       </div>
     </div>

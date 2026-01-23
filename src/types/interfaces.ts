@@ -543,6 +543,7 @@ export interface GameActions {
   openTreasureChest(): void;
   applyChestReward(): void;
   proceedToReroll(): void;
+  removeCardsFromDeck(cardIds: string[]): void;
   completeRoundReward(): void;
   clearRoundClearCelebration(): void;
 }

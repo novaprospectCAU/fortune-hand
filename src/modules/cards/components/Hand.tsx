@@ -22,9 +22,9 @@ export interface HandProps {
  * 카드 겹침 정도 (음수 마진) - 모바일에서 카드가 크므로 더 많이 겹침
  */
 const OVERLAP_STYLES = {
-  sm: '-ml-8 sm:-ml-4',
-  md: '-ml-10 sm:-ml-6',
-  lg: '-ml-12 sm:-ml-8',
+  sm: '-ml-5 sm:-ml-4',
+  md: '-ml-6 sm:-ml-6',
+  lg: '-ml-8 sm:-ml-8',
 };
 
 
@@ -64,22 +64,22 @@ function HandComponent({
     [selectedSet, isMaxSelected, onCardClick]
   );
 
-  // 카드 각도 계산 (부채꼴 배치) - 모바일에서는 각도 감소
+  // 카드 각도 계산 (부채꼴 배치) - 모바일에서는 각도 거의 없음
   const getCardRotation = (index: number, total: number): number => {
     if (total <= 1) return 0;
-    // 모바일에서는 더 평평하게
-    const maxAngle = Math.min(total * 2.5, 15); // 최대 15도 (기존 20도)
+    const isMobile = window.innerWidth < 640;
+    const maxAngle = isMobile ? Math.min(total * 1, 6) : Math.min(total * 2.5, 15);
     const step = maxAngle / (total - 1);
     return -maxAngle / 2 + step * index;
   };
 
-  // 카드 Y 오프셋 계산 (아치 형태) - 모바일에서는 더 평평하게
+  // 카드 Y 오프셋 계산 (아치 형태) - 모바일에서는 거의 평평하게
   const getCardYOffset = (index: number, total: number): number => {
     if (total <= 1) return 0;
     const middle = (total - 1) / 2;
     const distance = Math.abs(index - middle);
-    // 모바일에서는 아치 효과 감소
-    return distance * distance * 1.5; // 기존 2에서 1.5로 감소
+    const isMobile = window.innerWidth < 640;
+    return distance * distance * (isMobile ? 0.5 : 1.5);
   };
 
   return (

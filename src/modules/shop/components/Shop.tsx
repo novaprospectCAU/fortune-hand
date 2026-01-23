@@ -17,6 +17,8 @@ export interface ShopProps {
   onBuy: (itemId: string) => void;
   onReroll: () => void;
   onLeave: () => void;
+  /** Whether joker slots are full */
+  jokersFull?: boolean;
   /** Optional function to get item details for display */
   getItemDetails?: (
     itemId: string,
@@ -30,6 +32,7 @@ export function Shop({
   onBuy,
   onReroll,
   onLeave,
+  jokersFull = false,
   getItemDetails,
 }: ShopProps): React.ReactElement {
   const { t } = useI18n();
@@ -53,15 +56,19 @@ export function Shop({
       {/* Shop Items Grid */}
       <div className="flex-1 mb-6">
         <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
-          {shopState.items.map((item) => (
-            <ShopItem
-              key={item.id}
-              item={item}
-              canAfford={canAffordItem(item, playerGold)}
-              onBuy={() => onBuy(item.id)}
-              itemDetails={getItemDetails?.(item.itemId, item.type)}
-            />
-          ))}
+          {shopState.items.map((item) => {
+            const isJokerBlocked = item.type === 'joker' && jokersFull && !item.sold;
+            return (
+              <ShopItem
+                key={item.id}
+                item={item}
+                canAfford={isJokerBlocked ? false : canAffordItem(item, playerGold)}
+                onBuy={() => onBuy(item.id)}
+                itemDetails={getItemDetails?.(item.itemId, item.type)}
+                disabledReason={isJokerBlocked ? t('jokerSlotsFull') : undefined}
+              />
+            );
+          })}
         </div>
 
         {shopState.items.length === 0 && (

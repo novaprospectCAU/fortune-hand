@@ -169,6 +169,7 @@ export const translations = {
     selectUpToN: "Select up to {n} cards",
     selected: "Selected",
     removeCards: "Remove {n} Card(s)",
+    removeSelected: "Remove Selected",
     transformCards: "Transform {n} Card(s)",
     duplicateCards: "Duplicate {n} Card(s)",
     skipRemoval: "Skip",
@@ -299,6 +300,7 @@ export const translations = {
     // Shop UI
     leaveShop: "Leave Shop",
     noItemsAvailable: "No items available",
+    jokerSlotsFull: "Joker slots full",
 
     // Pack names
     pack_standard: "Standard Pack",
@@ -374,6 +376,7 @@ export const translations = {
     rewardGoldApplied: "Gold received!",
     clickToOpenChest: "Click the chest to open!",
     applyReward: "Apply Reward",
+    confirmReward: "Confirm",
     openingAgain: "Opening again",
     rerollGranted: "Reroll granted!",
     openAgain: "Open Again",
@@ -554,6 +557,7 @@ export const translations = {
     selectUpToN: "최대 {n}장 선택",
     selected: "선택됨",
     removeCards: "{n}장 제거",
+    removeSelected: "선택 제거",
     transformCards: "{n}장 변환",
     duplicateCards: "{n}장 복제",
     skipRemoval: "건너뛰기",
@@ -684,6 +688,7 @@ export const translations = {
     // Shop UI
     leaveShop: "상점 나가기",
     noItemsAvailable: "상품 없음",
+    jokerSlotsFull: "조커 슬롯 가득 참",
 
     // Pack names
     pack_standard: "기본 팩",
@@ -759,6 +764,7 @@ export const translations = {
     rewardGoldApplied: "골드를 받았습니다!",
     clickToOpenChest: "상자를 클릭해서 열어보세요!",
     applyReward: "보상 적용",
+    confirmReward: "확인",
     openingAgain: "다시 여는 중",
     rerollGranted: "리롤 획득!",
     openAgain: "다시 열기",

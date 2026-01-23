@@ -84,6 +84,9 @@ function App() {
   // Hovered card state (for effect tooltip)
   const [hoveredCard, setHoveredCard] = useState<import('@/types/interfaces').Card | null>(null);
 
+  // Mobile guide sidebar toggle
+  const [isMobileGuideOpen, setIsMobileGuideOpen] = useState(false);
+
   // Roulette retry tracking (resets when phase changes)
   const [rouletteRetryUsed, setRouletteRetryUsed] = useState(false);
 
@@ -314,10 +317,28 @@ function App() {
       case 'SLOT_PHASE':
         return (
           <div className="flex h-full gap-4">
-            {/* Slot Guide - Left Side */}
+            {/* Slot Guide - Left Side (desktop) */}
             <div className="hidden md:block w-48 shrink-0">
               <SlotGuide className="sticky top-4" />
             </div>
+
+            {/* Mobile Guide Toggle Button */}
+            <button
+              className="md:hidden fixed bottom-20 right-4 z-40 bg-indigo-600 hover:bg-indigo-700 text-white w-10 h-10 rounded-full shadow-lg flex items-center justify-center text-lg"
+              onClick={() => setIsMobileGuideOpen(!isMobileGuideOpen)}
+            >
+              {isMobileGuideOpen ? '✕' : '📋'}
+            </button>
+
+            {/* Mobile Guide Sidebar Overlay */}
+            {isMobileGuideOpen && (
+              <div className="md:hidden fixed inset-0 z-30" onClick={() => setIsMobileGuideOpen(false)}>
+                <div className="absolute inset-0 bg-black/50" />
+                <div className="absolute right-0 top-0 bottom-0 w-56 bg-gray-900 p-3 overflow-y-auto" onClick={(e) => e.stopPropagation()}>
+                  <SlotGuide />
+                </div>
+              </div>
+            )}
 
             {/* Main Content */}
             <div className="flex-1 flex flex-col items-center justify-center py-2 sm:py-4">
@@ -376,10 +397,28 @@ function App() {
       case 'PLAY_PHASE':
         return (
           <div className="flex h-full gap-4">
-            {/* Hand Guide - Left Side */}
+            {/* Hand Guide - Left Side (desktop) */}
             <div className="hidden md:block w-48 shrink-0">
               <HandGuide className="sticky top-4" />
             </div>
+
+            {/* Mobile Guide Toggle Button */}
+            <button
+              className="md:hidden fixed bottom-20 right-4 z-40 bg-indigo-600 hover:bg-indigo-700 text-white w-10 h-10 rounded-full shadow-lg flex items-center justify-center text-lg"
+              onClick={() => setIsMobileGuideOpen(!isMobileGuideOpen)}
+            >
+              {isMobileGuideOpen ? '✕' : '📋'}
+            </button>
+
+            {/* Mobile Guide Sidebar Overlay */}
+            {isMobileGuideOpen && (
+              <div className="md:hidden fixed inset-0 z-30" onClick={() => setIsMobileGuideOpen(false)}>
+                <div className="absolute inset-0 bg-black/50" />
+                <div className="absolute right-0 top-0 bottom-0 w-56 bg-gray-900 p-3 overflow-y-auto" onClick={(e) => e.stopPropagation()}>
+                  <HandGuide />
+                </div>
+              </div>
+            )}
 
             {/* Main Content */}
             <div className="flex-1 flex flex-col min-w-0">
@@ -591,6 +630,7 @@ function App() {
                 onBuy={buyItem}
                 onReroll={rerollShop}
                 onLeave={leaveShop}
+                jokersFull={jokers.length >= maxJokers}
                 getItemDetails={getItemDetails}
               />
             )}

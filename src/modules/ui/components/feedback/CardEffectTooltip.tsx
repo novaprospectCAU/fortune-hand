@@ -19,6 +19,9 @@ export interface CardEffectTooltipProps {
 function getCardEffectDescription(card: Card): string | null {
   const effects: string[] = [];
 
+  if (card.isGlass) {
+    effects.push('Glass: x2 Mult when scored, 1/4 chance to break');
+  }
   if (card.isWild) {
     effects.push('Wild: Can be any rank or suit');
   }

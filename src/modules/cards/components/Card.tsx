@@ -3,11 +3,10 @@
  * 카드의 시각적 표현과 상호작용 담당
  */
 
-import { memo, useState, useCallback } from 'react';
-import { motion, AnimatePresence } from 'framer-motion';
+import { memo } from 'react';
+import { motion } from 'framer-motion';
 import type { Card as CardType } from '@/types/interfaces';
 import { isSpecialCard } from '../specialCards';
-import { useI18n } from '@/modules/ui';
 
 /**
  * 무늬별 기호 매핑
@@ -136,54 +135,6 @@ function getSpecialBackground(card: CardType): string | undefined {
 }
 
 /**
- * 카드 효과 설명 생성
- */
-function getCardEffectDescriptions(
-  card: CardType,
-  t: (key: import('@/modules/ui').TranslationKey, params?: Record<string, string | number>) => string
-): string[] {
-  const effects: string[] = [];
-
-  // 특수 카드 효과
-  if (card.isGlass) {
-    effects.push(`💎 ${t('glassEffect')}`);
-  }
-  if (card.isWild) {
-    effects.push(`🌟 ${t('wildEffect')}`);
-  }
-  if (card.isGold) {
-    effects.push(`💰 ${t('goldEffect')}`);
-  }
-  if (card.triggerSlot) {
-    effects.push(`🎰 ${t('slotEffect')}`);
-  }
-  if (card.triggerRoulette) {
-    effects.push(`🎯 ${t('rouletteEffect')}`);
-  }
-
-  // 강화 효과
-  if (card.enhancement) {
-    const { type, value } = card.enhancement;
-    switch (type) {
-      case 'mult':
-        effects.push(`🔴 ${t('multEffect', { value })}`);
-        break;
-      case 'chips':
-        effects.push(`🔵 ${t('chipsEffect', { value })}`);
-        break;
-      case 'gold':
-        effects.push(`🟡 ${t('goldBonusEffect', { value })}`);
-        break;
-      case 'retrigger':
-        effects.push(`🟣 ${t('retriggerEffect', { count: value + 1 })}`);
-        break;
-    }
-  }
-
-  return effects;
-}
-
-/**
  * Card 컴포넌트
  * 개별 카드의 시각적 표현과 상호작용 처리
  */
@@ -195,9 +146,6 @@ function CardComponent({
   faceDown = false,
   size = 'md',
 }: CardProps) {
-  const { t } = useI18n();
-  const [showTooltip, setShowTooltip] = useState(false);
-
   const sizeStyle = SIZE_STYLES[size];
   const suitColor = card.isGlass ? '#0891b2' : SUIT_COLORS[card.suit];
   const suitSymbol = card.isGlass ? '◇' : SUIT_SYMBOLS[card.suit];
@@ -208,21 +156,6 @@ function CardComponent({
     ? ENHANCEMENT_GRADIENTS[card.enhancement.type]
     : undefined;
   const hasSpecialEffect = specialBorder || enhancementGradient || specialBackground;
-
-  // 카드 효과 설명 목록
-  const effectDescriptions = getCardEffectDescriptions(card, t);
-  const hasEffects = effectDescriptions.length > 0;
-
-  // 툴팁 표시/숨김 핸들러
-  const handleMouseEnter = useCallback(() => {
-    if (hasEffects && !faceDown) {
-      setShowTooltip(true);
-    }
-  }, [hasEffects, faceDown]);
-
-  const handleMouseLeave = useCallback(() => {
-    setShowTooltip(false);
-  }, []);
 
   // 카드 뒷면
   if (faceDown) {
@@ -250,14 +183,15 @@ function CardComponent({
         bg-white shadow-md
         flex flex-col relative
         ${disabled ? 'opacity-50 cursor-not-allowed' : 'cursor-pointer'}
-        ${selected ? 'ring-2 ring-yellow-400 ring-offset-1 sm:ring-offset-2' : ''}
         touch-manipulation select-none
       `}
       style={{
-        borderWidth: `${borderWidth}px`,
+        borderWidth: selected ? '3px' : `${borderWidth}px`,
         borderStyle: 'solid',
-        borderColor: specialBorder || '#d1d5db',
+        borderColor: selected ? '#facc15' : (specialBorder || '#d1d5db'),
         background: specialBackground || enhancementGradient || 'white',
+        outline: selected ? '2px solid #facc15' : 'none',
+        outlineOffset: '1px',
       }}
       initial={false}
       animate={{
@@ -267,32 +201,10 @@ function CardComponent({
       }}
       whileTap={!disabled ? { scale: 0.95 } : undefined}
       onClick={!disabled ? onClick : undefined}
-      onMouseEnter={handleMouseEnter}
-      onMouseLeave={handleMouseLeave}
       transition={{ type: 'spring', stiffness: 400, damping: 25 }}
     >
-      {/* 카드 효과 툴팁 */}
-      <AnimatePresence>
-        {showTooltip && hasEffects && (
-          <motion.div
-            initial={{ opacity: 0, y: 10 }}
-            animate={{ opacity: 1, y: 0 }}
-            exit={{ opacity: 0, y: 10 }}
-            transition={{ duration: 0.15 }}
-            className="absolute z-50 bottom-full left-1/2 -translate-x-1/2 mb-2 pointer-events-none"
-          >
-            <div className="bg-gray-900 text-white text-xs rounded-lg px-3 py-2 shadow-lg whitespace-nowrap">
-              {effectDescriptions.map((desc, idx) => (
-                <div key={idx} className={idx > 0 ? 'mt-1' : ''}>
-                  {desc}
-                </div>
-              ))}
-              {/* 툴팁 화살표 */}
-              <div className="absolute top-full left-1/2 -translate-x-1/2 border-4 border-transparent border-t-gray-900" />
-            </div>
-          </motion.div>
-        )}
-      </AnimatePresence>
+
+
       {/* 왼쪽 상단 랭크/무늬 */}
       <div
         className={`absolute top-1 left-1 ${sizeStyle.fontSize} font-bold leading-none`}
@@ -353,4 +265,13 @@ function CardComponent({
   );
 }
 
-export const Card = memo(CardComponent);
+export const Card = memo(CardComponent, (prev, next) => {
+  // Custom comparison: ignore onClick reference changes
+  return (
+    prev.card === next.card &&
+    prev.selected === next.selected &&
+    prev.disabled === next.disabled &&
+    prev.faceDown === next.faceDown &&
+    prev.size === next.size
+  );
+});
