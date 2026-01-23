@@ -241,17 +241,21 @@ export const useGameStore = create<GameStore>((set, get) => ({
         const penalty = state.slotResult?.effects.penalty.discardCards ?? 0;
         const drawCount = state.config.handSize + slotBonus;
 
-        // Apply penalty first
-        if (penalty > 0 && state.hand.length > 0) {
-          const toDiscard = state.hand.slice(0, Math.min(penalty, state.hand.length));
-          const newDeck = discard(state.deck, toDiscard);
-          set({
-            deck: newDeck,
-            hand: state.hand.filter(c => !toDiscard.includes(c)),
-          });
+        get()._drawCards(drawCount);
+
+        // Apply skull penalty AFTER drawing (discard from newly drawn hand)
+        if (penalty > 0) {
+          const currentState = get();
+          if (currentState.hand.length > 0) {
+            const toDiscard = currentState.hand.slice(0, Math.min(penalty, currentState.hand.length));
+            const newDeck = discard(currentState.deck, toDiscard);
+            set({
+              deck: newDeck,
+              hand: currentState.hand.filter(c => !toDiscard.includes(c)),
+            });
+          }
         }
 
-        get()._drawCards(drawCount);
         // Automatically move to play phase
         set({ phase: 'PLAY_PHASE' });
         getGameEventEmitter().emit({
@@ -1077,6 +1081,8 @@ export const useGameStore = create<GameStore>((set, get) => ({
           const RANKS: Array<Card['rank']> = ['A', '2', '3', '4', '5', '6', '7', '8', '9', '10', 'J', 'Q', 'K'];
           const ENHANCEMENTS = ['mult', 'chips', 'gold', 'retrigger'] as const;
 
+          const transformedCards: Card[] = [];
+
           const transformCard = (): Card => {
             const suit = SUITS[Math.floor(Math.random() * SUITS.length)]!;
             const rank = RANKS[Math.floor(Math.random() * RANKS.length)]!;
@@ -1106,6 +1112,7 @@ export const useGameStore = create<GameStore>((set, get) => ({
               }
             }
 
+            transformedCards.push(newCard);
             return newCard;
           };
 
@@ -1117,7 +1124,9 @@ export const useGameStore = create<GameStore>((set, get) => ({
             selectedCardIds.includes(c.id) ? transformCard() : c
           );
           newDeck = { cards: shuffle(newCards), discardPile: newDiscard };
-          console.log(`Transformed ${selectedCardIds.length} card(s)`);
+
+          // Show transformed cards in overlay
+          set({ openedPackCards: transformedCards });
         }
         break;
       }

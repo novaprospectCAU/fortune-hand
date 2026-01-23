@@ -151,6 +151,7 @@ export const translations = {
     // Pack
     cardAcquired: "Card Acquired!",
     packOpened: "Pack Opened!",
+    cardsTransformed: "Cards Transformed!",
     cardAddedToDeck: "1 card added to your deck",
     cardsAddedToDeck: "{n} cards added to your deck",
 
@@ -539,6 +540,7 @@ export const translations = {
     // Pack
     cardAcquired: "카드 획득!",
     packOpened: "팩 오픈!",
+    cardsTransformed: "카드 변환 완료!",
     cardAddedToDeck: "1장의 카드가 덱에 추가되었습니다",
     cardsAddedToDeck: "{n}장의 카드가 덱에 추가되었습니다",
 

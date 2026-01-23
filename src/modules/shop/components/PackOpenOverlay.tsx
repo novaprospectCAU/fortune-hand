@@ -11,18 +11,25 @@ import { useI18n } from '@/modules/ui';
 export interface PackOpenOverlayProps {
   cards: CardType[] | null;
   onClose: () => void;
+  customTitle?: string;
+  customSubtitle?: string;
 }
 
-export function PackOpenOverlay({ cards, onClose }: PackOpenOverlayProps) {
+export function PackOpenOverlay({ cards, onClose, customTitle, customSubtitle }: PackOpenOverlayProps) {
   const { t } = useI18n();
 
   if (!cards || cards.length === 0) return null;
 
   const isSingleCard = cards.length === 1;
-  const title = isSingleCard ? `🃏 ${t('cardAcquired')}` : `🎁 ${t('packOpened')}`;
-  const subtitle = isSingleCard
-    ? t('cardAddedToDeck')
-    : t('cardsAddedToDeck', { n: cards.length });
+  const isTransformed = cards[0]?.id.startsWith('transformed_');
+  const title = customTitle ?? (isTransformed
+    ? `✨ ${t('cardsTransformed')}`
+    : isSingleCard ? `🃏 ${t('cardAcquired')}` : `🎁 ${t('packOpened')}`);
+  const subtitle = customSubtitle ?? (isTransformed
+    ? t('cardsAddedToDeck', { n: cards.length })
+    : isSingleCard
+      ? t('cardAddedToDeck')
+      : t('cardsAddedToDeck', { n: cards.length }));
 
   return (
     <AnimatePresence>

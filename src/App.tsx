@@ -404,7 +404,7 @@ function App() {
 
             {/* Mobile Guide Toggle Button */}
             <button
-              className="md:hidden fixed bottom-20 right-4 z-40 bg-indigo-600 hover:bg-indigo-700 text-white w-10 h-10 rounded-full shadow-lg flex items-center justify-center text-lg"
+              className="md:hidden fixed bottom-20 left-4 z-40 bg-indigo-600 hover:bg-indigo-700 text-white w-10 h-10 rounded-full shadow-lg flex items-center justify-center text-lg"
               onClick={() => setIsMobileGuideOpen(!isMobileGuideOpen)}
             >
               {isMobileGuideOpen ? '✕' : '📋'}
@@ -414,7 +414,7 @@ function App() {
             {isMobileGuideOpen && (
               <div className="md:hidden fixed inset-0 z-30" onClick={() => setIsMobileGuideOpen(false)}>
                 <div className="absolute inset-0 bg-black/50" />
-                <div className="absolute right-0 top-0 bottom-0 w-56 bg-gray-900 p-3 overflow-y-auto" onClick={(e) => e.stopPropagation()}>
+                <div className="absolute left-0 top-0 bottom-0 w-56 bg-gray-900 p-3 overflow-y-auto" onClick={(e) => e.stopPropagation()}>
                   <HandGuide />
                 </div>
               </div>
