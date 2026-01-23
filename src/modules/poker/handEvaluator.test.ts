@@ -70,8 +70,8 @@ describe('evaluateHand', () => {
 
       expect(result.handType).toBe('royal_flush');
       expect(result.scoringCards.length).toBe(5);
-      expect(result.baseChips).toBe(100);
-      expect(result.baseMult).toBe(8);
+      expect(result.baseChips).toBe(0);
+      expect(result.baseMult).toBe(30);
     });
 
     it('should detect royal flush with extra cards', () => {
@@ -102,8 +102,8 @@ describe('evaluateHand', () => {
       const result = evaluateHand(cards);
 
       expect(result.handType).toBe('straight_flush');
-      expect(result.baseChips).toBe(100);
-      expect(result.baseMult).toBe(8);
+      expect(result.baseChips).toBe(0);
+      expect(result.baseMult).toBe(16);
     });
 
     it('should detect low straight flush (A-2-3-4-5)', () => {
@@ -145,8 +145,8 @@ describe('evaluateHand', () => {
       const result = evaluateHand(cards);
 
       expect(result.handType).toBe('four_of_a_kind');
-      expect(result.baseChips).toBe(60);
-      expect(result.baseMult).toBe(7);
+      expect(result.baseChips).toBe(0);
+      expect(result.baseMult).toBe(20);
     });
 
     it('should include kicker in scoring cards', () => {
@@ -176,8 +176,8 @@ describe('evaluateHand', () => {
       const result = evaluateHand(cards);
 
       expect(result.handType).toBe('full_house');
-      expect(result.baseChips).toBe(40);
-      expect(result.baseMult).toBe(4);
+      expect(result.baseChips).toBe(0);
+      expect(result.baseMult).toBe(13);
     });
 
     it('should prefer higher three of a kind', () => {
@@ -208,8 +208,8 @@ describe('evaluateHand', () => {
       const result = evaluateHand(cards);
 
       expect(result.handType).toBe('flush');
-      expect(result.baseChips).toBe(35);
-      expect(result.baseMult).toBe(4);
+      expect(result.baseChips).toBe(0);
+      expect(result.baseMult).toBe(10);
     });
 
     it('should select top 5 cards for flush', () => {
@@ -243,8 +243,8 @@ describe('evaluateHand', () => {
       const result = evaluateHand(cards);
 
       expect(result.handType).toBe('straight');
-      expect(result.baseChips).toBe(30);
-      expect(result.baseMult).toBe(4);
+      expect(result.baseChips).toBe(0);
+      expect(result.baseMult).toBe(8);
     });
 
     it('should detect low straight (A-2-3-4-5)', () => {
@@ -299,8 +299,8 @@ describe('evaluateHand', () => {
       const result = evaluateHand(cards);
 
       expect(result.handType).toBe('three_of_a_kind');
-      expect(result.baseChips).toBe(30);
-      expect(result.baseMult).toBe(3);
+      expect(result.baseChips).toBe(0);
+      expect(result.baseMult).toBe(6);
     });
   });
 
@@ -316,8 +316,8 @@ describe('evaluateHand', () => {
       const result = evaluateHand(cards);
 
       expect(result.handType).toBe('two_pair');
-      expect(result.baseChips).toBe(20);
-      expect(result.baseMult).toBe(2);
+      expect(result.baseChips).toBe(0);
+      expect(result.baseMult).toBe(4);
     });
 
     it('should select highest two pairs when more than two pairs exist', () => {
@@ -352,7 +352,7 @@ describe('evaluateHand', () => {
       const result = evaluateHand(cards);
 
       expect(result.handType).toBe('pair');
-      expect(result.baseChips).toBe(10);
+      expect(result.baseChips).toBe(0);
       expect(result.baseMult).toBe(2);
     });
   });
@@ -369,7 +369,7 @@ describe('evaluateHand', () => {
       const result = evaluateHand(cards);
 
       expect(result.handType).toBe('high_card');
-      expect(result.baseChips).toBe(5);
+      expect(result.baseChips).toBe(0);
       expect(result.baseMult).toBe(1);
     });
 

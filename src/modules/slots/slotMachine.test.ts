@@ -123,21 +123,21 @@ describe('slotMachine', () => {
       const result = spinWithResult(['gold', 'gold', 'gold']);
 
       expect(result.isJackpot).toBe(false);
-      expect(result.effects.instant.gold).toBe(25); // Gold Rush bonus
+      expect(result.effects.instant.gold).toBe(50); // Gold Rush bonus
     });
 
     it('should correctly detect jackpot', () => {
       const result = spinWithResult(['star', 'star', 'star']);
 
       expect(result.isJackpot).toBe(true);
-      expect(result.effects.instant.gold).toBe(50);
-      expect(result.effects.instant.chips).toBe(100);
+      expect(result.effects.instant.gold).toBe(100);
+      expect(result.effects.instant.chips).toBe(200);
     });
 
     it('should handle wild combinations', () => {
       const result = spinWithResult(['gold', 'wild', 'gold']);
 
-      expect(result.effects.instant.gold).toBe(25); // Should count as Gold Rush
+      expect(result.effects.instant.gold).toBe(50); // Should count as Gold Rush
     });
   });
 

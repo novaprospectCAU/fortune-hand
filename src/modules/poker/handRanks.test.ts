@@ -26,39 +26,45 @@ describe('getHandRanking', () => {
     expect(getHandRanking('straight')).toBe(4);
     expect(getHandRanking('flush')).toBe(5);
     expect(getHandRanking('full_house')).toBe(6);
-    expect(getHandRanking('four_of_a_kind')).toBe(7);
-    expect(getHandRanking('straight_flush')).toBe(8);
+    expect(getHandRanking('straight_flush')).toBe(7);
+    expect(getHandRanking('four_of_a_kind')).toBe(8);
     expect(getHandRanking('royal_flush')).toBe(9);
+    expect(getHandRanking('quintuple')).toBe(10);
+    expect(getHandRanking('royal_quintuple')).toBe(11);
+    expect(getHandRanking('pentagon')).toBe(12);
   });
 });
 
 describe('getBaseHandValue', () => {
   it('should return correct base chips and mult for high card', () => {
     const { chips, mult } = getBaseHandValue('high_card');
-    expect(chips).toBe(5);
+    expect(chips).toBe(0);
     expect(mult).toBe(1);
   });
 
   it('should return correct base chips and mult for pair', () => {
     const { chips, mult } = getBaseHandValue('pair');
-    expect(chips).toBe(10);
+    expect(chips).toBe(0);
     expect(mult).toBe(2);
   });
 
   it('should return correct base chips and mult for royal flush', () => {
     const { chips, mult } = getBaseHandValue('royal_flush');
-    expect(chips).toBe(100);
-    expect(mult).toBe(8);
+    expect(chips).toBe(0);
+    expect(mult).toBe(30);
   });
 
   it('should return correct base chips and mult for all hand types', () => {
-    expect(getBaseHandValue('two_pair')).toEqual({ chips: 20, mult: 2 });
-    expect(getBaseHandValue('three_of_a_kind')).toEqual({ chips: 30, mult: 3 });
-    expect(getBaseHandValue('straight')).toEqual({ chips: 30, mult: 4 });
-    expect(getBaseHandValue('flush')).toEqual({ chips: 35, mult: 4 });
-    expect(getBaseHandValue('full_house')).toEqual({ chips: 40, mult: 4 });
-    expect(getBaseHandValue('four_of_a_kind')).toEqual({ chips: 60, mult: 7 });
-    expect(getBaseHandValue('straight_flush')).toEqual({ chips: 100, mult: 8 });
+    expect(getBaseHandValue('two_pair')).toEqual({ chips: 0, mult: 4 });
+    expect(getBaseHandValue('three_of_a_kind')).toEqual({ chips: 0, mult: 6 });
+    expect(getBaseHandValue('straight')).toEqual({ chips: 0, mult: 8 });
+    expect(getBaseHandValue('flush')).toEqual({ chips: 0, mult: 10 });
+    expect(getBaseHandValue('full_house')).toEqual({ chips: 0, mult: 13 });
+    expect(getBaseHandValue('four_of_a_kind')).toEqual({ chips: 0, mult: 20 });
+    expect(getBaseHandValue('straight_flush')).toEqual({ chips: 0, mult: 16 });
+    expect(getBaseHandValue('quintuple')).toEqual({ chips: 0, mult: 25 });
+    expect(getBaseHandValue('royal_quintuple')).toEqual({ chips: 0, mult: 30 });
+    expect(getBaseHandValue('pentagon')).toEqual({ chips: 0, mult: 100 });
   });
 });
 
@@ -129,39 +135,42 @@ describe('compareHandTypes', () => {
 
 describe('HAND_TYPE_PRIORITY', () => {
   it('should be in descending order of strength', () => {
-    expect(HAND_TYPE_PRIORITY[0]).toBe('royal_flush');
+    expect(HAND_TYPE_PRIORITY[0]).toBe('pentagon');
     expect(HAND_TYPE_PRIORITY[HAND_TYPE_PRIORITY.length - 1]).toBe('high_card');
   });
 
   it('should contain all hand types', () => {
-    expect(HAND_TYPE_PRIORITY.length).toBe(10);
+    expect(HAND_TYPE_PRIORITY.length).toBe(13);
     expect(HAND_TYPE_PRIORITY).toContain('pair');
     expect(HAND_TYPE_PRIORITY).toContain('flush');
     expect(HAND_TYPE_PRIORITY).toContain('straight');
+    expect(HAND_TYPE_PRIORITY).toContain('pentagon');
+    expect(HAND_TYPE_PRIORITY).toContain('quintuple');
+    expect(HAND_TYPE_PRIORITY).toContain('royal_quintuple');
   });
 });
 
 describe('BASE_HAND_VALUES', () => {
   it('should have entries for all hand types', () => {
     const handTypes = Object.keys(BASE_HAND_VALUES);
-    expect(handTypes.length).toBe(10);
+    expect(handTypes.length).toBe(13);
   });
 
-  it('should have higher chip values for stronger hands', () => {
-    expect(BASE_HAND_VALUES.royal_flush.chips).toBeGreaterThan(BASE_HAND_VALUES.high_card.chips);
-    expect(BASE_HAND_VALUES.four_of_a_kind.chips).toBeGreaterThan(BASE_HAND_VALUES.pair.chips);
+  it('should have higher mult values for stronger hands', () => {
+    expect(BASE_HAND_VALUES.royal_flush.mult).toBeGreaterThan(BASE_HAND_VALUES.high_card.mult);
+    expect(BASE_HAND_VALUES.four_of_a_kind.mult).toBeGreaterThan(BASE_HAND_VALUES.pair.mult);
   });
 });
 
 describe('HAND_RANKINGS', () => {
   it('should have entries for all hand types', () => {
     const handTypes = Object.keys(HAND_RANKINGS);
-    expect(handTypes.length).toBe(10);
+    expect(handTypes.length).toBe(13);
   });
 
-  it('should have royal_flush as highest rank', () => {
+  it('should have pentagon as highest rank', () => {
     const maxRank = Math.max(...Object.values(HAND_RANKINGS));
-    expect(HAND_RANKINGS.royal_flush).toBe(maxRank);
+    expect(HAND_RANKINGS.pentagon).toBe(maxRank);
   });
 
   it('should have high_card as lowest rank', () => {

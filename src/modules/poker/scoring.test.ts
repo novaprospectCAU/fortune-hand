@@ -111,21 +111,22 @@ describe('calculateScore', () => {
 
       const result = calculateScore(handResult);
 
-      // chipTotal = baseChips(10) + cardChips(52) = 62
-      // multTotal = baseMult(2) = 2
-      // finalScore = 62 * 2 = 124
-      expect(result.chipTotal).toBe(62);
+      // chipTotal = pair cards only: 11 + 11 = 22
+      // multTotal = HAND_MULTIPLIERS.pair = 2
+      // finalScore = 22 * 2 = 44
+      expect(result.chipTotal).toBe(22);
       expect(result.multTotal).toBe(2);
-      expect(result.finalScore).toBe(124);
+      expect(result.finalScore).toBe(44);
     });
 
     it('should handle empty scoring cards', () => {
       const handResult = createHandResult('high_card', [], 5, 1);
       const result = calculateScore(handResult);
 
-      expect(result.chipTotal).toBe(5);
+      // No scoring cards = chipTotal 0
+      expect(result.chipTotal).toBe(0);
       expect(result.multTotal).toBe(1);
-      expect(result.finalScore).toBe(5);
+      expect(result.finalScore).toBe(0);
     });
   });
 
@@ -140,9 +141,9 @@ describe('calculateScore', () => {
 
       const result = calculateScore(handResult, bonuses);
 
-      // chipTotal = 5 + 11 + 20 + 10 = 46
-      expect(result.chipTotal).toBe(46);
-      expect(result.finalScore).toBe(46 * 1);
+      // chipTotal = 11 + 20 + 10 = 41 (no baseChips in new system)
+      expect(result.chipTotal).toBe(41);
+      expect(result.finalScore).toBe(41 * 1);
     });
 
     it('should apply mult bonuses after chips', () => {
@@ -157,7 +158,7 @@ describe('calculateScore', () => {
 
       // multTotal = 1 + 3 + 2 = 6
       expect(result.multTotal).toBe(6);
-      expect(result.finalScore).toBe(16 * 6); // (5 + 11) * 6 = 96
+      expect(result.finalScore).toBe(11 * 6); // 11 * 6 = 66
     });
 
     it('should apply xmult bonuses last (multiplicatively)', () => {
@@ -172,7 +173,7 @@ describe('calculateScore', () => {
 
       // multTotal = 1 * 2 * 3 = 6
       expect(result.multTotal).toBe(6);
-      expect(result.finalScore).toBe(16 * 6); // (5 + 11) * 6 = 96
+      expect(result.finalScore).toBe(11 * 6); // 11 * 6 = 66
     });
 
     it('should apply all bonus types in correct order', () => {
@@ -189,11 +190,11 @@ describe('calculateScore', () => {
 
       const result = calculateScore(handResult, bonuses);
 
-      // chipTotal = 5 + 10 + 5 + 10 = 30
-      // multTotal = (1 + 2 + 3) * 2 * 1.5 = 6 * 3 = 18
-      expect(result.chipTotal).toBe(30);
+      // chipTotal = 10 + 5 + 10 = 25 (no baseChips)
+      // multTotal = (1 + 2 + 3) * 2 * 1.5 = 18
+      expect(result.chipTotal).toBe(25);
       expect(result.multTotal).toBe(18);
-      expect(result.finalScore).toBe(30 * 18); // 540
+      expect(result.finalScore).toBe(25 * 18); // 450
     });
 
     it('should track applied bonuses', () => {
@@ -205,7 +206,7 @@ describe('calculateScore', () => {
 
       const result = calculateScore(handResult, bonuses);
 
-      expect(result.appliedBonuses.length).toBe(2);
+      // No "Card sum" entry since scoringCards is empty, but external bonuses are tracked
       expect(result.appliedBonuses.some(b => b.source === 'Joker A')).toBe(true);
       expect(result.appliedBonuses.some(b => b.source === 'Joker B')).toBe(true);
     });
@@ -220,20 +221,22 @@ describe('calculateScore', () => {
 
       const result = calculateScore(handResult);
 
-      // multTotal = 1 + 4 = 5
+      // multTotal = HAND_MULTIPLIERS.high_card(1) + 4 = 5
+      // chipTotal = 11, finalScore = 11 * 5 = 55
       expect(result.multTotal).toBe(5);
+      expect(result.finalScore).toBe(55);
     });
 
     it('should apply multiple card enhancements', () => {
       const scoringCards = [
         createCard('A', 'hearts', { enhancement: { type: 'mult', value: 4 } }),
-        createCard('K', 'hearts', { enhancement: { type: 'mult', value: 2 } }),
+        createCard('A', 'diamonds', { enhancement: { type: 'mult', value: 2 } }),
       ];
       const handResult = createHandResult('pair', scoringCards, 10, 2);
 
       const result = calculateScore(handResult);
 
-      // multTotal = 2 + 4 + 2 = 8
+      // multTotal = HAND_MULTIPLIERS.pair(2) + 4 + 2 = 8
       expect(result.multTotal).toBe(8);
     });
   });
@@ -251,10 +254,10 @@ describe('calculateScore', () => {
 
       const result = calculateScore(handResult);
 
-      // chipTotal = 10 + 52 = 62
-      // multTotal = 2
-      // finalScore = 62 * 2 = 124
-      expect(result.finalScore).toBe(124);
+      // chipTotal = pair cards only: 11 + 11 = 22
+      // multTotal = HAND_MULTIPLIERS.pair = 2
+      // finalScore = 22 * 2 = 44
+      expect(result.finalScore).toBe(44);
     });
 
     it('should calculate flush correctly', () => {
@@ -269,10 +272,10 @@ describe('calculateScore', () => {
 
       const result = calculateScore(handResult);
 
-      // chipTotal = 35 + 50 = 85
-      // multTotal = 4
-      // finalScore = 85 * 4 = 340
-      expect(result.finalScore).toBe(340);
+      // chipTotal = all cards sum: 11 + 10 + 10 + 10 + 9 = 50
+      // multTotal = HAND_MULTIPLIERS.flush = 10
+      // finalScore = 50 * 10 = 500
+      expect(result.finalScore).toBe(500);
     });
 
     it('should calculate royal flush with bonuses', () => {
@@ -291,10 +294,10 @@ describe('calculateScore', () => {
 
       const result = calculateScore(handResult, bonuses);
 
-      // chipTotal = 100 + 51 = 151
-      // multTotal = (8 + 10) * 2 = 36
-      // finalScore = 151 * 36 = 5436
-      expect(result.finalScore).toBe(5436);
+      // chipTotal = all cards sum: 11 + 10 + 10 + 10 + 10 = 51
+      // multTotal = (HAND_MULTIPLIERS.royal_flush(30) + 10) * 2 = 80
+      // finalScore = 51 * 80 = 4080
+      expect(result.finalScore).toBe(4080);
     });
   });
 
@@ -307,15 +310,17 @@ describe('calculateScore', () => {
 
       const result = calculateScore(handResult, bonuses);
 
-      // 5 * 1.5 = 7.5 -> 7
-      expect(result.finalScore).toBe(7);
+      // chipTotal = 0 (no cards), multTotal = 1 * 1.5 = 1.5
+      // finalScore = 0 * 1.5 = 0
+      expect(result.finalScore).toBe(0);
     });
 
     it('should handle zero bonuses', () => {
       const handResult = createHandResult('high_card', [], 5, 1);
       const result = calculateScore(handResult, []);
 
-      expect(result.finalScore).toBe(5);
+      // chipTotal = 0 (no cards), finalScore = 0
+      expect(result.finalScore).toBe(0);
       expect(result.appliedBonuses.length).toBe(0);
     });
   });
@@ -359,7 +364,7 @@ describe('Card Enhancements', () => {
       expect(getCardChipValue(enhancedCard)).toBe(35); // 5 + 30
     });
 
-    it('should track chips enhancement in appliedBonuses', () => {
+    it('should track card sum including chips enhancement in appliedBonuses', () => {
       const scoringCards = [
         createCard('A', 'hearts', { enhancement: { type: 'chips', value: 30 } }),
       ];
@@ -367,13 +372,13 @@ describe('Card Enhancements', () => {
 
       const result = calculateScore(handResult);
 
-      // Should have card chips bonus and enhancement bonus tracked
-      const enhancementBonus = result.appliedBonuses.find(b =>
-        b.source.includes('Enhancement')
+      // Chips enhancement is baked into getCardChipValue(), tracked as "Card sum"
+      const cardSumBonus = result.appliedBonuses.find(b =>
+        b.source === 'Card sum'
       );
-      expect(enhancementBonus).toBeDefined();
-      expect(enhancementBonus?.type).toBe('chips');
-      expect(enhancementBonus?.value).toBe(30);
+      expect(cardSumBonus).toBeDefined();
+      expect(cardSumBonus?.type).toBe('chips');
+      expect(cardSumBonus?.value).toBe(41); // 11 + 30
     });
 
     it('should calculate score correctly with chips enhancement', () => {
@@ -385,12 +390,12 @@ describe('Card Enhancements', () => {
 
       const result = calculateScore(handResult);
 
-      // chipTotal = baseChips(10) + card1(5+30) + card2(5) = 50
-      // multTotal = baseMult(2) = 2
-      // finalScore = 50 * 2 = 100
-      expect(result.chipTotal).toBe(50);
+      // chipTotal = pair cards: (5+30) + 5 = 40 (no baseChips)
+      // multTotal = HAND_MULTIPLIERS.pair = 2
+      // finalScore = 40 * 2 = 80
+      expect(result.chipTotal).toBe(40);
       expect(result.multTotal).toBe(2);
-      expect(result.finalScore).toBe(100);
+      expect(result.finalScore).toBe(80);
     });
 
     it('should handle multiple chips enhancements', () => {
@@ -403,14 +408,17 @@ describe('Card Enhancements', () => {
 
       const result = calculateScore(handResult);
 
-      // chipTotal = 35 + (11+30) + (10+30) + 10 = 126
-      expect(result.chipTotal).toBe(126);
+      // chipTotal = all cards: (11+30) + (10+30) + 10 = 91 (no baseChips)
+      // multTotal = HAND_MULTIPLIERS.flush = 10
+      // finalScore = 91 * 10 = 910
+      expect(result.chipTotal).toBe(91);
 
-      // Should track both enhancements
-      const enhancementBonuses = result.appliedBonuses.filter(b =>
-        b.source.includes('Enhancement')
+      // Chips enhancement is baked into card sum, only "Card sum" is tracked
+      const cardSumBonus = result.appliedBonuses.find(b =>
+        b.source === 'Card sum'
       );
-      expect(enhancementBonuses.length).toBe(2);
+      expect(cardSumBonus).toBeDefined();
+      expect(cardSumBonus?.value).toBe(91);
     });
   });
 
@@ -423,9 +431,10 @@ describe('Card Enhancements', () => {
 
       const result = calculateScore(handResult);
 
-      // multTotal = baseMult(1) + enhancement(4) = 5
+      // multTotal = HAND_MULTIPLIERS.high_card(1) + enhancement(4) = 5
+      // chipTotal = 11, finalScore = 11 * 5 = 55
       expect(result.multTotal).toBe(5);
-      expect(result.finalScore).toBe((5 + 11) * 5); // 80
+      expect(result.finalScore).toBe(55);
     });
 
     it('should track mult enhancement in appliedBonuses', () => {
@@ -454,10 +463,10 @@ describe('Card Enhancements', () => {
 
       const result = calculateScore(handResult);
 
-      // multTotal = 2 + 4 + 4 = 10
+      // multTotal = HAND_MULTIPLIERS.pair(2) + 4 + 4 = 10
       expect(result.multTotal).toBe(10);
 
-      // Should track both enhancements
+      // Should track both mult enhancements
       const enhancementBonuses = result.appliedBonuses.filter(b =>
         b.source.includes('Enhancement')
       );
@@ -475,7 +484,7 @@ describe('Card Enhancements', () => {
 
       const result = calculateScore(handResult, bonuses);
 
-      // multTotal = baseMult(1) + card enhancement(4) + joker(3) = 8
+      // multTotal = HAND_MULTIPLIERS.high_card(1) + card enhancement(4) + joker(3) = 8
       expect(result.multTotal).toBe(8);
     });
   });
@@ -526,7 +535,8 @@ describe('Card Enhancements', () => {
       const result = calculateScore(handResult);
 
       // Score should be calculated normally (gold is applied in reward phase)
-      expect(result.finalScore).toBe((5 + 11) * 1); // 16
+      // chipTotal = 11, multTotal = 1, finalScore = 11
+      expect(result.finalScore).toBe(11);
     });
   });
 
@@ -543,22 +553,22 @@ describe('Card Enhancements', () => {
 
       const result = calculateScore(handResult);
 
-      // chipTotal = 35 + (11+30) + 10 + 10 + 10 + 10 = 116
-      // multTotal = 4 + 4 = 8
-      // finalScore = 116 * 8 = 928
-      expect(result.chipTotal).toBe(116);
-      expect(result.multTotal).toBe(8);
-      expect(result.finalScore).toBe(928);
+      // chipTotal = all cards: (11+30) + 10 + 10 + 10 + 10 = 81 (no baseChips)
+      // multTotal = HAND_MULTIPLIERS.flush(10) + 4 = 14
+      // finalScore = 81 * 14 = 1134
+      expect(result.chipTotal).toBe(81);
+      expect(result.multTotal).toBe(14);
+      expect(result.finalScore).toBe(1134);
 
       // Gold should be calculated separately
       const goldTotal = calculateGoldFromEnhancements(scoringCards);
       expect(goldTotal).toBe(3);
 
-      // Should track chips and mult enhancements
+      // Should track mult enhancement only (chips enhancement is baked into card sum)
       const enhancementBonuses = result.appliedBonuses.filter(b =>
         b.source.includes('Enhancement')
       );
-      expect(enhancementBonuses.length).toBe(2); // chips and mult only
+      expect(enhancementBonuses.length).toBe(1); // mult only
     });
 
     it('should work with enhancements and external bonuses', () => {
@@ -574,12 +584,12 @@ describe('Card Enhancements', () => {
 
       const result = calculateScore(handResult, bonuses);
 
-      // chipTotal = 10 + (11+30) + 11 = 62
-      // multTotal = (2 + 4 + 5) * 2 = 22
-      // finalScore = 62 * 22 = 1364
-      expect(result.chipTotal).toBe(62);
+      // chipTotal = pair cards: (11+30) + 11 = 52 (no baseChips)
+      // multTotal = (HAND_MULTIPLIERS.pair(2) + 4 + 5) * 2 = 22
+      // finalScore = 52 * 22 = 1144
+      expect(result.chipTotal).toBe(52);
       expect(result.multTotal).toBe(22);
-      expect(result.finalScore).toBe(1364);
+      expect(result.finalScore).toBe(1144);
     });
   });
 
@@ -587,29 +597,29 @@ describe('Card Enhancements', () => {
     it('should include card identifier in enhancement source', () => {
       const scoringCards = [
         createCard('A', 'hearts', { enhancement: { type: 'mult', value: 4 } }),
-        createCard('K', 'diamonds', { enhancement: { type: 'chips', value: 30 } }),
+        createCard('A', 'diamonds', { enhancement: { type: 'mult', value: 2 } }),
       ];
       const handResult = createHandResult('pair', scoringCards, 10, 2);
 
       const result = calculateScore(handResult);
 
-      // Check that sources include card identifiers
-      const multEnhancement = result.appliedBonuses.find(
-        b => b.source.includes('Enhancement') && b.type === 'mult'
+      // Check that mult enhancement sources include card identifiers
+      const multEnhancementH = result.appliedBonuses.find(
+        b => b.source.includes('Enhancement') && b.source.includes('AH')
       );
-      expect(multEnhancement?.source).toContain('AH'); // Ace of Hearts
+      expect(multEnhancementH).toBeDefined(); // Ace of Hearts
 
-      const chipsEnhancement = result.appliedBonuses.find(
-        b => b.source.includes('Enhancement') && b.type === 'chips'
+      const multEnhancementD = result.appliedBonuses.find(
+        b => b.source.includes('Enhancement') && b.source.includes('AD')
       );
-      expect(chipsEnhancement?.source).toContain('KD'); // King of Diamonds
+      expect(multEnhancementD).toBeDefined(); // Ace of Diamonds
     });
   });
 
   describe('Retrigger Enhancement', () => {
     describe('Basic retrigger functionality', () => {
-      it('should retrigger card chip value', () => {
-        // Ace with retrigger (value: 1) = triggers 2 times total
+      it('should not retrigger card chip value', () => {
+        // In new system, retrigger only affects mult enhancements, not chip values
         const scoringCards = [
           createCard('A', 'hearts', { enhancement: { type: 'retrigger', value: 1 } }),
         ];
@@ -617,13 +627,13 @@ describe('Card Enhancements', () => {
 
         const result = calculateScore(handResult);
 
-        // chipTotal = 5 + (11 * 2) = 27
-        expect(result.chipTotal).toBe(27);
-        expect(result.finalScore).toBe(27);
+        // chipTotal = 11 (retrigger doesn't affect chip values)
+        expect(result.chipTotal).toBe(11);
+        expect(result.finalScore).toBe(11);
       });
 
-      it('should retrigger multiple times', () => {
-        // Card with retrigger value: 3 = triggers 4 times total (1 + 3)
+      it('should not retrigger chip values multiple times', () => {
+        // Card with retrigger value: 3 - still only counts chip value once
         const scoringCards = [
           createCard('10', 'hearts', { enhancement: { type: 'retrigger', value: 3 } }),
         ];
@@ -631,30 +641,30 @@ describe('Card Enhancements', () => {
 
         const result = calculateScore(handResult);
 
-        // chipTotal = 5 + (10 * 4) = 45
-        expect(result.chipTotal).toBe(45);
-        expect(result.finalScore).toBe(45);
+        // chipTotal = 10 (retrigger doesn't affect chip values)
+        expect(result.chipTotal).toBe(10);
+        expect(result.finalScore).toBe(10);
       });
 
-      it('should apply retrigger to multiple cards independently', () => {
+      it('should not affect chip values for multiple cards with retrigger', () => {
         const scoringCards = [
-          createCard('A', 'hearts', { enhancement: { type: 'retrigger', value: 1 } }), // 11 * 2 = 22
-          createCard('K', 'diamonds', { enhancement: { type: 'retrigger', value: 2 } }), // 10 * 3 = 30
-          createCard('Q', 'clubs'), // 10 * 1 = 10
+          createCard('A', 'hearts', { enhancement: { type: 'retrigger', value: 1 } }),
+          createCard('K', 'diamonds', { enhancement: { type: 'retrigger', value: 2 } }),
+          createCard('Q', 'clubs'),
         ];
         const handResult = createHandResult('high_card', scoringCards, 5, 1);
 
         const result = calculateScore(handResult);
 
-        // chipTotal = 5 + 22 + 30 + 10 = 67
-        expect(result.chipTotal).toBe(67);
-        expect(result.finalScore).toBe(67);
+        // chipTotal = max(11, 10, 10) = 11 (high_card takes max single card)
+        expect(result.chipTotal).toBe(11);
+        expect(result.finalScore).toBe(11);
       });
     });
 
     describe('Retrigger with other enhancements', () => {
-      it('should retrigger chips enhancement', () => {
-        // Ace with chips enhancement and retrigger
+      it('should not retrigger chips enhancement on different card', () => {
+        // Ace with chips enhancement and another Ace with retrigger
         const scoringCards = [
           createCard('A', 'hearts', { enhancement: { type: 'chips', value: 30 } }),
           createCard('A', 'diamonds', { enhancement: { type: 'retrigger', value: 1 } }),
@@ -663,13 +673,14 @@ describe('Card Enhancements', () => {
 
         const result = calculateScore(handResult);
 
-        // chipTotal = 10 + (11 + 30) + (11 * 2) = 10 + 41 + 22 = 73
-        expect(result.chipTotal).toBe(73);
-        expect(result.finalScore).toBe(73 * 2);
+        // chipTotal = pair cards: (11+30) + 11 = 52 (retrigger doesn't affect chips)
+        // multTotal = HAND_MULTIPLIERS.pair = 2
+        expect(result.chipTotal).toBe(52);
+        expect(result.finalScore).toBe(52 * 2); // 104
       });
 
-      it('should retrigger mult enhancement', () => {
-        // Card with mult enhancement and retrigger
+      it('should retrigger mult enhancement on same card', () => {
+        // Card with mult enhancement and retrigger on another card
         const scoringCards = [
           createCard('A', 'hearts', { enhancement: { type: 'mult', value: 4 } }),
           createCard('A', 'diamonds', { enhancement: { type: 'retrigger', value: 1 } }),
@@ -678,24 +689,21 @@ describe('Card Enhancements', () => {
 
         const result = calculateScore(handResult);
 
-        // multTotal = 2 + 4 (no retrigger on first card) = 6
-        // BUT second card has retrigger, its mult would be 0 (no mult enhancement)
-        // chipTotal = 10 + 11 + (11 * 2) = 43
-        expect(result.chipTotal).toBe(43);
+        // chipTotal = pair cards: 11 + 11 = 22
+        // multTotal = HAND_MULTIPLIERS.pair(2) + 4*1 = 6
+        // (first card has mult:4 with triggerCount=1, second has retrigger not mult)
+        expect(result.chipTotal).toBe(22);
         expect(result.multTotal).toBe(6); // 2 + 4
-        expect(result.finalScore).toBe(43 * 6);
+        expect(result.finalScore).toBe(22 * 6); // 132
       });
 
-      it('should combine chips enhancement with retrigger on same card', () => {
-        // This test assumes a card can't have both enhancements at once
-        // based on CardEnhancement interface (single type)
-        // But we test the retrigger of a chips-enhanced card
-
+      it('should compare chips enhancement vs retrigger on same card', () => {
+        // A card can only have one enhancement type at a time
         const scoringCards = [
           createCard('5', 'hearts', { enhancement: { type: 'chips', value: 30 } }),
         ];
 
-        // Now create a version with retrigger
+        // Now create a version with retrigger instead
         const retriggeredCards = [
           createCard('5', 'hearts', { enhancement: { type: 'retrigger', value: 1 } }),
         ];
@@ -707,11 +715,11 @@ describe('Card Enhancements', () => {
           createHandResult('high_card', retriggeredCards, 5, 1)
         );
 
-        // Normal: 5 + (5 + 30) = 40
-        expect(normalResult.chipTotal).toBe(40);
+        // Normal: chipTotal = 5 + 30 = 35
+        expect(normalResult.chipTotal).toBe(35);
 
-        // Retrigger: 5 + (5 * 2) = 15 (no chips enhancement on retriggered version)
-        expect(retriggerResult.chipTotal).toBe(15);
+        // Retrigger: chipTotal = 5 (retrigger doesn't affect chip values)
+        expect(retriggerResult.chipTotal).toBe(5);
       });
     });
 
@@ -753,9 +761,11 @@ describe('Card Enhancements', () => {
 
         const result = calculateScore(handResult);
 
-        // Should be capped at 11 total triggers (1 original + 10 retriggers)
-        // chipTotal = 5 + (10 * 11) = 115
-        expect(result.chipTotal).toBe(115);
+        // chipTotal = 10 (retrigger doesn't affect chip values)
+        // multTotal = 1 (no mult enhancement to retrigger)
+        expect(result.chipTotal).toBe(10);
+        expect(result.multTotal).toBe(1);
+        expect(result.finalScore).toBe(10);
       });
 
       it('should handle zero retrigger value', () => {
@@ -766,9 +776,8 @@ describe('Card Enhancements', () => {
 
         const result = calculateScore(handResult);
 
-        // Should trigger only once (original)
-        // chipTotal = 5 + 11 = 16
-        expect(result.chipTotal).toBe(16);
+        // chipTotal = 11 (retrigger doesn't affect chip values)
+        expect(result.chipTotal).toBe(11);
       });
 
       it('should handle negative retrigger value', () => {
@@ -779,14 +788,13 @@ describe('Card Enhancements', () => {
 
         const result = calculateScore(handResult);
 
-        // Should still trigger at least once (1 + max(0, -5) = 1)
-        // chipTotal = 5 + 11 = 16
-        expect(result.chipTotal).toBe(16);
+        // chipTotal = 11 (retrigger doesn't affect chip values)
+        expect(result.chipTotal).toBe(11);
       });
     });
 
     describe('Retrigger tracking in appliedBonuses', () => {
-      it('should track retrigger in applied bonuses', () => {
+      it('should not create separate retrigger entry for retrigger-only cards', () => {
         const scoringCards = [
           createCard('A', 'hearts', { enhancement: { type: 'retrigger', value: 1 } }),
         ];
@@ -794,15 +802,16 @@ describe('Card Enhancements', () => {
 
         const result = calculateScore(handResult);
 
-        // Should have retrigger bonus tracked
-        const retriggerBonus = result.appliedBonuses.find(b =>
-          b.source.includes('Retrigger')
+        // Retrigger-only cards don't create Enhancement entries (they have no mult/chips to enhance)
+        // Only "Card sum" entry should be present
+        const cardSumBonus = result.appliedBonuses.find(b =>
+          b.source === 'Card sum'
         );
-        expect(retriggerBonus).toBeDefined();
-        expect(retriggerBonus?.source).toContain('AH');
+        expect(cardSumBonus).toBeDefined();
+        expect(cardSumBonus?.value).toBe(11);
       });
 
-      it('should show trigger count in enhancement sources', () => {
+      it('should show trigger count in mult enhancement sources when card has both', () => {
         const scoringCards = [
           createCard('A', 'hearts', { enhancement: { type: 'mult', value: 4 } }),
           createCard('K', 'hearts', { enhancement: { type: 'retrigger', value: 2 } }),
@@ -811,17 +820,13 @@ describe('Card Enhancements', () => {
 
         const result = calculateScore(handResult);
 
-        // The mult enhancement should not show (x2) since it doesn't have retrigger
+        // The mult enhancement should not show (x...) since A has mult (triggerCount=1)
         const multBonus = result.appliedBonuses.find(b =>
           b.source.includes('Enhancement') && b.source.includes('AH')
         );
+        expect(multBonus).toBeDefined();
         expect(multBonus?.source).not.toContain('(x');
-
-        // The retriggered card should show in bonus tracking
-        const retriggerBonus = result.appliedBonuses.find(b =>
-          b.source.includes('Retrigger')
-        );
-        expect(retriggerBonus).toBeDefined();
+        expect(multBonus?.value).toBe(4);
       });
     });
 
@@ -836,9 +841,10 @@ describe('Card Enhancements', () => {
 
         const result = calculateScore(handResult);
 
-        // chipTotal = 10 + (7*2) + (7*2) + 10 = 10 + 14 + 14 + 10 = 48
-        expect(result.chipTotal).toBe(48);
-        expect(result.finalScore).toBe(48 * 2);
+        // chipTotal = pair cards: 7 + 7 = 14 (retrigger doesn't affect chip values)
+        // multTotal = HAND_MULTIPLIERS.pair = 2
+        expect(result.chipTotal).toBe(14);
+        expect(result.finalScore).toBe(14 * 2); // 28
       });
 
       it('should work with retrigger and external bonuses', () => {
@@ -853,12 +859,12 @@ describe('Card Enhancements', () => {
 
         const result = calculateScore(handResult, bonuses);
 
-        // chipTotal = 5 + (11 * 3) = 38
+        // chipTotal = 11 (retrigger doesn't affect chip values)
         // multTotal = (1 + 5) * 2 = 12
-        // finalScore = 38 * 12 = 456
-        expect(result.chipTotal).toBe(38);
+        // finalScore = 11 * 12 = 132
+        expect(result.chipTotal).toBe(11);
         expect(result.multTotal).toBe(12);
-        expect(result.finalScore).toBe(456);
+        expect(result.finalScore).toBe(132);
       });
 
       it('should handle full house with mixed enhancements including retrigger', () => {
@@ -873,12 +879,13 @@ describe('Card Enhancements', () => {
 
         const result = calculateScore(handResult);
 
-        // chipTotal = 40 + (11*2) + 11 + 11 + (10+30) + 10 = 40 + 22 + 11 + 11 + 40 + 10 = 134
-        // multTotal = 4 + 4 = 8
-        // finalScore = 134 * 8 = 1072
-        expect(result.chipTotal).toBe(134);
-        expect(result.multTotal).toBe(8);
-        expect(result.finalScore).toBe(1072);
+        // chipTotal = all cards: 11 + 11 + 11 + (10+30) + 10 = 83 (no baseChips)
+        // multTotal = HAND_MULTIPLIERS.full_house(13) + 4 = 17
+        // (mult:4 on A diamonds, triggerCount=1 since it has mult not retrigger)
+        // finalScore = 83 * 17 = 1411
+        expect(result.chipTotal).toBe(83);
+        expect(result.multTotal).toBe(17);
+        expect(result.finalScore).toBe(1411);
       });
     });
   });

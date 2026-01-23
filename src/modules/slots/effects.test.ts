@@ -93,7 +93,7 @@ describe('effects', () => {
 
       const effects = calculateEffects(symbols, combo);
 
-      expect(effects.instant.gold).toBe(25);
+      expect(effects.instant.gold).toBe(50);
       expect(effects.instant.chips).toBe(0);
     });
 
@@ -102,10 +102,10 @@ describe('effects', () => {
 
       const effects = calculateEffects(symbols, null);
 
-      // card gives +1 extraDraw, gold gives +5 gold, target gives +5 safeZone
+      // card gives +1 extraDraw, gold gives +10 gold, target gives +10 safeZone
       expect(effects.cardBonus.extraDraw).toBe(1);
-      expect(effects.instant.gold).toBe(5);
-      expect(effects.rouletteBonus.safeZoneBonus).toBe(5);
+      expect(effects.instant.gold).toBe(10);
+      expect(effects.rouletteBonus.safeZoneBonus).toBe(10);
     });
 
     it('should handle skull penalties', () => {
@@ -124,7 +124,7 @@ describe('effects', () => {
 
       // wild has no individual effect
       expect(effects.cardBonus.extraDraw).toBe(1); // only card
-      expect(effects.instant.gold).toBe(5); // only gold
+      expect(effects.instant.gold).toBe(10); // only gold
     });
 
     it('should return jackpot effects for star triple', () => {
@@ -133,10 +133,10 @@ describe('effects', () => {
 
       const effects = calculateEffects(symbols, combo);
 
-      expect(effects.instant.gold).toBe(50);
-      expect(effects.instant.chips).toBe(100);
-      expect(effects.cardBonus.extraDraw).toBe(3);
-      expect(effects.cardBonus.scoreMultiplier).toBe(2);
+      expect(effects.instant.gold).toBe(100);
+      expect(effects.instant.chips).toBe(200);
+      expect(effects.cardBonus.extraDraw).toBe(6);
+      expect(effects.cardBonus.scoreMultiplier).toBe(4);
     });
 
     it('should return skull triple effects', () => {

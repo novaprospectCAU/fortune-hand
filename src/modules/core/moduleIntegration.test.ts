@@ -277,16 +277,16 @@ describe('Poker Module Integration', () => {
         handType: 'pair' as const,
         rank: 14,
         scoringCards: [createCard('A', 'hearts'), createCard('A', 'diamonds')],
-        baseChips: 10,
+        baseChips: 0,
         baseMult: 2,
       };
 
       const score = calculateScore(handResult, []);
 
-      // baseChips (10) + card chips (11 + 11) = 32
-      // baseMult = 2
-      // 32 * 2 = 64
-      expect(score.finalScore).toBe(64);
+      // pair card sum = 11 + 11 = 22
+      // HAND_MULTIPLIERS.pair = 2
+      // 22 * 2 = 44
+      expect(score.finalScore).toBe(44);
     });
 
     it('should apply chip bonuses', () => {
@@ -294,7 +294,7 @@ describe('Poker Module Integration', () => {
         handType: 'pair' as const,
         rank: 14,
         scoringCards: [createCard('A', 'hearts'), createCard('A', 'diamonds')],
-        baseChips: 10,
+        baseChips: 0,
         baseMult: 2,
       };
 
@@ -303,8 +303,8 @@ describe('Poker Module Integration', () => {
       ];
 
       const score = calculateScore(handResult, bonuses);
-      // (10 + 22 + 20) * 2 = 104
-      expect(score.finalScore).toBe(104);
+      // (22 + 20) * 2 = 84
+      expect(score.finalScore).toBe(84);
     });
 
     it('should apply mult bonuses', () => {
@@ -312,7 +312,7 @@ describe('Poker Module Integration', () => {
         handType: 'pair' as const,
         rank: 14,
         scoringCards: [createCard('A', 'hearts'), createCard('A', 'diamonds')],
-        baseChips: 10,
+        baseChips: 0,
         baseMult: 2,
       };
 
@@ -321,8 +321,8 @@ describe('Poker Module Integration', () => {
       ];
 
       const score = calculateScore(handResult, bonuses);
-      // 32 * (2 + 3) = 160
-      expect(score.finalScore).toBe(160);
+      // 22 * (2 + 3) = 110
+      expect(score.finalScore).toBe(110);
     });
 
     it('should apply xmult bonuses', () => {
@@ -330,7 +330,7 @@ describe('Poker Module Integration', () => {
         handType: 'pair' as const,
         rank: 14,
         scoringCards: [createCard('A', 'hearts'), createCard('A', 'diamonds')],
-        baseChips: 10,
+        baseChips: 0,
         baseMult: 2,
       };
 
@@ -339,8 +339,8 @@ describe('Poker Module Integration', () => {
       ];
 
       const score = calculateScore(handResult, bonuses);
-      // 32 * (2 * 2) = 128
-      expect(score.finalScore).toBe(128);
+      // 22 * (2 * 2) = 88
+      expect(score.finalScore).toBe(88);
     });
   });
 });
