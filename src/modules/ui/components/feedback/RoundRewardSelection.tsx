@@ -7,12 +7,12 @@
 
 import React, { useState, useMemo } from 'react';
 import { motion } from 'framer-motion';
-import { useI18n } from '../../i18n';
+import { useI18n, type TranslationKey } from '../../i18n';
 import { useGameStore } from '@/modules/core/store';
 import type { TreasureChestRewardType } from '@/types/interfaces';
 
 // Reward type display info
-const REWARD_TYPE_INFO: Record<TreasureChestRewardType, { emoji: string; nameKey: string }> = {
+const REWARD_TYPE_INFO: Record<TreasureChestRewardType, { emoji: string; nameKey: TranslationKey }> = {
   hand_upgrades: { emoji: '🃏', nameKey: 'chestReward_handUpgrades' },
   high_rarity_item: { emoji: '💰', nameKey: 'chestReward_highRarity' },
   remove_cards: { emoji: '🗑️', nameKey: 'chestReward_removeCards' },
@@ -123,7 +123,7 @@ function TreasureChest() {
               {REWARD_TYPE_INFO[currentReward.type]?.emoji ?? '❓'}
             </div>
             <div className={`text-xl font-bold ${isJackpot ? 'text-yellow-400' : 'text-white'}`}>
-              {t(REWARD_TYPE_INFO[currentReward.type]?.nameKey as any)}
+              {t(REWARD_TYPE_INFO[currentReward.type]?.nameKey)}
             </div>
           </motion.div>
         )}
